@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Données brutes (téléchargées, jamais versionnées)
+data/raw/
+data/interim/
+
+# Artefacts lourds régénérables
+results/cache/
+mlruns/
+mlartifacts/
+.dagster/
+dagster_home/
+
+# Quarto
+site/_site/
+site/.quarto/
+/.quarto/
+
+# Local
+.env
+.env.*
+CLAUDE.local.md
+.claude/settings.local.json
