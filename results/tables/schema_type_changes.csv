@@ -1,0 +1,7 @@
+change
+green RatecodeID : float (2020-12) -> integer (2024-01)
+green passenger_count : float (2020-12) -> integer (2024-01)
+green payment_type : float (2020-12) -> integer (2024-01)
+green trip_type : float (2020-12) -> integer (2024-01)
+yellow passenger_count : float (2020-12) -> integer (2024-01)
+yellow RatecodeID : float (2020-12) -> integer (2024-01)
