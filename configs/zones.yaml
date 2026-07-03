@@ -1,0 +1,303 @@
+# 60 zones les plus actives en 2019 (jaune + vert), liste figée (SPEC, section 2).
+# cbd : part 2025 des courses avec cbd_congestion_fee > 0 supérieure à 0.8.
+zones:
+- zone: 7
+  borough: Queens
+  name: Astoria
+  cbd_share_2025: 0.2729
+  cbd: false
+- zone: 13
+  borough: Manhattan
+  name: Battery Park City
+  cbd_share_2025: 0.9569
+  cbd: true
+- zone: 24
+  borough: Manhattan
+  name: Bloomingdale
+  cbd_share_2025: 0.2674
+  cbd: false
+- zone: 33
+  borough: Brooklyn
+  name: Brooklyn Heights
+  cbd_share_2025: 0.4272
+  cbd: false
+- zone: 41
+  borough: Manhattan
+  name: Central Harlem
+  cbd_share_2025: 0.2278
+  cbd: false
+- zone: 42
+  borough: Manhattan
+  name: Central Harlem North
+  cbd_share_2025: 0.2533
+  cbd: false
+- zone: 43
+  borough: Manhattan
+  name: Central Park
+  cbd_share_2025: 0.5913
+  cbd: false
+- zone: 48
+  borough: Manhattan
+  name: Clinton East
+  cbd_share_2025: 0.9663
+  cbd: true
+- zone: 50
+  borough: Manhattan
+  name: Clinton West
+  cbd_share_2025: 0.9519
+  cbd: true
+- zone: 65
+  borough: Brooklyn
+  name: Downtown Brooklyn/MetroTech
+  cbd_share_2025: 0.3277
+  cbd: false
+- zone: 68
+  borough: Manhattan
+  name: East Chelsea
+  cbd_share_2025: 0.9712
+  cbd: true
+- zone: 74
+  borough: Manhattan
+  name: East Harlem North
+  cbd_share_2025: 0.1466
+  cbd: false
+- zone: 75
+  borough: Manhattan
+  name: East Harlem South
+  cbd_share_2025: 0.2446
+  cbd: false
+- zone: 79
+  borough: Manhattan
+  name: East Village
+  cbd_share_2025: 0.9767
+  cbd: true
+- zone: 82
+  borough: Queens
+  name: Elmhurst
+  cbd_share_2025: 0.0621
+  cbd: false
+- zone: 87
+  borough: Manhattan
+  name: Financial District North
+  cbd_share_2025: 0.9682
+  cbd: true
+- zone: 88
+  borough: Manhattan
+  name: Financial District South
+  cbd_share_2025: 0.9363
+  cbd: true
+- zone: 90
+  borough: Manhattan
+  name: Flatiron
+  cbd_share_2025: 0.9718
+  cbd: true
+- zone: 95
+  borough: Queens
+  name: Forest Hills
+  cbd_share_2025: 0.0594
+  cbd: false
+- zone: 97
+  borough: Brooklyn
+  name: Fort Greene
+  cbd_share_2025: 0.2442
+  cbd: false
+- zone: 100
+  borough: Manhattan
+  name: Garment District
+  cbd_share_2025: 0.9584
+  cbd: true
+- zone: 107
+  borough: Manhattan
+  name: Gramercy
+  cbd_share_2025: 0.9721
+  cbd: true
+- zone: 113
+  borough: Manhattan
+  name: Greenwich Village North
+  cbd_share_2025: 0.9767
+  cbd: true
+- zone: 114
+  borough: Manhattan
+  name: Greenwich Village South
+  cbd_share_2025: 0.9766
+  cbd: true
+- zone: 125
+  borough: Manhattan
+  name: Hudson Sq
+  cbd_share_2025: 0.972
+  cbd: true
+- zone: 129
+  borough: Queens
+  name: Jackson Heights
+  cbd_share_2025: 0.1119
+  cbd: false
+- zone: 132
+  borough: Queens
+  name: JFK Airport
+  cbd_share_2025: 0.3692
+  cbd: false
+- zone: 137
+  borough: Manhattan
+  name: Kips Bay
+  cbd_share_2025: 0.9524
+  cbd: true
+- zone: 138
+  borough: Queens
+  name: LaGuardia Airport
+  cbd_share_2025: 0.5016
+  cbd: false
+- zone: 140
+  borough: Manhattan
+  name: Lenox Hill East
+  cbd_share_2025: 0.4609
+  cbd: false
+- zone: 141
+  borough: Manhattan
+  name: Lenox Hill West
+  cbd_share_2025: 0.4992
+  cbd: false
+- zone: 142
+  borough: Manhattan
+  name: Lincoln Square East
+  cbd_share_2025: 0.594
+  cbd: false
+- zone: 143
+  borough: Manhattan
+  name: Lincoln Square West
+  cbd_share_2025: 0.5357
+  cbd: false
+- zone: 144
+  borough: Manhattan
+  name: Little Italy/NoLiTa
+  cbd_share_2025: 0.9734
+  cbd: true
+- zone: 148
+  borough: Manhattan
+  name: Lower East Side
+  cbd_share_2025: 0.9734
+  cbd: true
+- zone: 151
+  borough: Manhattan
+  name: Manhattan Valley
+  cbd_share_2025: 0.2393
+  cbd: false
+- zone: 158
+  borough: Manhattan
+  name: Meatpacking/West Village West
+  cbd_share_2025: 0.9739
+  cbd: true
+- zone: 161
+  borough: Manhattan
+  name: Midtown Center
+  cbd_share_2025: 0.9712
+  cbd: true
+- zone: 162
+  borough: Manhattan
+  name: Midtown East
+  cbd_share_2025: 0.9725
+  cbd: true
+- zone: 163
+  borough: Manhattan
+  name: Midtown North
+  cbd_share_2025: 0.9692
+  cbd: true
+- zone: 164
+  borough: Manhattan
+  name: Midtown South
+  cbd_share_2025: 0.971
+  cbd: true
+- zone: 166
+  borough: Manhattan
+  name: Morningside Heights
+  cbd_share_2025: 0.2597
+  cbd: false
+- zone: 170
+  borough: Manhattan
+  name: Murray Hill
+  cbd_share_2025: 0.9679
+  cbd: true
+- zone: 186
+  borough: Manhattan
+  name: Penn Station/Madison Sq West
+  cbd_share_2025: 0.9655
+  cbd: true
+- zone: 211
+  borough: Manhattan
+  name: SoHo
+  cbd_share_2025: 0.9762
+  cbd: true
+- zone: 229
+  borough: Manhattan
+  name: Sutton Place/Turtle Bay North
+  cbd_share_2025: 0.9733
+  cbd: true
+- zone: 230
+  borough: Manhattan
+  name: Times Sq/Theatre District
+  cbd_share_2025: 0.9597
+  cbd: true
+- zone: 231
+  borough: Manhattan
+  name: TriBeCa/Civic Center
+  cbd_share_2025: 0.9621
+  cbd: true
+- zone: 233
+  borough: Manhattan
+  name: UN/Turtle Bay South
+  cbd_share_2025: 0.9679
+  cbd: true
+- zone: 234
+  borough: Manhattan
+  name: Union Sq
+  cbd_share_2025: 0.9772
+  cbd: true
+- zone: 236
+  borough: Manhattan
+  name: Upper East Side North
+  cbd_share_2025: 0.3412
+  cbd: false
+- zone: 237
+  borough: Manhattan
+  name: Upper East Side South
+  cbd_share_2025: 0.526
+  cbd: false
+- zone: 238
+  borough: Manhattan
+  name: Upper West Side North
+  cbd_share_2025: 0.2657
+  cbd: false
+- zone: 239
+  borough: Manhattan
+  name: Upper West Side South
+  cbd_share_2025: 0.3631
+  cbd: false
+- zone: 244
+  borough: Manhattan
+  name: Washington Heights South
+  cbd_share_2025: 0.3007
+  cbd: false
+- zone: 246
+  borough: Manhattan
+  name: West Chelsea/Hudson Yards
+  cbd_share_2025: 0.9602
+  cbd: true
+- zone: 249
+  borough: Manhattan
+  name: West Village
+  cbd_share_2025: 0.9784
+  cbd: true
+- zone: 261
+  borough: Manhattan
+  name: World Trade Center
+  cbd_share_2025: 0.9401
+  cbd: true
+- zone: 262
+  borough: Manhattan
+  name: Yorkville East
+  cbd_share_2025: 0.3838
+  cbd: false
+- zone: 263
+  borough: Manhattan
+  name: Yorkville West
+  cbd_share_2025: 0.3502
+  cbd: false
