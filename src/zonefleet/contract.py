@@ -72,17 +72,21 @@ def validate_schema(schema: pa.Schema, service: str, month: str, contract: dict)
     names = list(schema.names)
     rep.types = {n: type_family(schema.field(n).type) for n in names}
     pickup = contract["services"][service]["pickup_column"]
-    required = {"pickup_datetime": pickup, "PULocationID": "PULocationID", "DOLocationID": "DOLocationID"}
+    required = {
+        "pickup_datetime": pickup,
+        "PULocationID": "PULocationID",
+        "DOLocationID": "DOLocationID",
+    }
     for key, col in required.items():
         expected = contract["required"][key]["type"]
         if col not in names:
             rep.violations.append(f"colonne requise absente : {col}")
-        elif rep.types[col] != expected:
-            # Un entier stocké en flottant reste exploitable, un autre type non.
-            if not (expected == "integer" and rep.types[col] == "float"):
-                rep.violations.append(f"{col} : type {rep.types[col]} au lieu de {expected}")
+        # Un entier stocké en flottant reste exploitable, un autre type non.
+        elif rep.types[col] != expected and (expected, rep.types[col]) != ("integer", "float"):
+            rep.violations.append(f"{col} : type {rep.types[col]} au lieu de {expected}")
     known = {c.lower() for c in contract["known_optional"]}
-    known |= {pickup.lower(), pickup.lower().replace("pickup", "dropoff"), "pulocationid", "dolocationid"}
+    dropoff = pickup.lower().replace("pickup", "dropoff")
+    known |= {pickup.lower(), dropoff, "pulocationid", "dolocationid"}
     breaks = {b["column"]: b for b in contract.get("known_breaks", [])}
     for n in names:
         if n in breaks and month >= breaks[n]["since"]:
@@ -116,6 +120,7 @@ def type_changes(reports: list[ContractReport]) -> list[str]:
         for col, fam in r.types.items():
             key = (r.service, col.lower())
             if key in last and last[key][0] != fam and "null" not in (fam, last[key][0]):
-                out.append(f"{r.service} {col} : {last[key][0]} ({last[key][1]}) -> {fam} ({r.month})")
+                prev, since = last[key]
+                out.append(f"{r.service} {col} : {prev} ({since}) -> {fam} ({r.month})")
             last[key] = (fam, r.month)
     return out
