@@ -1,0 +1,49 @@
+# Data contract des fichiers TLC consommés par le pipeline.
+# Un fichier qui viole une règle `required` bloque l'agrégation ; une colonne inconnue
+# ou un type qui change est journalisé comme rupture de schéma (non bloquant).
+version: 1
+services:
+  yellow:
+    pickup_column: tpep_pickup_datetime
+  green:
+    pickup_column: lpep_pickup_datetime
+required:
+  pickup_datetime:
+    type: timestamp
+  PULocationID:
+    type: integer
+    min: 1
+    max: 265
+  DOLocationID:
+    type: integer
+    min: 1
+    max: 265
+known_optional:
+  - VendorID
+  - passenger_count
+  - trip_distance
+  - RatecodeID
+  - store_and_fwd_flag
+  - payment_type
+  - fare_amount
+  - extra
+  - mta_tax
+  - tip_amount
+  - tolls_amount
+  - improvement_surcharge
+  - total_amount
+  - congestion_surcharge
+  - ehail_fee
+  - trip_type
+  - airport_fee
+# Ruptures connues et datées : documentées pour ne pas lever de fausse alerte.
+known_breaks:
+  - column: Airport_fee
+    note: "renommage de airport_fee (casse), fichiers 2023+ ; type null avant 2021"
+    since: "2023-01"
+  - column: cbd_congestion_fee
+    note: "nouvelle colonne liée à la tarification de congestion du 5 janvier 2025"
+    since: "2025-01"
+# Plage plausible du nombre de prises en charge par zone et par heure (contrôle du panel).
+panel:
+  max_pickups_per_zone_hour: 3000
