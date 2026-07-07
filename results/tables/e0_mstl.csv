@@ -1,0 +1,7 @@
+split,model,mae,n
+covid,lightgbm,37.0984,23424
+covid,seasonal_naive,49.8254,23424
+covid,mstl,45.9798,23424
+congestion,lightgbm,25.0966,23424
+congestion,seasonal_naive,32.9885,23424
+congestion,mstl,28.3971,23424
