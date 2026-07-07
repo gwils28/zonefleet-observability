@@ -1,0 +1,5 @@
+policy,target_day,decision,delay_days,false_alert_days_before
+P1_drift,2020-03-13,2020-03-12,-1.0,71
+P2_dle,2020-03-23,2020-03-22,9.0,0
+P3_drift_and_dle,2020-03-23,2020-03-22,9.0,0
+P4_realized,2020-03-15,2020-05-14,62.0,0
