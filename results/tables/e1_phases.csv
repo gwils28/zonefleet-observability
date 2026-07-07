@@ -1,0 +1,13 @@
+metric,phase,estimated,realized,ratio_est_real,corr_daily
+mae_count,avant (janv.-12 mars),22.7748,20.6003,1.1056,0.3643
+mae_count,choc (13 mars-12 avril),14.1417,25.7073,0.5501,0.9793
+mae_count,plancher (13 avril-30 juin),6.1499,3.4852,1.7646,0.734
+mae_log,avant (janv.-12 mars),0.2175,0.202,1.0765,0.4375
+mae_log,choc (13 mars-12 avril),0.4005,1.0956,0.3655,0.6001
+mae_log,plancher (13 avril-30 juin),0.372,0.5937,0.6266,0.7143
+rmse_count,avant (janv.-12 mars),41.9342,35.5093,1.1809,0.3172
+rmse_count,choc (13 mars-12 avril),31.7922,35.9173,0.8852,0.9161
+rmse_count,plancher (13 avril-30 juin),22.2974,4.6959,4.7483,0.0701
+rmse_log,avant (janv.-12 mars),0.3123,0.2867,1.0896,0.4255
+rmse_log,choc (13 mars-12 avril),0.5244,1.2194,0.4301,0.5209
+rmse_log,plancher (13 avril-30 juin),0.5263,0.7638,0.6891,0.6988
