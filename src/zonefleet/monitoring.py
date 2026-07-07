@@ -108,3 +108,72 @@ def realized_performance(df: pd.DataFrame, scale: str = "count", freq: str = CHU
     )
     out["metric"] = out["metric"] + f"_{scale}"
     return out
+
+
+def univariate_drift(
+    reference: pd.DataFrame,
+    analysis: pd.DataFrame,
+    columns: list[str] | None = None,
+    methods: tuple[str, ...] = ("kolmogorov_smirnov", "wasserstein"),
+    chunk_period: str = CHUNK,
+) -> pd.DataFrame:
+    """Dérive univariée (KS, Wasserstein) par colonne et par chunk."""
+    columns = columns or DRIFT_FEATURES
+    calc = nml.UnivariateDriftCalculator(
+        column_names=columns,
+        treat_as_numerical=columns,
+        timestamp_column_name=TS,
+        continuous_methods=list(methods),
+        chunk_period=chunk_period,
+    )
+    calc.fit(reference[[TS, *columns]])
+    res = calc.calculate(analysis[[TS, *columns]]).filter(period="analysis").to_df()
+    dates = pd.to_datetime(res[("chunk", "chunk", "start_date")]).dt.normalize().to_numpy()
+    rows = []
+    for col in columns:
+        for m in methods:
+            rows.append(
+                pd.DataFrame(
+                    {
+                        "date": dates,
+                        "feature": col,
+                        "method": m,
+                        "value": res[(col, m, "value")].to_numpy(),
+                        "threshold": res[(col, m, "upper_threshold")].to_numpy(),
+                        "alert": res[(col, m, "alert")].astype(bool).to_numpy(),
+                    }
+                )
+            )
+    return pd.concat(rows, ignore_index=True)
+
+
+def multivariate_drift(
+    reference: pd.DataFrame,
+    analysis: pd.DataFrame,
+    columns: list[str] | None = None,
+    chunk_period: str = CHUNK,
+    n_components: float = 0.65,
+) -> pd.DataFrame:
+    """Erreur de reconstruction PCA par chunk (NannyML DataReconstructionDriftCalculator).
+
+    La PCA, ajustée sur la référence standardisée, garde `n_components` de la variance ;
+    une hausse de l'erreur de reconstruction signale que la structure jointe des entrées
+    a changé, même si chaque marginale bouge peu.
+    """
+    columns = columns or DRIFT_FEATURES
+    calc = nml.DataReconstructionDriftCalculator(
+        column_names=columns,
+        timestamp_column_name=TS,
+        chunk_period=chunk_period,
+        n_components=n_components,
+    )
+    calc.fit(reference[[TS, *columns]])
+    flat = flatten(calc.calculate(analysis[[TS, *columns]]).filter(period="analysis").to_df())
+    return pd.DataFrame(
+        {
+            "date": _dates(flat),
+            "value": flat["reconstruction_error__value"],
+            "threshold": flat["reconstruction_error__upper_threshold"],
+            "alert": flat["reconstruction_error__alert"].astype(bool),
+        }
+    )
