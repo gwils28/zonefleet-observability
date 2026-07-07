@@ -13,3 +13,5 @@ test:        ## Suite de tests rapide
 lint:
 	uv run ruff check .
 check: lint test
+e0:          ## E0 : qualité du modèle surveillé (≈ 6 min, MSTL inclus)
+	uv run python -m zonefleet.experiments.e0_model
