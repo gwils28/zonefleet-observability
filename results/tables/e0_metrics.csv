@@ -1,0 +1,9 @@
+split,period,model,mae,rmse,smape,mase,pinball_mean,coverage_80
+covid,analysis,lightgbm,14.0411,31.7568,61.5701,0.5329,4.762,0.5674
+covid,analysis,seasonal_naive,17.086,,53.4659,0.6485,,
+covid,reference,lightgbm,22.7361,41.1819,20.4841,0.863,7.5037,0.715
+covid,reference,seasonal_naive,31.0804,,26.4985,1.1797,,
+congestion,analysis,lightgbm,14.2652,26.7526,29.9869,0.9054,4.6427,0.7517
+congestion,analysis,seasonal_naive,18.0303,,35.8874,1.1444,,
+congestion,reference,lightgbm,14.8801,28.0422,33.4578,0.9445,4.8711,0.7182
+congestion,reference,seasonal_naive,19.6637,,40.5478,1.2481,,
