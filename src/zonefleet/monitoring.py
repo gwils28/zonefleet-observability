@@ -177,3 +177,56 @@ def multivariate_drift(
             "alert": flat["reconstruction_error__alert"].astype(bool),
         }
     )
+
+
+def psi(reference: np.ndarray, current: np.ndarray, bins: int = 10, eps: float = 1e-4) -> float:
+    """Population Stability Index, bacs définis par les quantiles de la référence.
+
+    Repères usuels : < 0,1 stable ; 0,1 à 0,25 dérive modérée ; > 0,25 dérive forte.
+    """
+    reference, current = np.asarray(reference, float), np.asarray(current, float)
+    edges = np.unique(np.quantile(reference, np.linspace(0, 1, bins + 1)))
+    edges[0], edges[-1] = -np.inf, np.inf
+    r = np.histogram(reference, edges)[0] / len(reference)
+    c = np.histogram(current, edges)[0] / max(len(current), 1)
+    r, c = np.clip(r, eps, None), np.clip(c, eps, None)
+    return float(np.sum((c - r) * np.log(c / r)))
+
+
+def daily_psi(
+    reference: pd.DataFrame, analysis: pd.DataFrame, columns: list[str], bins: int = 10
+) -> pd.DataFrame:
+    """PSI journalier de chaque colonne contre la référence entière."""
+    rows = []
+    for day, d in analysis.groupby(analysis[TS].dt.floor(CHUNK)):
+        for col in columns:
+            rows.append({"date": day, "feature": col, "psi": psi(reference[col], d[col], bins)})
+    return pd.DataFrame(rows)
+
+
+def prediction_drift(reference: pd.DataFrame, analysis: pd.DataFrame) -> pd.DataFrame:
+    """Dérive de la distribution des prévisions (médiane, échelle log) : KS et Wasserstein."""
+    ref = reference.assign(pred_log=np.log1p(reference["q50"]))
+    an = analysis.assign(pred_log=np.log1p(analysis["q50"]))
+    return univariate_drift(ref, an, columns=["pred_log"])
+
+
+def monitor(
+    reference: pd.DataFrame, analysis: pd.DataFrame, seed: int = 0
+) -> dict[str, pd.DataFrame]:
+    """Exécute toutes les briques et renvoie un tableau par signal."""
+    est = pd.concat(
+        [estimate_performance(reference, analysis, s, seed=seed) for s in ("count", "log")],
+        ignore_index=True,
+    )
+    real = pd.concat([realized_performance(analysis, s) for s in ("count", "log")])
+    perf = est.merge(real, on=["date", "metric"], how="left")
+    return {
+        "performance": perf,
+        "univariate": univariate_drift(reference, analysis),
+        "multivariate": multivariate_drift(reference, analysis),
+        "prediction": prediction_drift(reference, analysis),
+        "psi": daily_psi(
+            reference, analysis, ["lag_24", "lag_168", "roll_mean_168", "temperature_2m"]
+        ),
+    }
