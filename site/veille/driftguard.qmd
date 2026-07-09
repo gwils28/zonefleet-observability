@@ -1,0 +1,54 @@
+---
+title: "DriftGuard : détecter et réparer la dérive en supply chain"
+subtitle: "Veille scientifique · Alam, Rahman, Sadeqa, arXiv:2601.08928 (janvier 2026)"
+description: "Lecture critique d'un cadre hiérarchique de détection et de remédiation du concept drift évalué sur M5 : ce qui est transposable à ZoneFleet, ce qui ne l'est pas."
+---
+
+::: {.callout-note appearance="minimal"}
+**Référence** : S. Alam, M. A. Rahman, B. Sadeqa, *DriftGuard: A Hierarchical Framework
+for Concept Drift Detection and Remediation in Supply Chain Forecasting*,
+[arXiv:2601.08928](https://arxiv.org/abs/2601.08928), v1 du 13 janvier 2026.
+Faits relevés dans `docs/notes/veille_fiches.md`.
+:::
+
+## Le problème posé
+
+Les modèles de prévision supply chain se dégradent quand le monde change (promotions,
+préférences, ruptures), et cette dégradation est **silencieuse** : stocks vides ou
+surstocks, sans qu'aucune alerte système ne se déclenche. La pratique la plus courante,
+d'après les auteurs, reste la surveillance manuelle et le réentraînement planifié tous
+les trois à six mois.
+
+C'est le même constat que celui de ZoneFleet, transposé de l'entrepôt à la flotte : un
+véhicule mal positionné est un stock mal placé.
+
+## L'architecture en cinq modules
+
+```{mermaid}
+flowchart TB
+  M1["1. Prévision de base<br/>XGBoost retenu (WMAPE 0,048)<br/>réconciliation bottom-up"] --> M3
+  M2["2. Scénarios de dérive<br/>semi-synthétiques injectés"] --> M3
+  M3["3. Détection par ensemble<br/>4 détecteurs, vote >= 3/4"] --> M4
+  M4["4. Diagnostic SHAP<br/>écart des contributions,<br/>agrégé SKU, magasin, région"] --> M5
+  M5["5. Réentraînement sensible au coût<br/>fenêtre {30, 60, 90, 180} j<br/>top-K SKU seulement"]
+```
+
+### Module 3 : quatre détecteurs, un vote
+
+| Détecteur | Ce qu'il regarde | Besoin de labels ? |
+|---|---|---|
+| Ratio de RMSE glissant | erreur récente / erreur de base | **oui** |
+| KS (continu) et PSI (catégoriel) | distribution des features | non |
+| Autoencodeur | erreur de reconstruction des résidus | **oui** (résidus) |
+| CUSUM | rupture dans la série des résidus | **oui** (résidus) |
+
+La dérive est signalée quand **au moins trois détecteurs sur quatre** sont d'accord.
+
+::: {.callout-warning}
+## Une hypothèse cachée
+Trois des quatre détecteurs travaillent sur l'**erreur** ou les **résidus**, donc sur des
+labels. Le vote majoritaire suppose que la vérité terrain arrive vite (données
+journalières M5, où la vente du jour est connue le soir). Dans ZoneFleet, la vérité
+arrive avec **60 jours** de retard : trois voix sur quatre seraient muettes pendant toute
+la fenêtre aveugle. C'est exactement le trou que DLE essaie de combler.
+:::
