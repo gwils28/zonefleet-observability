@@ -91,3 +91,81 @@ change brutalement (confinement, nouvelle taxe), les lags décrivent **encore le
 d'avant** pendant une à deux semaines : les entrées semblent normales, la demande ne
 l'est plus. C'est la définition opérationnelle d'un concept drift, vu depuis le modèle.
 :::
+
+## Dérive multivariée : la reconstruction PCA
+
+Les tests univariés (KS, Wasserstein, PSI) regardent chaque feature isolément. Ils sont
+aveugles à un changement de **structure jointe** : deux variables qui restaient corrélées
+et qui cessent de l'être, sans que leurs marginales bougent. NannyML répond par la
+reconstruction de données :
+
+```{mermaid}
+flowchart LR
+  A["Chunk d'analysis"] --> B["Imputation, encodage fréquentiel, standardisation (paramètres de la référence)"]
+  B --> C["Projection PCA (ajustée sur la référence, 65 % de variance)"]
+  C --> D["PCA inverse : retour à l'espace d'origine"]
+  D --> E["Distance euclidienne original / reconstruit"]
+  E --> F["Moyenne par chunk = erreur de reconstruction"]
+  F --> G{"> moyenne référence + 3 écarts-types ?"}
+  G -- oui --> H["alerte"]
+  G -- non --> I["ok"]
+```
+
+L'exemple « papillon » de la documentation est parlant : une rotation de 90 degrés du
+nuage de points change le signe d'une corrélation, aucun test KS ne bouge, l'erreur de
+reconstruction explose.
+
+### La limite que nous avons trouvée (et testée)
+
+L'inverse est vrai aussi, et la documentation ne le dit pas : **un déplacement le long
+d'une direction principale n'augmente pas l'erreur de reconstruction**. La PCA « sait »
+reconstruire tout point situé sur son sous-espace, même très loin du nuage de référence.
+
+Or un choc de demande déplace **tous les lags ensemble** (lag 24, 48, 168, moyennes
+glissantes), c'est-à-dire précisément le long de la première composante d'un panel de
+séries fortement autocorrélées. Le test
+`test_pca_reconstruction_sees_broken_correlation_but_not_shift_along_it` fige ce
+comportement, et c'est pourquoi le signal de dérive de ce projet combine PCA **et** PSI
+(voir [dérive multivariée](../concepts/derive-multivariee.qmd)).
+
+## Ce que NannyML ne fait pas
+
+- **Il ne voit pas le concept drift pur.** C'est écrit, et c'est logique : sans labels,
+  un changement de P(y | X) à P(X) constant ne laisse aucune trace dans les entrées.
+- **Il ne choisit pas la métrique pour vous.** Pendant le COVID, la MAE en courses
+  *baisse* (le volume s'effondre) alors que l'erreur relative triple. Ce projet surveille
+  donc deux échelles : `count` et `log` (≈ erreur relative), voir
+  [métriques](../concepts/metriques.qmd).
+- **Il ne décide pas.** Un seuil à 3 écarts-types sur chaque signal, sans persistance ni
+  combinaison, produit une alerte permanente dès que la saison change : la politique
+  d'alerte est une décision d'architecture, traitée dans
+  [E4](../experiences/e4-backtest.qmd) et le [system design](../system-design.qmd).
+
+## Comment le projet l'utilise
+
+| Brique | Classe NannyML | Fichier |
+|---|---|---|
+| Performance estimée (MAE, RMSE, deux échelles) | `DLE` | `src/zonefleet/monitoring.py::estimate_performance` |
+| Performance réalisée | calcul direct par chunk | `monitoring.py::realized_performance` |
+| Dérive univariée | `UnivariateDriftCalculator` (KS, Wasserstein) | `monitoring.py::univariate_drift` |
+| Dérive multivariée | `DataReconstructionDriftCalculator` | `monitoring.py::multivariate_drift` |
+| PSI | implémentation maison (bacs = quantiles de la référence) | `monitoring.py::psi` |
+
+Deux règles d'usage, apprises à nos dépens et inscrites dans `CLAUDE.md` :
+
+1. **La référence doit être hors échantillon pour le forecaster.** Sur les données
+   d'entraînement, le modèle se trompe moins qu'ailleurs ; le nanny model apprendrait une
+   carte d'erreurs trop optimiste.
+2. **La vérité terrain de l'analysis n'est jamais transmise à `estimate`.** Le test
+   `test_dle_never_sees_analysis_labels` remplace les labels par des `NaN` et vérifie que
+   l'estimation est inchangée.
+
+## À retenir
+
+::: {.callout-tip}
+DLE transforme la fenêtre aveugle en fenêtre **floue** : il voit les changements de
+régime qui déplacent le modèle vers des zones où il se trompait déjà davantage
+(covariate shift), pas ceux où il se met à se tromper pour de nouvelles raisons
+(concept drift). La compétence n'est pas de l'utiliser, c'est de savoir **quand ne pas
+le croire**.
+:::
