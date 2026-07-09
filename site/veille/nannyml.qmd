@@ -1,0 +1,93 @@
+---
+title: "NannyML : estimer la performance sans labels"
+subtitle: "Veille technologique · bibliothèque open-source de post-deployment data science"
+description: "Comment DLE estime l'erreur d'un modèle de régression sans vérité terrain, comment la reconstruction PCA détecte une dérive multivariée, et sous quelles hypothèses ces estimations tiennent."
+---
+
+::: {.callout-note appearance="minimal"}
+**Sources** : [dépôt NannyML](https://github.com/nannyml/nannyml) ·
+[doc, estimation de performance](https://nannyml.readthedocs.io/en/stable/how_it_works/performance_estimation.html) ·
+[doc, dérive multivariée](https://nannyml.readthedocs.io/en/stable/how_it_works/multivariate_drift.html).
+Version utilisée dans ce projet : **nannyml 0.13.1**. Les faits ci-dessous sont relevés
+dans `docs/notes/veille_fiches.md`.
+:::
+
+## Pourquoi c'est le cœur du problème
+
+Un forecaster de demande produit aujourd'hui la prévision de demain ; la demande réelle
+n'est connue qu'après la cible, et dans le cas TLC, publiée environ **deux mois plus
+tard**. Entre les deux s'étend une **fenêtre aveugle** pendant laquelle aucune métrique
+classique (MAE, MASE) n'est calculable. NannyML propose de remplir cette fenêtre avec une
+**performance estimée**, calculée à partir des seules entrées et prédictions.
+
+| Problème | Méthode NannyML | Ce qu'elle estime |
+|---|---|---|
+| Classification | CBPE (*Confidence-Based Performance Estimation*) | n'importe quelle métrique de classification, à partir des probabilités calibrées |
+| Régression | **DLE** (*Direct Loss Estimation*) | MAE, RMSE, MSE et métriques dérivées |
+| Dérive des entrées | Reconstruction PCA, classifieur de domaine, tests univariés | un score de dérive par chunk |
+
+Ce projet est une régression (nombre de courses par zone et par heure) : **DLE** est l'outil.
+
+## DLE pas à pas
+
+L'idée tient en une phrase : si le modèle surveillé se trompe plus dans certaines régions
+de l'espace des entrées que dans d'autres, un second modèle peut **apprendre où il se
+trompe**, puis prédire son erreur là où les labels manquent.
+
+```{mermaid}
+flowchart LR
+  subgraph REF["Référence (labels connus)"]
+    X1["features X"] --> F1["modèle surveillé f"]
+    F1 --> P1["prédiction f(X)"]
+    Y1["vérité y"] --> L1["perte |y - f(X)|"]
+    P1 --> L1
+  end
+  subgraph NANNY["Nanny model (LightGBM)"]
+    N["apprend : (X, f(X)) -> perte"]
+  end
+  X1 --> N
+  P1 --> N
+  L1 --> N
+  subgraph AN["Analysis (sans labels)"]
+    X2["features X"] --> F2["f"] --> P2["f(X)"]
+    X2 --> E["perte estimée par ligne"]
+    P2 --> E
+    E --> C["moyenne par chunk = MAE estimée"]
+  end
+  N -.-> E
+```
+
+1. **Sur la référence**, on calcule la perte de chaque observation : pour la MAE,
+   l'erreur absolue ; pour la RMSE, l'erreur au carré.
+2. On entraîne le **nanny model** (LightGBM, perte L2 par défaut) : entrées = features
+   et prédiction du modèle surveillé, cible = cette perte.
+3. **Sur l'analysis**, le nanny model prédit la perte de chaque ligne ; la moyenne par
+   chunk (ici, un jour) donne la MAE estimée ; pour la RMSE, on prend la racine de la
+   moyenne des erreurs carrées estimées.
+
+La prédiction du modèle surveillé est elle-même une entrée du nanny model : un forecaster
+qui prévoit 900 courses à Midtown se trompe en valeur absolue bien plus qu'un forecaster
+qui en prévoit 3 dans le Queens. C'est cette **hétéroscédasticité** que DLE exploite.
+
+### Les quatre hypothèses, et pourquoi la première compte le plus
+
+La documentation liste explicitement les conditions de validité :
+
+| # | Hypothèse | Si elle tombe |
+|---|---|---|
+| 1 | **Pas de concept drift** : P(y \| X) est stable | DLE « will not work under concept drift » : le nanny model a appris une carte des erreurs qui n'est plus la bonne |
+| 2 | Pas de covariate shift vers des régions **jamais vues** | le nanny model extrapole une erreur qu'il n'a jamais observée |
+| 3 | Bruit **hétéroscédastique** | sinon la vraie performance est constante, toute variation estimée est du bruit d'échantillonnage |
+| 4 | Échantillon assez grand par chunk | l'intervalle de confiance s'élargit, les alertes deviennent aléatoires |
+
+Ce projet transforme l'hypothèse 1 en **question expérimentale** : la page
+[E3, frontière](../experiences/e3-frontiere.qmd) construit des dérives pures de chaque type
+et mesure l'endroit exact où l'estimation décroche.
+
+::: {.callout-important}
+## Le point aveugle structurel
+Un forecaster de demande à lags est un cas défavorable pour l'hypothèse 1. Quand le monde
+change brutalement (confinement, nouvelle taxe), les lags décrivent **encore le monde
+d'avant** pendant une à deux semaines : les entrées semblent normales, la demande ne
+l'est plus. C'est la définition opérationnelle d'un concept drift, vu depuis le modèle.
+:::
