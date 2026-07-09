@@ -1,0 +1,11 @@
+---
+title: "Un modèle ne tombe pas en panne, il dérive"
+subtitle: "Observabilité d'un forecaster de demande quand la vérité terrain arrive en retard"
+---
+
+::: {.lead-question}
+Peut-on mesurer la santé d'un modèle de prévision **pendant la fenêtre aveugle**, avant
+l'arrivée des labels, et savoir **où cette mesure devient un mensonge** ?
+:::
+
+Page en construction : la carte du site et les résultats clés arrivent au fil du projet.
