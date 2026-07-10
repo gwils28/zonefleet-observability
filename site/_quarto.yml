@@ -1,0 +1,61 @@
+project:
+  type: website
+  output-dir: _site
+  resources:
+    - figures/
+
+lang: fr
+
+website:
+  title: "ZoneFleet : un modèle ne tombe pas en panne, il dérive"
+  description: "Observabilité d'un forecaster de demande zone x heure (NYC TLC) : dérive, performance estimée sans labels, frontière covariate shift / concept drift, backtest du moniteur."
+  site-url: https://gwils28.github.io/zonefleet-observability/
+  repo-url: https://github.com/gwils28/zonefleet-observability
+  repo-actions: [source, issue]
+  page-navigation: true
+  reader-mode: true
+  search: true
+  navbar:
+    left:
+      - href: index.qmd
+        text: Accueil
+      - text: Veille
+        menu:
+          - href: veille/nannyml.qmd
+          - href: veille/driftguard.qmd
+          - href: veille/sculley.qmd
+      - text: Concepts
+        menu:
+          - href: concepts/trois-horloges.qmd
+          - href: concepts/types-de-derive.qmd
+          - href: concepts/dle.qmd
+          - href: concepts/derive-univariee.qmd
+          - href: concepts/derive-multivariee.qmd
+          - href: concepts/metriques.qmd
+          - href: concepts/politiques-alerte.qmd
+    right:
+      - icon: github
+        href: https://github.com/gwils28/zonefleet-observability
+  page-footer:
+    left: "Wilson Goma · MLOps et observabilité des modèles de prévision"
+    right: "Construit avec [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme:
+      light: [cosmo, styles/custom.scss]
+    toc: true
+    toc-depth: 3
+    toc-title: "Sur cette page"
+    code-copy: true
+    fig-align: center
+    fig-cap-location: bottom
+    lightbox: true
+    smooth-scroll: true
+    link-external-newwindow: true
+    callout-appearance: simple
+    mermaid:
+      theme: neutral
+
+execute:
+  enabled: false

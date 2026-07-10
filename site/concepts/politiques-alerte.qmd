@@ -1,0 +1,76 @@
+---
+title: "Politiques d'alerte : du signal à la décision"
+description: "Comment quatre signaux journaliers deviennent une alerte : persistance, condition jointe, horloge de décision."
+---
+
+## Quatre signaux, quatre politiques
+
+Chaque jour cible D produit quatre booléens (`alerting.daily_signals`) :
+
+| Signal | Définition | Disponible |
+|---|---|---|
+| `drift` | alerte PCA **ou** PSI maximal > 0,25 sur `lag_24`, `lag_168`, `roll_mean_168`, `temperature_2m` | D - 1 |
+| `perf_est` | MAE estimée par DLE (échelle log) > seuil NannyML | D - 1 |
+| `perf_real` | MAE réalisée (échelle log) > le même seuil | D + 60 |
+
+Les politiques comparées dans tout le projet :
+
+```{mermaid}
+flowchart LR
+  D["drift"] --> P1["P1 : dérive seule"]
+  E["perf_est (DLE)"] --> P2["P2 : DLE seul"]
+  D --> AND(("ET"))
+  E --> AND
+  AND --> P3["P3 : dérive ET DLE"]
+  R["perf_real (labels, D + 60)"] --> P4["P4 : labels retardés"]
+  P1 & P2 & P3 & P4 --> PERS["persistance :<br/>2 jours consécutifs"]
+  PERS --> A["alerte, datée sur<br/>l'horloge de décision"]
+```
+
+## Pourquoi la condition jointe
+
+La bonne pratique défendue dans ce projet, et testée dans [E4](../experiences/e4-backtest.qmd) :
+**ne pas alerter sur la dérive seule**. Une dérive sans impact mesurable (saison, météo,
+calendrier) est une fausse alerte qui épuise l'astreinte. La condition jointe exige
+que l'entrée bouge **et** que l'erreur estimée monte.
+
+| Situation | P1 | P2 | P3 | Lecture |
+|---|---|---|---|---|
+| Changement de saison, modèle robuste | alerte | - | - | dérive sans impact : P3 se tait, à raison |
+| Covariate shift vers des zones difficiles | alerte | alerte | **alerte** | le cas d'école de la condition jointe |
+| Bruit du nanny model, entrées stables | - | alerte | - | P3 filtre une fausse alerte de DLE |
+| Concept drift pur | - | - | - | **tous muets** ; seul P4 verra, 60 jours plus tard |
+
+## Persistance
+
+Une alerte exige **deux jours consécutifs** en dépassement (`alerting.persistent`). Un jour
+atypique isolé (tempête de neige, panne de compteur, jour férié mal capté) ne réveille
+personne ; un vrai changement de régime dure.
+
+Le coût est connu et assumé : un jour de délai supplémentaire.
+
+## Encoder le ET logique en production
+
+En pseudo-règle d'alerting (format type Prometheus/Grafana), la condition devient :
+
+```text
+ALERT ForecastDegradationSuspected
+  IF   (input_drift_psi_max > 0.25 OR pca_reconstruction_alert == 1)
+   AND (dle_mae_log_estimated > dle_mae_log_threshold)
+  FOR  2d
+  LABELS { severity = "page", model = "zonefleet-demand" }
+
+ALERT InputDriftNoImpact
+  IF   (input_drift_psi_max > 0.25 OR pca_reconstruction_alert == 1)
+   AND (dle_mae_log_estimated <= dle_mae_log_threshold)
+  FOR  7d
+  LABELS { severity = "ticket" }      # revue hebdomadaire, pas d'astreinte
+
+ALERT RealizedDegradation
+  IF   realized_mae_log > dle_mae_log_threshold
+  FOR  2d
+  LABELS { severity = "page", note = "labels retardés : audit et réentraînement" }
+```
+
+La dérive seule n'est pas jetée : elle descend d'un niveau de sévérité (ticket), parce
+qu'elle reste le seul indice d'un concept drift naissant quand DLE se tait.

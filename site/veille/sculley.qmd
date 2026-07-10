@@ -1,0 +1,118 @@
+---
+title: "Sculley et al. (2015) : la dette technique cachée du ML"
+subtitle: "Lecture de référence · NeurIPS 28, p. 2494-2502"
+description: "Le papier fondateur du MLOps, relu comme une grille d'observabilité : changements du monde extérieur, boucles de rétroaction, dépendances de données."
+---
+
+::: {.callout-note appearance="minimal"}
+D. Sculley, G. Holt, D. Golovin, E. Davydov, T. Phillips, D. Ebner, V. Chaudhary,
+M. Young, J.-F. Crespo, D. Dennison. *Hidden Technical Debt in Machine Learning Systems*.
+[NeurIPS 2015](https://proceedings.neurips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html).
+:::
+
+## La thèse
+
+Les gains rapides du machine learning ne sont pas gratuits. Un système ML a tous les
+problèmes de maintenance du code classique, **plus** une famille de problèmes propres,
+qui vivent au niveau du système et non du code. La phrase qui résume le papier :
+
+> « Hidden debt is dangerous because it compounds silently. »
+
+Remplacez *debt* par *drift* et vous avez le sujet de ce projet.
+
+## La carte des dettes
+
+```{mermaid}
+mindmap
+  root((Dette ML))
+    Frontières érodées
+      Entanglement : CACE
+      Cascades de corrections
+      Consommateurs non déclarés
+    Dépendances de données
+      Instables
+      Sous-utilisées
+      Analyse statique
+    Boucles de rétroaction
+      Directes
+      Cachées
+    Anti-patterns système
+      Glue code
+      Pipeline jungles
+      Chemins expérimentaux morts
+    Dette de configuration
+    Monde extérieur
+      Seuils fixes
+      Monitoring et tests
+```
+
+L'entanglement se résume par le principe **CACE** : *Changing Anything Changes
+Everything*. Le papier rappelle aussi qu'un système mature peut n'être fait que de 5 %
+de code d'apprentissage pour 95 % de glue code.
+
+## Section 7, « changes in the external world » : le drift que l'on surveille
+
+La section 7 est la plus directement liée à notre thème. Elle part d'un constat :
+l'expérience montre que le monde extérieur est rarement stable, et ce taux de
+changement de fond crée un coût de maintenance permanent. Trois réponses sont proposées.
+
+| Recommandation (2015) | Traduction ZoneFleet (2026) |
+|---|---|
+| **Seuils fixes dans des systèmes dynamiques** : un seuil réglé à la main devient faux dès que le modèle ou le monde bouge | les seuils d'alerte sont dérivés de la **référence** (3 écarts-types des chunks de référence), recalculés à chaque promotion de modèle, jamais tapés à la main |
+| **Prediction bias** : la distribution des prédictions devrait égaler celle des labels observés ; à découper par dimensions | dérive des **prédictions** (KS sur la médiane prédite) et, quand les labels arrivent, biais réalisé par zone (CBD vs hors CBD) |
+| **Action limits** : plafonds de sanité sur les actions déclenchées | garde-fou de positionnement : la flotte déplacée par la prévision est bornée par zone et par heure (voir system design) |
+| **Up-stream producers** : surveiller les producteurs de données en amont, propager leurs alertes | **data contract** sur les fichiers TLC : schéma, types, ruptures datées (`cbd_congestion_fee` en 2025) |
+
+Et la conclusion de la section, qui fixe l'ambition :
+
+> « Comprehensive live monitoring of system behavior in real time combined with
+> automated response is critical for long-term system reliability. »
+
+## Section 4 : boucles de rétroaction, le risque propre au forecasting de flotte
+
+Un modèle peut influencer la sélection de ses propres futures données d'entraînement
+(boucle **directe**), ou deux systèmes peuvent s'influencer à travers le monde (boucle
+**cachée**). Pour ZoneFleet, le mécanisme est concret :
+
+```{mermaid}
+flowchart LR
+  F["Prévision de demande<br/>par zone"] --> P["Positionnement<br/>de la flotte"]
+  P --> S["Courses servies<br/>(demande observée)"]
+  S --> T["Données d'entraînement<br/>du prochain modèle"]
+  T --> F
+  P -. "zone sous-servie :<br/>demande latente non observée" .-> S
+```
+
+Une zone sous-prévue reçoit moins de véhicules ; moins de courses y sont servies ; la
+demande *observée* baisse ; le modèle suivant prévoit encore moins. La demande devient
+**censurée par l'offre**. Les garde-fous retenus (détaillés dans
+[E5](../experiences/e5-reentrainement.qmd) et le [system design](../system-design.qmd)) :
+journaliser les demandes non servies, garder des zones témoins à positionnement
+indépendant du modèle, et ne jamais réentraîner sur une période où le modèle a piloté
+seul toute l'offre.
+
+## Section 3 : les dépendances de données coûtent plus cher que le code
+
+Une dépendance de données **instable** (un signal dont la définition change en amont)
+casse un modèle sans changer une ligne de code. Les fichiers TLC en donnent trois
+exemples réels sur notre période, journalisés par le data contract :
+
+- `airport_fee` est de type nul en 2019-2020, puis renommé `Airport_fee` (casse) ;
+- les identifiants et compteurs passent de flottants à entiers entre 2020 et 2024 ;
+- `cbd_congestion_fee` apparaît en janvier 2025.
+
+Aucun ne casse ce pipeline (il n'utilise que l'heure et la zone de prise en charge),
+mais un pipeline qui aurait utilisé le montant total des courses aurait vu sa feature
+changer de sens le 5 janvier 2025.
+
+## Grille de lecture pour la suite du projet
+
+| Dette (Sculley) | Où elle apparaît ici | Réponse |
+|---|---|---|
+| Changes in the external world | COVID, tarification de congestion | monitoring E1/E2, DLE + dérive |
+| Fixed thresholds | seuils d'alerte | seuils issus de la référence, persistance |
+| Hidden feedback loops | positionnement de flotte | zones témoins, demande non servie |
+| Unstable data dependencies | schéma TLC | data contract versionné |
+| Pipeline jungles, glue code | orchestration | assets Dagster typés |
+| Configuration debt | découpages, seuils | `config.py` unique, SPEC figé |
+| Monitoring and testing | le moniteur lui-même | backtest E4 du moniteur |

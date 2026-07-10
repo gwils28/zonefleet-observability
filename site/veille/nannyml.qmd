@@ -1,0 +1,171 @@
+---
+title: "NannyML : estimer la performance sans labels"
+subtitle: "Veille technologique · bibliothèque open-source de post-deployment data science"
+description: "Comment DLE estime l'erreur d'un modèle de régression sans vérité terrain, comment la reconstruction PCA détecte une dérive multivariée, et sous quelles hypothèses ces estimations tiennent."
+---
+
+::: {.callout-note appearance="minimal"}
+**Sources** : [dépôt NannyML](https://github.com/nannyml/nannyml) ·
+[doc, estimation de performance](https://nannyml.readthedocs.io/en/stable/how_it_works/performance_estimation.html) ·
+[doc, dérive multivariée](https://nannyml.readthedocs.io/en/stable/how_it_works/multivariate_drift.html).
+Version utilisée dans ce projet : **nannyml 0.13.1**. Les faits ci-dessous sont relevés
+dans `docs/notes/veille_fiches.md`.
+:::
+
+## Pourquoi c'est le cœur du problème
+
+Un forecaster de demande produit aujourd'hui la prévision de demain ; la demande réelle
+n'est connue qu'après la cible, et dans le cas TLC, publiée environ **deux mois plus
+tard**. Entre les deux s'étend une **fenêtre aveugle** pendant laquelle aucune métrique
+classique (MAE, MASE) n'est calculable. NannyML propose de remplir cette fenêtre avec une
+**performance estimée**, calculée à partir des seules entrées et prédictions.
+
+| Problème | Méthode NannyML | Ce qu'elle estime |
+|---|---|---|
+| Classification | CBPE (*Confidence-Based Performance Estimation*) | n'importe quelle métrique de classification, à partir des probabilités calibrées |
+| Régression | **DLE** (*Direct Loss Estimation*) | MAE, RMSE, MSE et métriques dérivées |
+| Dérive des entrées | Reconstruction PCA, classifieur de domaine, tests univariés | un score de dérive par chunk |
+
+Ce projet est une régression (nombre de courses par zone et par heure) : **DLE** est l'outil.
+
+## DLE pas à pas
+
+L'idée tient en une phrase : si le modèle surveillé se trompe plus dans certaines régions
+de l'espace des entrées que dans d'autres, un second modèle peut **apprendre où il se
+trompe**, puis prédire son erreur là où les labels manquent.
+
+```{mermaid}
+flowchart LR
+  subgraph REF["Référence (labels connus)"]
+    X1["features X"] --> F1["modèle surveillé f"]
+    F1 --> P1["prédiction f(X)"]
+    Y1["vérité y"] --> L1["perte |y - f(X)|"]
+    P1 --> L1
+  end
+  subgraph NANNY["Nanny model (LightGBM)"]
+    N["apprend : (X, f(X)) -> perte"]
+  end
+  X1 --> N
+  P1 --> N
+  L1 --> N
+  subgraph AN["Analysis (sans labels)"]
+    X2["features X"] --> F2["f"] --> P2["f(X)"]
+    X2 --> E["perte estimée par ligne"]
+    P2 --> E
+    E --> C["moyenne par chunk = MAE estimée"]
+  end
+  N -.-> E
+```
+
+1. **Sur la référence**, on calcule la perte de chaque observation : pour la MAE,
+   l'erreur absolue ; pour la RMSE, l'erreur au carré.
+2. On entraîne le **nanny model** (LightGBM, perte L2 par défaut) : entrées = features
+   et prédiction du modèle surveillé, cible = cette perte.
+3. **Sur l'analysis**, le nanny model prédit la perte de chaque ligne ; la moyenne par
+   chunk (ici, un jour) donne la MAE estimée ; pour la RMSE, on prend la racine de la
+   moyenne des erreurs carrées estimées.
+
+La prédiction du modèle surveillé est elle-même une entrée du nanny model : un forecaster
+qui prévoit 900 courses à Midtown se trompe en valeur absolue bien plus qu'un forecaster
+qui en prévoit 3 dans le Queens. C'est cette **hétéroscédasticité** que DLE exploite.
+
+### Les quatre hypothèses, et pourquoi la première compte le plus
+
+La documentation liste explicitement les conditions de validité :
+
+| # | Hypothèse | Si elle tombe |
+|---|---|---|
+| 1 | **Pas de concept drift** : P(y \| X) est stable | DLE « will not work under concept drift » : le nanny model a appris une carte des erreurs qui n'est plus la bonne |
+| 2 | Pas de covariate shift vers des régions **jamais vues** | le nanny model extrapole une erreur qu'il n'a jamais observée |
+| 3 | Bruit **hétéroscédastique** | sinon la vraie performance est constante, toute variation estimée est du bruit d'échantillonnage |
+| 4 | Échantillon assez grand par chunk | l'intervalle de confiance s'élargit, les alertes deviennent aléatoires |
+
+Ce projet transforme l'hypothèse 1 en **question expérimentale** : la page
+[E3, frontière](../experiences/e3-frontiere.qmd) construit des dérives pures de chaque type
+et mesure l'endroit exact où l'estimation décroche.
+
+::: {.callout-important}
+## Le point aveugle structurel
+Un forecaster de demande à lags est un cas défavorable pour l'hypothèse 1. Quand le monde
+change brutalement (confinement, nouvelle taxe), les lags décrivent **encore le monde
+d'avant** pendant une à deux semaines : les entrées semblent normales, la demande ne
+l'est plus. C'est la définition opérationnelle d'un concept drift, vu depuis le modèle.
+:::
+
+## Dérive multivariée : la reconstruction PCA
+
+Les tests univariés (KS, Wasserstein, PSI) regardent chaque feature isolément. Ils sont
+aveugles à un changement de **structure jointe** : deux variables qui restaient corrélées
+et qui cessent de l'être, sans que leurs marginales bougent. NannyML répond par la
+reconstruction de données :
+
+```{mermaid}
+flowchart LR
+  A["Chunk d'analysis"] --> B["Imputation, encodage fréquentiel, standardisation (paramètres de la référence)"]
+  B --> C["Projection PCA (ajustée sur la référence, 65 % de variance)"]
+  C --> D["PCA inverse : retour à l'espace d'origine"]
+  D --> E["Distance euclidienne original / reconstruit"]
+  E --> F["Moyenne par chunk = erreur de reconstruction"]
+  F --> G{"> moyenne référence + 3 écarts-types ?"}
+  G -- oui --> H["alerte"]
+  G -- non --> I["ok"]
+```
+
+L'exemple « papillon » de la documentation est parlant : une rotation de 90 degrés du
+nuage de points change le signe d'une corrélation, aucun test KS ne bouge, l'erreur de
+reconstruction explose.
+
+### La limite que nous avons trouvée (et testée)
+
+L'inverse est vrai aussi, et la documentation ne le dit pas : **un déplacement le long
+d'une direction principale n'augmente pas l'erreur de reconstruction**. La PCA « sait »
+reconstruire tout point situé sur son sous-espace, même très loin du nuage de référence.
+
+Or un choc de demande déplace **tous les lags ensemble** (lag 24, 48, 168, moyennes
+glissantes), c'est-à-dire précisément le long de la première composante d'un panel de
+séries fortement autocorrélées. Le test
+`test_pca_reconstruction_sees_broken_correlation_but_not_shift_along_it` fige ce
+comportement, et c'est pourquoi le signal de dérive de ce projet combine PCA **et** PSI
+(voir [dérive multivariée](../concepts/derive-multivariee.qmd)).
+
+## Ce que NannyML ne fait pas
+
+- **Il ne voit pas le concept drift pur.** C'est écrit, et c'est logique : sans labels,
+  un changement de P(y | X) à P(X) constant ne laisse aucune trace dans les entrées.
+- **Il ne choisit pas la métrique pour vous.** Pendant le COVID, la MAE en courses
+  *baisse* (le volume s'effondre) alors que l'erreur relative triple. Ce projet surveille
+  donc deux échelles : `count` et `log` (≈ erreur relative), voir
+  [métriques](../concepts/metriques.qmd).
+- **Il ne décide pas.** Un seuil à 3 écarts-types sur chaque signal, sans persistance ni
+  combinaison, produit une alerte permanente dès que la saison change : la politique
+  d'alerte est une décision d'architecture, traitée dans
+  [E4](../experiences/e4-backtest.qmd) et le [system design](../system-design.qmd).
+
+## Comment le projet l'utilise
+
+| Brique | Classe NannyML | Fichier |
+|---|---|---|
+| Performance estimée (MAE, RMSE, deux échelles) | `DLE` | `src/zonefleet/monitoring.py::estimate_performance` |
+| Performance réalisée | calcul direct par chunk | `monitoring.py::realized_performance` |
+| Dérive univariée | `UnivariateDriftCalculator` (KS, Wasserstein) | `monitoring.py::univariate_drift` |
+| Dérive multivariée | `DataReconstructionDriftCalculator` | `monitoring.py::multivariate_drift` |
+| PSI | implémentation maison (bacs = quantiles de la référence) | `monitoring.py::psi` |
+
+Deux règles d'usage, apprises à nos dépens et inscrites dans `CLAUDE.md` :
+
+1. **La référence doit être hors échantillon pour le forecaster.** Sur les données
+   d'entraînement, le modèle se trompe moins qu'ailleurs ; le nanny model apprendrait une
+   carte d'erreurs trop optimiste.
+2. **La vérité terrain de l'analysis n'est jamais transmise à `estimate`.** Le test
+   `test_dle_never_sees_analysis_labels` remplace les labels par des `NaN` et vérifie que
+   l'estimation est inchangée.
+
+## À retenir
+
+::: {.callout-tip}
+DLE transforme la fenêtre aveugle en fenêtre **floue** : il voit les changements de
+régime qui déplacent le modèle vers des zones où il se trompait déjà davantage
+(covariate shift), pas ceux où il se met à se tromper pour de nouvelles raisons
+(concept drift). La compétence n'est pas de l'utiliser, c'est de savoir **quand ne pas
+le croire**.
+:::

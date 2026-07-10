@@ -1,0 +1,48 @@
+/*-- scss:defaults --*/
+// Palette catégorielle validée (skill dataviz) : bleu = estimé, orange = réalisé.
+$primary: #2a78d6;
+$link-color: #256abf;
+$body-bg: #fcfcfb;
+$font-size-root: 17px;
+
+/*-- scss:rules --*/
+.lead-question {
+  font-size: 1.25rem;
+  border-left: 4px solid $primary;
+  padding: 0.4rem 1rem;
+  margin: 1.2rem 0;
+}
+
+.kpi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.kpi {
+  flex: 1 1 180px;
+  border: 1px solid #e3e2de;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  background: #ffffff;
+}
+
+.kpi .value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #0b0b0b;
+}
+
+.kpi .label {
+  font-size: 0.85rem;
+  color: #52514e;
+}
+
+figure img {
+  border-radius: 4px;
+}
+
+table {
+  font-size: 0.92rem;
+}
