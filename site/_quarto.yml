@@ -28,6 +28,11 @@ website:
         menu:
           - href: concepts/trois-horloges.qmd
           - href: concepts/types-de-derive.qmd
+          - href: concepts/dle.qmd
+          - href: concepts/derive-univariee.qmd
+          - href: concepts/derive-multivariee.qmd
+          - href: concepts/metriques.qmd
+          - href: concepts/politiques-alerte.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability
