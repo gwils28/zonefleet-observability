@@ -10,6 +10,9 @@ mkdir -p "$RAW/tlc" "$RAW/ref"
 
 lookup="$RAW/ref/taxi_zone_lookup.csv"
 [ -s "$lookup" ] || curl -sSfL -o "$lookup" "$BASE/misc/taxi_zone_lookup.csv"
+# Contours des zones (shapefile), pour les cartes de la documentation
+shp="$RAW/ref/taxi_zones.zip"
+[ -s "$shp" ] || curl -sSfL -o "$shp" "$BASE/misc/taxi_zones.zip"
 for y in 2019 2020 2024 2025; do
   for m in 01 02 03 04 05 06 07 08 09 10 11 12; do
     for s in yellow green; do
@@ -20,7 +23,7 @@ for y in 2019 2020 2024 2025; do
 done
 
 if [ "${1:-}" = "--update-manifest" ]; then
-  (cd "$RAW" && sha256sum ref/*.csv tlc/*.parquet) > configs/manifest_sha256.txt
+  (cd "$RAW" && sha256sum ref/*.csv ref/*.zip tlc/*.parquet) > configs/manifest_sha256.txt
   echo "manifeste mis à jour"
 else
   (cd "$RAW" && sha256sum --quiet -c ../../configs/manifest_sha256.txt) && echo "empreintes vérifiées"
