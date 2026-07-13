@@ -33,6 +33,11 @@ website:
           - href: concepts/derive-multivariee.qmd
           - href: concepts/metriques.qmd
           - href: concepts/politiques-alerte.qmd
+      - text: Données
+        menu:
+          - href: donnees/sources.qmd
+          - href: donnees/data-contract.qmd
+          - href: donnees/panel.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability
