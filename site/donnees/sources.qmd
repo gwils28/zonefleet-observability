@@ -1,0 +1,70 @@
+---
+title: "Sources de données"
+description: "NYC TLC Trip Records, table et contours des zones, météo Open-Meteo, calendrier US : ce qui est utilisé, pourquoi, et avec quelles hypothèses."
+---
+
+## NYC TLC Trip Record Data
+
+La [Taxi & Limousine Commission](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
+publie chaque mois, au format Parquet, une ligne par course : horodatages de prise en
+charge et de dépose, zones de départ et d'arrivée (`PULocationID`, `DOLocationID`),
+distance, tarif et suppléments. Les fichiers paraissent avec environ **deux mois de
+décalage** : c'est le L = 60 jours de nos [trois horloges](../concepts/trois-horloges.qmd).
+
+| Choix | Valeur | Raison |
+|---|---|---|
+| Services | taxis jaunes et verts | volumes TLC historiques ; les VTC (FHVHV, ~0,5 Go par mois) sont hors périmètre |
+| Années | 2019-2020, 2024-2025 | deux ruptures réelles : le COVID (mars 2020) et la tarification de congestion (5 janvier 2025) |
+| Fichiers | 96 Parquet, 3,1 Go | `make data`, empreintes SHA-256 vérifiées (`configs/manifest_sha256.txt`) |
+| Granularité | zone de prise en charge x heure locale | maille du positionnement de flotte |
+
+![Courses journalières (moyenne glissante 7 jours). En avril 2020, le volume tombe à 3,9 % de celui de février. Début 2025, aucune chute visible après la tarification de congestion : le choc est local, pas global.](../figures/data_volumes_ville.png){#fig-volumes}
+
+::: {.callout-note}
+## Deux ruptures de nature très différente
+Le COVID est un **effondrement global** : 9 000 courses par jour en moyenne en avril 2020,
+contre 229 000 en février (`results/tables/data_summary.csv`). La tarification de
+congestion est une **modification locale** : à l'échelle de la ville, février 2025
+(129 000 courses par jour) dépasse décembre 2024 (120 000). Si elle déplace la demande,
+c'est entre zones et entre heures, ce qu'[E2](../experiences/e2-congestion.qmd) examine.
+:::
+
+Le poids des taxis verts s'effondre entre les deux périodes : 7 % des courses en 2019,
+1,2 % en 2025. Le panel additionne les deux services, mais cette recomposition est un
+exemple de **changement de population** que le monitoring doit tolérer.
+
+## Taxi Zone Lookup Table et contours
+
+263 zones numérotées (plus deux codes « inconnu », écartés), rattachées à un
+arrondissement. Le shapefile des contours sert uniquement aux cartes de la documentation.
+
+## Météo : Open-Meteo (archive ERA5)
+
+Température à 2 m et précipitations horaires au point de Times Square, via
+l'[API d'archive Open-Meteo](https://open-meteo.com/en/docs/historical-weather-api),
+récupérées en UTC puis ramenées en heure locale sur la même convention que les courses.
+Cache versionné : `data/processed/weather.csv` (35 184 heures, aucune valeur manquante).
+
+![La météo dérive par nature : une référence d'automne et une analysis d'hiver n'ont pas la même distribution de température. C'est une dérive attendue, sans impact si le modèle a vu des hivers.](../figures/data_meteo.png){#fig-weather}
+
+::: {.callout-warning}
+## Hypothèse optimiste assumée
+La météo **réalisée** tient lieu de prévision météo à 24 h. En production, on utiliserait
+une prévision (erreur de quelques degrés, timing des averses incertain). Cela dégraderait
+légèrement le modèle, sans changer la logique du monitoring.
+:::
+
+## Calendrier
+
+Heure, jour de semaine, week-end, jours fériés fédéraux US et observés (paquet
+`holidays`). Les features de saison (jour de l'année en sinus et cosinus) sont calculées
+mais **exclues du modèle** : voir [features](../modele/features.qmd).
+
+## Ce que les données ne contiennent pas
+
+- **La demande non servie.** TLC enregistre des courses, pas des demandes. Une zone sans
+  taxi disponible a une demande observée nulle. Pour ZoneFleet, c'est la porte d'entrée
+  des boucles de rétroaction (voir [Sculley](../veille/sculley.qmd)).
+- **Les événements** (concerts, matchs, manifestations) : non intégrés, faute de source
+  historique propre ; ils apparaissent comme des jours atypiques que la persistance des
+  alertes (2 jours) absorbe.
