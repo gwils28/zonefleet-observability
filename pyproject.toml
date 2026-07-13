@@ -33,6 +33,7 @@ dev = [
     "nbformat>=5.10",
     "nbconvert>=7.16",
     "geopandas>=1.2.0",
+    "tabulate>=0.10.0",
 ]
 
 [build-system]

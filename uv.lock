@@ -3865,6 +3865,7 @@ dev = [
     { name = "nbformat" },
     { name = "pytest" },
     { name = "ruff" },
+    { name = "tabulate" },
 ]
 
 [package.metadata]
@@ -3897,4 +3898,5 @@ dev = [
     { name = "nbformat", specifier = ">=5.10" },
     { name = "pytest", specifier = ">=8" },
     { name = "ruff", specifier = ">=0.7" },
+    { name = "tabulate", specifier = ">=0.10.0" },
 ]
