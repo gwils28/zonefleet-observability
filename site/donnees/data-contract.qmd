@@ -1,0 +1,69 @@
+---
+title: "Data contract : versionner les ruptures de schéma"
+description: "Comment le pipeline valide chaque fichier TLC sans le charger, distingue ruptures connues et inconnues, et pourquoi c'est le premier étage du monitoring."
+---
+
+## Le premier capteur d'un système de monitoring
+
+Avant que le *modèle* ne dérive, ce sont souvent les **données** qui changent de forme :
+colonne renommée, type modifié, nouveau champ, unité différente. Sculley et al. appellent
+cela une dépendance de données instable. Le data contract est la réponse : une
+description versionnée de ce que le pipeline attend, vérifiée à chaque fichier.
+
+## Ce que dit le contrat
+
+`configs/data_contract.yaml` déclare :
+
+| Rubrique | Contenu | Effet |
+|---|---|---|
+| `required` | heure de prise en charge (horodatage), `PULocationID` et `DOLocationID` (entiers 1 à 265) | **bloquant** : le fichier est refusé |
+| `known_optional` | les 17 colonnes tarifaires et techniques connues | silencieux |
+| `known_breaks` | `Airport_fee` (renommage, 2023+), `cbd_congestion_fee` (2025+) | **journalisé** comme rupture attendue et datée |
+| tout le reste | colonne jamais vue | **journalisé** comme rupture inconnue, à examiner |
+| `panel` | au plus 3 000 courses par zone et par heure | contrôle de cohérence de l'agrégat |
+
+La validation ne lit que le **schéma** Parquet (`pyarrow.parquet.read_schema`), pas les
+données : 96 fichiers sont contrôlés en moins d'une seconde.
+
+## Ce que le contrat a trouvé
+
+![Présence et type de sept colonnes des fichiers jaunes, mois par mois. `airport_fee` est de type nul jusqu'en 2020, les compteurs passent de flottant à entier en 2024, `cbd_congestion_fee` apparaît en janvier 2025.](../figures/data_schema_timeline.png){#fig-schema}
+
+| Rupture | Fichiers | Classement |
+|---|---|---|
+| `airport_fee` de type nul | jaunes 2019 à 2020 (sauf quelques mois) | colonne optionnelle, tolérée |
+| `Airport_fee` (majuscule) | jaunes 2024-2025 | rupture connue, datée |
+| `passenger_count`, `RatecodeID` : flottant → entier | jaunes et verts, 2024 | changement de type, journalisé |
+| `payment_type`, `trip_type` : flottant → entier | verts, 2024 | changement de type, journalisé |
+| `cbd_congestion_fee` | jaunes et verts, 2025 | rupture connue, datée |
+
+Le journal complet est versionné : `results/tables/schema_timeline.csv` (une ligne par
+fichier) et `results/tables/schema_type_changes.csv`.
+
+::: {.callout-tip}
+## Et la rupture de 2016 ?
+Le cahier des charges ZoneFleet mentionne le passage des coordonnées GPS aux zones
+(`LocationID`) vers 2016. Nos périodes commencent en 2019 : la rupture est hors champ,
+mais le contrat la bloquerait (colonne requise `PULocationID` absente).
+:::
+
+## Pourquoi « connue et datée » plutôt que « autorisée »
+
+Une rupture déclarée dans `known_breaks` n'est acceptée **qu'après sa date**. Une colonne
+`cbd_congestion_fee` dans un fichier de 2024 serait signalée comme inconnue : soit le
+fichier est mal nommé, soit l'amont a republié des données. Le test
+`test_known_break_is_logged_only_after_its_date` le vérifie.
+
+## Dans le code
+
+```python
+from zonefleet.contract import validate_file, schema_timeline, type_changes
+
+rep = validate_file(Path("data/raw/tlc/yellow_tripdata_2025-03.parquet"))
+rep.ok              # True
+rep.known_breaks    # ['Airport_fee : ...', 'cbd_congestion_fee : ...']
+rep.unknown_breaks  # []
+```
+
+`data.aggregate_file` appelle `validate_file` avant toute lecture : un fichier qui viole
+le contrat n'entre jamais dans le panel.

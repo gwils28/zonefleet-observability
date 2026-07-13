@@ -33,6 +33,14 @@ def schema_tables(files, tables) -> None:
         for r in reps
     ]
     pd.DataFrame(rows).to_csv(tables / "schema_timeline.csv", index=False)
+    presence = pd.DataFrame(
+        [
+            {"service": r.service, "month": r.month, "column": c, "type": t}
+            for r in reps
+            for c, t in r.types.items()
+        ]
+    )
+    presence.to_csv(tables / "schema_columns.csv", index=False)
     changes = pd.DataFrame({"change": type_changes(reps)})
     changes.to_csv(tables / "schema_type_changes.csv", index=False)
 
