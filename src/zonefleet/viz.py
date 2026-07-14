@@ -80,3 +80,13 @@ def label_end(ax, x, y, text: str, color: str, dy: float = 0.0) -> None:
         color=INK2,
     )
     ax.plot([x], [y], "o", ms=4, color=color)
+
+
+def plain_log_axis(ax, axis: str = "x") -> None:
+    """Axe logarithmique gradué en nombres simples (10, 20, 50, 100...), sans mineures."""
+    import matplotlib.ticker as mticker
+
+    target = ax.xaxis if axis == "x" else ax.yaxis
+    target.set_major_locator(mticker.LogLocator(base=10, subs=(1, 2, 5)))
+    target.set_major_formatter(mticker.FuncFormatter(lambda v, _: f"{v:g}"))
+    target.set_minor_formatter(mticker.NullFormatter())
