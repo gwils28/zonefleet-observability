@@ -16,7 +16,7 @@ flowchart LR
   W["météo"] --> X
   C["calendrier : heure, jour,<br/>week-end, férié"] --> X
   Z["zone (catégorielle), CBD"] --> X
-  L --> X["matrice X<br/>17 features"]
+  L --> X["matrice X<br/>15 features"]
   X --> Q1["LightGBM q = 0,1"]
   X --> Q2["LightGBM q = 0,5"]
   X --> Q3["LightGBM q = 0,9"]
