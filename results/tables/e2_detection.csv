@@ -1,0 +1,5 @@
+policy,target_day,decision,delay_days,false_alert_days_before
+P1_drift,2025-01-05,2025-01-04,-1.0,3
+P2_dle,,,,0
+P3_drift_and_dle,,,,0
+P4_realized,,,,0
