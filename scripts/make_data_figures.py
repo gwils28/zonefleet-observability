@@ -201,6 +201,7 @@ def intermittency() -> None:
             s["mean"], 100 * s["zero"], s=28, color=c, label=lab, edgecolor=viz.SURFACE, lw=1
         )
     ax.set_xscale("log")
+    viz.plain_log_axis(ax)
     ax.set_xlabel("courses moyennes par heure (échelle log)")
     ax.set_ylabel("% d'heures sans course")
     ax.set_title("60 zones : peu d'heures à zéro, mais deux ordres de grandeur de niveau")
