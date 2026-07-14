@@ -38,6 +38,10 @@ website:
           - href: donnees/sources.qmd
           - href: donnees/data-contract.qmd
           - href: donnees/panel.qmd
+      - text: Modèle
+        menu:
+          - href: modele/features.qmd
+          - href: modele/e0.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability
