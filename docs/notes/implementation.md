@@ -27,3 +27,19 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Impact : le signal de dérive devient plus sensible, donc plus bavard ; c'est voulu pour
   mesurer en E4 ce que la condition jointe retire comme bruit.
 - Persistance : une alerte exige 2 jours consécutifs en dépassement (toutes politiques).
+
+## 2026-07-15 : artefacts de la dérive univariée relevés en E1 et E2
+
+- `dow` et `is_weekend` : KS constant par chunk journalier (un chunk = un seul jour de
+  semaine). Artefact de découpage, pas une dérive. Recommandation : exclure les features
+  calendaires déterministes des tests univariés journaliers.
+- `roll_mean_168` : PSI > 0,25 sur 73 % des jours de E2 alors que `lag_168` ne dépasse
+  que 3 % du temps. Une moyenne glissante de 7 jours, vue sur un chunk d'un jour, a une
+  distribution resserrée : le PSI sur les déciles de la référence explose sans
+  déplacement. Recommandation : pas de PSI journalier sur une feature lissée à la semaine.
+- `temperature_2m` : PSI > 0,25 tous les jours en E1 et E2 (saison). Dérive réelle,
+  impact nul.
+- Décision : le signal `drift` des expériences E1/E2 n'est **pas** modifié après coup
+  (protocole figé). E4 ajoute une variante de politique « dérive nettoyée » (P1b : PCA OU
+  PSI sur `lag_24` et `lag_168` seulement), déclarée ici avant son exécution, pour ne pas
+  comparer la condition jointe à un homme de paille.

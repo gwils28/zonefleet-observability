@@ -1,0 +1,98 @@
+---
+title: "E1 : le choc COVID, estimé contre réalisé"
+description: "Un forecaster figé fin 2019 traverse le premier semestre 2020. Ce que DLE et la dérive des entrées en disent pendant la fenêtre aveugle, et ce que les labels révèlent deux mois plus tard."
+---
+
+::: {.callout-note appearance="minimal"}
+Script : `uv run python -m zonefleet.experiments.e1_covid` (≈ 10 s, modèle et prédictions
+en cache) · tables : `results/tables/e1_*.csv` · référence sept.-déc. 2019 (hors
+échantillon), analysis janv.-juin 2020, chunks journaliers de 1 440 lignes.
+:::
+
+## Le résultat en une figure
+
+![Erreur journalière estimée par DLE sans aucun label (bleu, avec intervalle de confiance) et erreur réalisée révélée a posteriori (orange). En haut, l'erreur relative ; en bas, l'erreur en courses. La bande rose marque le mois qui suit l'état d'urgence.](../figures/e1_estime_vs_realise.png){#fig-e1}
+
+{{< include ../_tables/e1_phases.md >}}
+
+## Lecture : trois régimes
+
+**Avant le choc (janvier au 12 mars).** DLE suit l'erreur réalisée de près en échelle log
+(0,217 estimé contre 0,202 réalisé). Deux faux pics isolés (fin janvier, mi-février)
+sont absorbés par la persistance de 2 jours.
+
+**Le choc (13 mars au 12 avril).** L'erreur relative réalisée est multipliée par cinq
+(1,10 en moyenne, jusqu'à 1,75). DLE **monte** (de 0,20 à 0,40), donc il voit quelque
+chose, mais il reste à **37 % de la réalité**. C'est le régime du **concept drift vu depuis
+le modèle** : pendant une à deux semaines, les lags décrivent encore le monde d'avant ; la
+relation « mêmes entrées, même demande » est fausse et le nanny model, qui a appris sur
+l'automne 2019, ne peut pas le savoir. Puis les entrées s'effondrent à leur tour vers des
+niveaux **jamais vus** dans la référence : DLE extrapole, et LightGBM extrapole par une
+constante.
+
+**Le plancher (13 avril au 30 juin).** Les lags ont rattrapé le nouveau niveau ; l'erreur
+relative réalisée redescend (0,59) mais reste trois fois supérieure à l'avant-choc.
+DLE s'est stabilisé autour de 0,37 : il sous-estime encore (ratio 0,63), mais la
+corrélation journalière avec le réalisé est la meilleure des trois phases (0,71).
+
+::: {.callout-important}
+## Où l'estimation décroche
+DLE suit l'erreur tant que le monde reste dans le support de la référence (avant) et
+retrouve une partie de sa capacité quand les lags ont absorbé le nouveau régime
+(plancher). Il **décroche pendant la transition** : c'est le moment où la relation
+X → y est cassée et où X lui-même sort du connu. La frontière est nommée et mesurée
+proprement, type par type, dans [E3](e3-frontiere.qmd).
+:::
+
+![Chaque point est un jour. Avant le choc (gris), les points suivent la diagonale. Pendant le choc (magenta), l'erreur réalisée s'étale de 0,4 à 1,75 pendant que l'estimation reste coincée entre 0,2 et 0,5. Au plancher (violet), une relation monotone réapparaît, décalée sous la diagonale.](../figures/e1_scatter.png){#fig-scatter}
+
+## L'erreur en courses ment dans l'autre sens
+
+En bas de la @fig-e1, la MAE en courses réalisée **baisse** au plancher (3,5 contre 20,6
+avant le choc). DLE en courses la **surestime** (6,2) parce qu'il a appris « grosse
+prévision, grosse erreur » et lit maintenant de petites prévisions, mais pas assez petites.
+Ni l'une ni l'autre ne dit que le modèle est devenu inutile : il faut l'échelle relative.
+
+## Ce que voit la dérive des entrées
+
+![En haut, la statistique KS hebdomadaire par feature. Les lags basculent à partir de la semaine du 15 mars, la température dérive dès janvier, et `dow` et `is_weekend` affichent un KS constant (artefact : un chunk d'un jour ne contient qu'un seul jour de semaine). En bas, rapport de chaque signal de dérive à son seuil.](../figures/e1_derive.png){#fig-drift}
+
+Trois enseignements :
+
+1. **La température dérive en permanence** : une analysis d'hiver contre une référence
+   d'automne. C'est la première source de fausses alertes de la dérive seule (PSI > 0,25
+   **tous les jours** de l'analysis).
+2. **La reconstruction PCA ne voit pas le choc** : son rapport au seuil reste sous 1
+   presque tous les jours (alerte 2,7 % des jours), exactement comme prévu par
+   l'analyse géométrique de la [dérive multivariée](../concepts/derive-multivariee.qmd).
+3. **Les features calendaires ne doivent pas être testées par chunk journalier** : un jour
+   contient un seul `dow`, la statistique est un artefact du découpage. Elles sont
+   déterministes ; leur dérive n'apporte aucune information. À retirer des tests
+   univariés en production (elles restent utiles dans la PCA, où elles structurent le
+   nuage).
+
+## Quand chaque politique aurait alerté
+
+{{< include ../_tables/e1_detection.md >}}
+
+![Jours en alerte par politique sur l'horloge cible. La dérive seule (P1) alerte avant même le choc ; DLE (P2) et la condition jointe (P3) n'alertent qu'aux pires jours ; les labels (P4) voient tout, deux mois trop tard.](../figures/e1_alertes.png){#fig-alerts}
+
+- **P1, dérive seule** : « alerte » le 12 mars, mais elle alertait déjà depuis 71 jours.
+  Une alarme qui sonne tout le temps n'a pas de délai de détection, elle a un taux de
+  fausses alertes de 100 %.
+- **P2 et P3** : décision possible le **22 mars**, 9 jours après l'état d'urgence, sans
+  aucune fausse alerte avant. Mais elles ne sont en alerte que **18 jours** sur les 102
+  jours où l'erreur réalisée dépasse le seuil : leur rappel au jour près est faible,
+  parce que DLE sous-estime.
+- **P4, labels** : en alerte 102 jours sur 110, mais la première décision n'est possible
+  que le **14 mai**.
+
+## Ce que E1 établit
+
+1. Sur un choc réel, **la performance estimée sans labels détecte en 9 jours ce que les
+   labels détectent en 62**, sans fausse alerte, mais en sous-estimant l'ampleur.
+2. La **condition jointe** ne coûte rien ici (P3 = P2) et ne gagne rien non plus : DLE n'a
+   pas eu de faux positif à filtrer. Son intérêt apparaît sur un choc sans impact
+   ([E2](e2-congestion.qmd)) et dans le backtest ([E4](e4-backtest.qmd)).
+3. Une politique de production ne peut pas se reposer sur DLE seul pour l'**ampleur** :
+   le chiffre estimé est un minorant pendant les ruptures.

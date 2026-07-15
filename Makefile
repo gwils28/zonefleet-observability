@@ -17,3 +17,5 @@ e0:          ## E0 : qualité du modèle surveillé (≈ 6 min, MSTL inclus)
 	uv run python -m zonefleet.experiments.e0_model
 e1:          ## E1 : choc COVID, DLE estimé vs réalisé
 	uv run python -m zonefleet.experiments.e1_covid
+e2:          ## E2 : tarification de congestion, CBD vs hors CBD
+	uv run python -m zonefleet.experiments.e2_congestion

@@ -92,6 +92,79 @@ def e0_mstl() -> pd.DataFrame:
     )
 
 
+POLICY_FR = {
+    "P1_drift": "P1 dérive seule",
+    "P2_dle": "P2 DLE seul",
+    "P3_drift_and_dle": "P3 dérive ET DLE",
+    "P4_realized": "P4 labels retardés",
+}
+
+
+def detection_frame(d: pd.DataFrame) -> pd.DataFrame:
+    def date_fr(v):
+        return "-" if pd.isna(v) else pd.Timestamp(v).strftime("%d/%m/%Y")
+
+    return pd.DataFrame(
+        {
+            "Politique": d["policy"].map(POLICY_FR),
+            "1er jour cible en alerte": d["target_day"].map(date_fr),
+            "Décision possible le": d["decision"].map(date_fr),
+            "Délai (jours)": d["delay_days"].map(
+                lambda v: "non détecté" if pd.isna(v) else fr(v, 0)
+            ),
+            "Jours en alerte avant le choc": d["false_alert_days_before"].astype(int),
+        }
+    )
+
+
+@table("e1_phases")
+def e1_phases() -> pd.DataFrame:
+    m = pd.read_csv(T / "e1_phases.csv")
+    m = m[m["metric"].isin(["mae_log", "mae_count"])]
+    return pd.DataFrame(
+        {
+            "Métrique": m["metric"].map({"mae_log": "MAE log", "mae_count": "MAE courses"}),
+            "Phase": m["phase"],
+            "Estimée (DLE)": m["estimated"].map(lambda v: fr(v, 3)),
+            "Réalisée": m["realized"].map(lambda v: fr(v, 3)),
+            "Estimée / réalisée": m["ratio_est_real"].map(lambda v: fr(v, 2)),
+            "Corrélation journalière": m["corr_daily"].map(lambda v: fr(v, 2)),
+        }
+    )
+
+
+@table("e1_detection")
+def e1_detection() -> pd.DataFrame:
+    return detection_frame(pd.read_csv(T / "e1_detection.csv"))
+
+
+@table("e2_detection")
+def e2_detection() -> pd.DataFrame:
+    d = pd.read_csv(T / "e2_detection.csv")
+    g = pd.read_csv(T / "e2_detection_by_group.csv")
+    out = detection_frame(d)
+    after = g.groupby("policy")["alert_days_after"].apply(
+        lambda s: " / ".join(str(int(v)) for v in s)
+    )
+    out["Jours en alerte après (CBD / hors CBD)"] = d["policy"].map(after).to_numpy()
+    return out
+
+
+@table("e2_realized")
+def e2_realized() -> pd.DataFrame:
+    r = pd.read_csv(T / "e2_realized_by_group.csv")
+    return pd.DataFrame(
+        {
+            "Groupe": r["group"].map({"cbd": "CBD", "hors_cbd": "hors CBD"}),
+            "Phase": r["phase"],
+            "MAE courses": r["mae_count"].map(lambda v: fr(v, 1)),
+            "MAE log": r["mae_log"].map(lambda v: fr(v, 3)),
+            "Biais log (réalisé - prévu)": r["bias_log"].map(lambda v: fr(v, 3)),
+            "Lignes": r["n"].map(lambda v: fr(v, 0)),
+        }
+    )
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in REGISTRY.items():

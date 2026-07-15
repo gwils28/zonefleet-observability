@@ -42,6 +42,10 @@ website:
         menu:
           - href: modele/features.qmd
           - href: modele/e0.qmd
+      - text: Expériences
+        menu:
+          - href: experiences/e1-covid.qmd
+          - href: experiences/e2-congestion.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability

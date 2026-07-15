@@ -141,6 +141,263 @@ def e0_traces() -> None:
     viz.save(fig, "e0_traces")
 
 
+# --------------------------------------------------------------------------- E1/E2
+POLICY_FR = {
+    "P1_drift": "P1 dérive seule",
+    "P2_dle": "P2 DLE seul",
+    "P3_drift_and_dle": "P3 dérive ET DLE",
+    "P4_realized": "P4 labels (D + 60 j)",
+}
+
+
+def perf_panel(ax, perf: pd.DataFrame, metric: str, title: str, shock=None, phases=None) -> None:
+    """Erreur estimée (bande de confiance) vs réalisée, journalière, avec seuil."""
+    d = perf[perf["metric"] == metric].sort_values("date")
+    if phases:
+        for (a, b), shade in phases:
+            ax.axvspan(pd.Timestamp(a), pd.Timestamp(b), color=shade, alpha=0.08, lw=0)
+    ax.fill_between(d["date"], d["lower"], d["upper"], color=viz.BLUE, alpha=0.15, lw=0)
+    ax.plot(d["date"], d["estimated"], color=viz.BLUE, label="estimée par DLE (sans labels)")
+    ax.plot(d["date"], d["realized"], color=viz.ORANGE, label="réalisée (labels, D + 60 j)")
+    ax.plot(
+        d["date"], d["threshold"], color=viz.MUTED, ls="--", lw=1, label="seuil (référence + 3 σ)"
+    )
+    if shock is not None:
+        ax.axvline(shock, color=viz.INK2, lw=1)
+    ax.set_title(title, fontsize=11)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+
+
+def policy_timeline(ax, sig: pd.DataFrame, shock) -> None:
+    """Jours d'alerte par politique (horloge cible), début du choc en trait vertical."""
+    for i, col in enumerate(POLICY_FR):
+        days = sig.index[sig[col].astype(bool)]
+        ax.scatter(days, [i] * len(days), marker="|", s=120, color=viz.ALERT, lw=1.6)
+    ax.set_yticks(range(4), list(POLICY_FR.values()))
+    ax.set_ylim(-0.6, 3.6)
+    ax.invert_yaxis()
+    ax.axvline(shock, color=viz.INK2, lw=1)
+    ax.grid(axis="y", visible=False)
+    ax.grid(axis="x")
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+
+
+E1_PHASES = [(("2020-03-13", "2020-04-13"), viz.ALERT)]
+
+
+@group("e1")
+def e1_estimated_vs_realized() -> None:
+    from zonefleet.config import COVID_EMERGENCY
+
+    perf = pd.read_csv(T / "e1_performance.csv", parse_dates=["date"])
+    fig, axes = plt.subplots(2, 1, figsize=(12, 6.6), sharex=True)
+    perf_panel(
+        axes[0],
+        perf,
+        "mae_log",
+        "Erreur relative (MAE sur log1p) : DLE voit le choc mais le sous-estime d'un facteur 2,7",
+        COVID_EMERGENCY,
+        E1_PHASES,
+    )
+    perf_panel(
+        axes[1],
+        perf,
+        "mae_count",
+        "Erreur en courses (MAE) : la mesure absolue « s'améliore » au plancher",
+        COVID_EMERGENCY,
+        E1_PHASES,
+    )
+    axes[0].legend(loc="upper left")
+    axes[0].annotate(
+        "13 mars : état d'urgence",
+        (COVID_EMERGENCY, 0.97),
+        xycoords=("data", "axes fraction"),
+        xytext=(5, 0),
+        textcoords="offset points",
+        fontsize=9,
+        color=viz.INK2,
+        va="top",
+    )
+    fig.tight_layout()
+    viz.save(fig, "e1_estime_vs_realise")
+
+
+@group("e1")
+def e1_scatter() -> None:
+    perf = pd.read_csv(T / "e1_performance.csv", parse_dates=["date"])
+    d = perf[perf["metric"] == "mae_log"]
+    phases = [
+        ("avant", d["date"] < "2020-03-13", viz.NEUTRAL),
+        (
+            "choc (13 mars-12 avril)",
+            (d["date"] >= "2020-03-13") & (d["date"] < "2020-04-13"),
+            viz.MAGENTA,
+        ),
+        ("plancher (13 avril-30 juin)", d["date"] >= "2020-04-13", viz.VIOLET),
+    ]
+    fig, ax = plt.subplots(figsize=(6.4, 5.4))
+    for lab, m, c in phases:
+        ax.scatter(
+            d.loc[m, "realized"],
+            d.loc[m, "estimated"],
+            s=22,
+            color=c,
+            label=lab,
+            edgecolor=viz.SURFACE,
+            lw=0.8,
+        )
+    lim = [0, max(d["realized"].max(), d["estimated"].max()) * 1.05]
+    ax.plot(lim, lim, color=viz.MUTED, lw=1, ls="--")
+    ax.annotate(
+        "estimé = réalisé", (lim[1] * 0.62, lim[1] * 0.66), rotation=38, fontsize=9, color=viz.INK2
+    )
+    ax.set_xlim(lim)
+    ax.set_ylim(lim)
+    ax.set_xlabel("MAE log réalisée")
+    ax.set_ylabel("MAE log estimée (DLE)")
+    ax.set_title("Chaque point est un jour de 2020")
+    ax.legend(loc="upper left")
+    ax.grid(axis="x")
+    fig.tight_layout()
+    viz.save(fig, "e1_scatter")
+
+
+@group("e1")
+def e1_drift() -> None:
+    from zonefleet.config import COVID_EMERGENCY
+
+    u = pd.read_csv(T / "e1_univariate.csv", parse_dates=["date"])
+    u = u[u["method"] == "kolmogorov_smirnov"]
+    w = u.pivot_table(index="feature", columns=pd.Grouper(key="date", freq="W"), values="value")
+    order = [
+        "lag_24",
+        "lag_48",
+        "lag_72",
+        "lag_168",
+        "lag_336",
+        "roll_mean_24",
+        "roll_mean_168",
+        "temperature_2m",
+        "precipitation",
+        "hour",
+        "dow",
+        "is_weekend",
+        "is_holiday",
+    ]
+    w = w.reindex([o for o in order if o in w.index])
+    mv = pd.read_csv(T / "e1_multivariate.csv", parse_dates=["date"])
+    psi = pd.read_csv(T / "e1_psi.csv", parse_dates=["date"]).groupby("date")["psi"].max()
+    fig, axes = plt.subplots(2, 1, figsize=(12, 7), gridspec_kw={"height_ratios": [1.5, 1]})
+    im = axes[0].imshow(w, aspect="auto", cmap="Blues", vmin=0, vmax=1, interpolation="nearest")
+    axes[0].set_yticks(range(len(w)), w.index)
+    ticks = list(range(0, w.shape[1], 4))
+    axes[0].set_xticks(ticks, [w.columns[i].strftime("%d %b") for i in ticks])
+    axes[0].grid(False)
+    axes[0].set_title("Statistique KS hebdomadaire par feature (0 = identique à la référence)")
+    fig.colorbar(im, ax=axes[0], shrink=0.8)
+    ax = axes[1]
+    ax.plot(
+        mv["date"], mv["value"] / mv["threshold"], color=viz.VIOLET, label="PCA : erreur / seuil"
+    )
+    ax.plot(psi.index, psi / 0.25, color=viz.AQUA, label="PSI max / 0,25")
+    ax.axhline(1, color=viz.ALERT, lw=1, ls="--")
+    ax.axvline(COVID_EMERGENCY, color=viz.INK2, lw=1)
+    ax.set_yscale("log")
+    viz.plain_log_axis(ax, "y")
+    ax.set_ylabel("rapport au seuil (log)")
+    ax.set_title(
+        "Au-dessus de 1 : alerte. PCA sous son seuil ; PSI au-dessus dès janvier (température)"
+    )
+    ax.legend(loc="center left", bbox_to_anchor=(0.0, 0.42))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    fig.tight_layout()
+    viz.save(fig, "e1_derive")
+
+
+@group("e1")
+def e1_timeline() -> None:
+    from zonefleet.config import COVID_EMERGENCY
+
+    sig = pd.read_csv(T / "e1_signals.csv", parse_dates=["date"]).set_index("date")
+    fig, ax = plt.subplots(figsize=(12, 2.8))
+    policy_timeline(ax, sig, COVID_EMERGENCY)
+    ax.set_title("Jours en alerte par politique (après persistance de 2 jours), E1")
+    fig.tight_layout()
+    viz.save(fig, "e1_alertes")
+
+
+@group("e2")
+def e2_demand() -> None:
+    from zonefleet.config import CONGESTION_START
+
+    h = pd.read_csv(T / "e2_demand_change_by_hour.csv")
+    d = pd.read_csv(T / "e2_demand_daily.csv", parse_dates=["date"])
+    fig, axes = plt.subplots(1, 2, figsize=(12, 3.8))
+    ax = axes[0]
+    ax.bar(h["hour"] - 0.2, h["cbd"], width=0.38, color=viz.BLUE, label="zones CBD")
+    ax.bar(h["hour"] + 0.2, h["hors_cbd"], width=0.38, color=viz.AQUA, label="zones hors CBD")
+    ax.set_xticks(range(0, 24, 3), [f"{x}h" for x in range(0, 24, 3)])
+    ax.set_ylabel("évolution janv.-juin 2025 / 2024 (%)")
+    ax.set_title("Toute la ville progresse ; la nuit, le CBD progresse moins")
+    ax.legend(loc="upper right")
+    ax = axes[1]
+    ax.plot(d["date"], 100 * d["ratio_cbd"].rolling(7).mean(), color=viz.BLUE)
+    ax.axvline(CONGESTION_START, color=viz.INK2, lw=1)
+    ax.set_ylabel("part du CBD dans les 60 zones (%)")
+    ax.set_title("Part du CBD (moyenne 7 jours)")
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
+    fig.tight_layout()
+    viz.save(fig, "e2_demande")
+
+
+@group("e2")
+def e2_estimated_vs_realized() -> None:
+    from zonefleet.config import CONGESTION_START
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 3.8), sharey=True)
+    for ax, g, title in [(axes[0], "cbd", "Zones CBD"), (axes[1], "hors_cbd", "Zones hors CBD")]:
+        perf = pd.read_csv(T / f"e2_performance_{g}.csv", parse_dates=["date"])
+        perf_panel(ax, perf, "mae_log", f"{title} : erreur relative (MAE log)", CONGESTION_START)
+    axes[0].legend(loc="upper right", fontsize=8.5)
+    fig.tight_layout()
+    viz.save(fig, "e2_estime_vs_realise")
+
+
+@group("e2")
+def e2_false_alarms() -> None:
+    rows = []
+    for e, lab in [("e1", "E1 (janv.-juin 2020)"), ("e2", "E2 (janv.-juin 2025)")]:
+        p = pd.read_csv(T / f"{e}_psi.csv")
+        r = p.assign(a=p["psi"] > 0.25).groupby("feature")["a"].mean()
+        rows.append(r.rename(lab))
+    t = pd.concat(rows, axis=1).loc[["temperature_2m", "roll_mean_168", "lag_168", "lag_24"]]
+    fig, ax = plt.subplots(figsize=(8, 3.4))
+    y = np.arange(len(t))
+    ax.barh(y + 0.2, 100 * t.iloc[:, 0], height=0.38, color=viz.VIOLET, label=t.columns[0])
+    ax.barh(y - 0.2, 100 * t.iloc[:, 1], height=0.38, color=viz.YELLOW, label=t.columns[1])
+    ax.set_yticks(y, t.index)
+    ax.invert_yaxis()
+    ax.grid(axis="x")
+    ax.grid(axis="y", visible=False)
+    ax.set_xlabel("% des jours avec PSI > 0,25")
+    ax.set_title("Anatomie des fausses alertes de la dérive seule")
+    ax.legend(loc="lower right")
+    fig.tight_layout()
+    viz.save(fig, "e2_fausses_alertes")
+
+
+@group("e2")
+def e2_timeline() -> None:
+    from zonefleet.config import CONGESTION_START
+
+    sig = pd.read_csv(T / "e2_signals.csv", parse_dates=["date"]).set_index("date")
+    fig, ax = plt.subplots(figsize=(12, 2.8))
+    policy_timeline(ax, sig, CONGESTION_START)
+    ax.set_title("Jours en alerte par politique, E2 : seule la dérive seule alerte, tous les jours")
+    fig.tight_layout()
+    viz.save(fig, "e2_alertes")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
