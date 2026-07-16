@@ -19,3 +19,5 @@ e1:          ## E1 : choc COVID, DLE estimé vs réalisé
 	uv run python -m zonefleet.experiments.e1_covid
 e2:          ## E2 : tarification de congestion, CBD vs hors CBD
 	uv run python -m zonefleet.experiments.e2_congestion
+e3:          ## E3 : frontière covariate shift / concept drift (≈ 2 min)
+	uv run python -m zonefleet.experiments.e3_frontier

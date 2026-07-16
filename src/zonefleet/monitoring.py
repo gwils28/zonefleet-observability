@@ -13,8 +13,12 @@ Deux échelles de performance sont surveillées :
 from __future__ import annotations
 
 import logging
+import os
 
-import nannyml as nml
+# NannyML envoie par défaut des statistiques d'usage à un service tiers : désactivé.
+os.environ.setdefault("NML_DISABLE_USAGE_LOGGING", "1")
+
+import nannyml as nml  # noqa: E402
 import numpy as np
 import pandas as pd
 

@@ -7,7 +7,10 @@ Signaux journaliers (un booléen par jour cible) :
 - `perf_real` : MAE réalisée (échelle log) au-dessus du même seuil, connue avec retard.
 
 Politiques (SPEC, E4) :
-- P1 dérive seule, P2 DLE seul, P3 dérive ET DLE, P4 labels retardés.
+- P1 dérive seule, P2 DLE seul, P3 dérive ET DLE, P4 labels retardés ;
+- variantes déclarées avant E4 (docs/notes/implementation.md) : P1b dérive « nettoyée »
+  (PCA OU PSI > 0,25 sur `lag_24` et `lag_168` seulement, sans température ni moyenne
+  glissante) et P3b = P1b ET DLE.
 
 Une alerte n'est levée qu'après `persistence` jours consécutifs en dépassement, pour ne
 pas réveiller l'astreinte sur un jour atypique isolé.
@@ -23,7 +26,15 @@ import pandas as pd
 from zonefleet.config import HORIZON_H, LABEL_DELAY_DAYS
 
 PSI_ALERT = 0.25
-POLICIES = ("P1_drift", "P2_dle", "P3_drift_and_dle", "P4_realized")
+CLEAN_PSI_FEATURES = ("lag_24", "lag_168")
+POLICIES = (
+    "P1_drift",
+    "P1b_drift_clean",
+    "P2_dle",
+    "P3_drift_and_dle",
+    "P3b_clean_and_dle",
+    "P4_realized",
+)
 LEAD = pd.Timedelta(hours=HORIZON_H)
 LAG = pd.Timedelta(days=LABEL_DELAY_DAYS)
 
@@ -33,10 +44,14 @@ def daily_signals(signals: dict[str, pd.DataFrame], metric: str = "mae_log") -> 
     perf = signals["performance"].query("metric == @metric").set_index("date")
     mv = signals["multivariate"].set_index("date")["alert"]
     psi_max = signals["psi"].groupby("date")["psi"].max()
+    clean = signals["psi"][signals["psi"]["feature"].isin(CLEAN_PSI_FEATURES)]
+    psi_clean = clean.groupby("date")["psi"].max()
     out = pd.DataFrame(index=perf.index)
     out["pca_alert"] = mv.reindex(out.index).fillna(False).astype(bool)
     out["psi_max"] = psi_max.reindex(out.index)
     out["drift"] = out["pca_alert"] | (out["psi_max"] > PSI_ALERT)
+    out["psi_clean_max"] = psi_clean.reindex(out.index)
+    out["drift_clean"] = out["pca_alert"] | (out["psi_clean_max"] > PSI_ALERT)
     out["perf_est"] = perf["estimated"] > perf["threshold"]
     out["perf_real"] = perf["realized"] > perf["threshold"]
     out["estimated"], out["realized"], out["threshold"] = (
@@ -61,6 +76,9 @@ def policy_flags(sig: pd.DataFrame, persistence: int = 2) -> pd.DataFrame:
         "P3_drift_and_dle": sig["drift"] & sig["perf_est"],
         "P4_realized": sig["perf_real"],
     }
+    if "drift_clean" in sig:
+        raw["P1b_drift_clean"] = sig["drift_clean"]
+        raw["P3b_clean_and_dle"] = sig["drift_clean"] & sig["perf_est"]
     return pd.DataFrame({k: persistent(v, persistence) for k, v in raw.items()})
 
 

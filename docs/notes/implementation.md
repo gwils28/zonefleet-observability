@@ -43,3 +43,14 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   (protocole figé). E4 ajoute une variante de politique « dérive nettoyée » (P1b : PCA OU
   PSI sur `lag_24` et `lag_168` seulement), déclarée ici avant son exécution, pour ne pas
   comparer la condition jointe à un homme de paille.
+
+## 2026-07-16 : E3 mesuré contre un contrefactuel, pas en avant/après
+
+- Décision : l'effet d'un scénario est la différence avec le scénario « aucune dérive »
+  sur les mêmes jours, et non la différence avant/après l'injection.
+- Raison : premier passage, le scénario sans dérive montrait déjà Δ estimé = -0,10 entre
+  janvier-février (vague de froid, DLE haut) et mars-juin. L'avant/après mesurait la
+  saison autant que l'injection.
+- Impact : les taux de suivi deviennent interprétables (0,82 à 0,99 en covariate shift,
+  0 en concept drift pur). Le SPEC (section 8) demandait une corrélation ; le taux de
+  suivi est rapporté en plus, la corrélation journalière est dans `e3_summary.csv`.
