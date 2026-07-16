@@ -54,3 +54,18 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Impact : les taux de suivi deviennent interprétables (0,82 à 0,99 en covariate shift,
   0 en concept drift pur). Le SPEC (section 8) demandait une corrélation ; le taux de
   suivi est rapporté en plus, la corrélation journalière est dans `e3_summary.csv`.
+
+## 2026-07-16 : E4, détection par front montant et lissage sur 7 jours
+
+- Détection comptée seulement sur un **front montant** de l'alerte dans les 28 jours
+  suivant l'injection : une alarme déjà allumée avant l'injection ne « détecte » rien.
+  Premier passage (20 scénarios) : sans cette règle, P1 affichait un rappel de 1 avec un
+  délai de -1 jour alors qu'elle était en alerte 100 % du temps.
+- Fausses alertes rapportées de deux façons : événements (allumages) par 30 jours, et
+  part des jours sans dérive passés en alerte.
+- Dimension ajoutée : signal estimé et réalisé lissé sur 7 jours (moyenne passée) contre
+  signal journalier brut ; seuils calculés sur la référence lissée de la même façon.
+  Raison : l'erreur estimée de base vaut ~0,29 et le seuil k = 1 vaut 0,34 ; un shift
+  nuisible modéré (+10 %) reste sous le bruit jour à jour.
+- Grille de k étendue à 0,5. La nuisance d'un scénario est mesurée sur le signal brut,
+  indépendamment du lissage.
