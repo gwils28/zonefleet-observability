@@ -165,6 +165,25 @@ def e2_realized() -> pd.DataFrame:
     )
 
 
+@table("e3_summary")
+def e3_summary() -> pd.DataFrame:
+    s = pd.read_csv(T / "e3_summary.csv")
+    s = s[s["family"] != "aucune"]
+    f2 = lambda v: fr(v, 3)  # noqa: E731
+    return pd.DataFrame(
+        {
+            "Scénario": s["scenario"],
+            "Δ réalisé (14 j)": s["delta_real_transition"].map(f2),
+            "Δ estimé (14 j)": s["delta_est_transition"].map(f2),
+            "Suivi (14 j)": s["tracking_transition"].map(lambda v: fr(v, 2)),
+            "Δ réalisé (établi)": s["delta_real_steady"].map(f2),
+            "Δ estimé (établi)": s["delta_est_steady"].map(f2),
+            "Suivi (établi)": s["tracking_steady"].map(lambda v: fr(v, 2)),
+            "Jours en dérive (P1b)": s["share_drift_clean"].map(lambda v: fr(100 * v, 0) + " %"),
+        }
+    )
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in REGISTRY.items():
