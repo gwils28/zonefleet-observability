@@ -26,7 +26,7 @@ from zonefleet.monitoring import DLE_FEATURES, DRIFT_FEATURES, TS, prepare, psi 
 
 logging.getLogger("nannyml").setLevel(logging.WARNING)
 
-PSI_COLUMNS = ("lag_24", "lag_168")
+PSI_COLUMNS = ("lag_24", "lag_168", "roll_mean_168", "temperature_2m")
 
 
 class RowScorer:

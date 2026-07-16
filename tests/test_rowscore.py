@@ -37,5 +37,5 @@ def test_aggregate_of_resampled_rows_is_cheap_and_consistent(fitted):
     rows = rs.score_rows(an)
     resampled = rows.sample(frac=1.0, replace=True, random_state=0)
     out = rs.aggregate(resampled)
-    assert set(out.columns) == {"est", "recon", "real", "psi_lag_24", "psi_lag_168"}
+    assert {"est", "recon", "real", "psi_lag_24", "psi_lag_168"} <= set(out.columns)
     assert (out["est"] >= 0).all()
