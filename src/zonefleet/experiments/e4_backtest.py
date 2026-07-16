@@ -193,63 +193,58 @@ def evaluate(sc, daily, harm, flags) -> list[dict]:
     return out
 
 
-def summarize(res: pd.DataFrame, n_boot: int = 1000, seed: int = 0) -> pd.DataFrame:
+def _metrics(a: dict[str, np.ndarray], i: np.ndarray) -> dict[str, np.ndarray]:
+    """Métriques d'une politique pour des tirages d'indices de scénarios (n_tirages x n)."""
+    h, b, det = a["harmful"][i], a["benign"][i], a["det"][i]
+    with np.errstate(all="ignore"):
+        return {
+            "recall": (det * h).sum(-1) / np.maximum(h.sum(-1), 1),
+            "median_delay": np.nanmedian(np.where(h & (det > 0), a["delay"][i], np.nan), axis=-1),
+            "false_alerts_per_30d": 30 * a["fa_ev"][i].sum(-1) / a["null"][i].sum(-1),
+            "benign_alert_rate": (det * b).sum(-1) / np.maximum(b.sum(-1), 1),
+        }
+
+
+def summarize(res: pd.DataFrame, n_boot: int = 2000, seed: int = 0) -> pd.DataFrame:
     """Rappel, délai médian, fausses alertes (événements / 30 j et part de jours),
-    alertes sur dérive non nuisible ; intervalles bootstrap 90 % sur les scénarios."""
+    alertes sur dérive non nuisible ; intervalles bootstrap 90 % sur les scénarios.
+
+    Vectorisé : une ligne par scénario, rééchantillonnage d'indices de scénarios.
+    """
     rng = np.random.default_rng(seed)
     rows = []
-
-    def stats(sub):
-        harmful = sub[sub["harmful"]]
-        benign = sub[~sub["harmful"] & (sub["kind"] != "none")]
-        delays = harmful.loc[harmful["detected"], "delay_days"]
-        return (
-            harmful["detected"].mean(),
-            delays.median() if len(delays) else np.nan,
-            30 * sub["false_alert_events"].sum() / sub["null_days"].sum(),
-            sub["false_alert_days"].sum() / sub["null_days"].sum(),
-            benign["detected"].mean(),
-        )
-
     for (w, k, pol), d in res.groupby(["smooth", "k", "policy"]):
-        ids = d["id"].unique()
-        by_id = {i: g for i, g in d.groupby("id")}
-        point = stats(d)
-        boots = np.array(
-            [
-                stats(pd.concat([by_id[i] for i in rng.choice(ids, size=len(ids))]))
-                for _ in range(n_boot)
-            ],
-            dtype=float,
-        )
-        with np.errstate(all="ignore"):
-            lo = np.nanpercentile(boots, 5, axis=0)
-            hi = np.nanpercentile(boots, 95, axis=0)
-        rows.append(
-            {
-                "smooth": w,
-                "k": k,
-                "policy": pol,
-                "recall": point[0],
-                "recall_lo": lo[0],
-                "recall_hi": hi[0],
-                "median_delay": point[1],
-                "delay_lo": lo[1],
-                "delay_hi": hi[1],
-                "false_alerts_per_30d": point[2],
-                "fa_lo": lo[2],
-                "fa_hi": hi[2],
-                "share_null_days_in_alert": point[3],
-                "benign_alert_rate": point[4],
-                "n_harmful": int(d.loc[d["harmful"], "id"].nunique()),
-                "n_scenarios": int(len(ids)),
-            }
-        )
+        d = d.sort_values("id")
+        harmful = d["harmful"].to_numpy().astype(bool)
+        arrays = {
+            "harmful": harmful,
+            "benign": (~harmful) & (d["kind"] != "none").to_numpy(),
+            "det": d["detected"].to_numpy().astype(float),
+            "delay": d["delay_days"].to_numpy(dtype=float),
+            "fa_ev": d["false_alert_events"].to_numpy(dtype=float),
+            "null": d["null_days"].to_numpy(dtype=float),
+        }
+        point = _metrics(arrays, np.arange(len(d))[None, :])
+        boot = _metrics(arrays, rng.integers(0, len(d), size=(n_boot, len(d))))
+        out = {"smooth": w, "k": k, "policy": pol}
+        for name in point:
+            with np.errstate(all="ignore"):
+                out[name] = float(point[name][0])
+                out[f"{name}_lo"] = float(np.nanpercentile(boot[name], 5))
+                out[f"{name}_hi"] = float(np.nanpercentile(boot[name], 95))
+        out["share_null_days_in_alert"] = d["false_alert_days"].sum() / d["null_days"].sum()
+        out["n_harmful"] = int(harmful.sum())
+        out["n_scenarios"] = int(len(d))
+        rows.append(out)
     return pd.DataFrame(rows)
 
 
-def main(n: int = 240) -> None:
+def main(n: int = 240, summary_only: bool = False) -> None:
     warnings.filterwarnings("ignore", category=RuntimeWarning)
+    if summary_only:
+        res = pd.read_csv(TABLES / "e4_results.csv", parse_dates=["onset"])
+        summarize(res).round(4).to_csv(TABLES / "e4_summary.csv", index=False)
+        return
     pred = predictions(SPLIT)
     ref, an = pred[pred.period == "reference"], pred[pred.period == "analysis"]
     an = an.reset_index(drop=True)
@@ -307,4 +302,6 @@ def main(n: int = 240) -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=240)
-    main(ap.parse_args().n)
+    ap.add_argument("--summary-only", action="store_true", help="relit e4_results.csv")
+    args = ap.parse_args()
+    main(args.n, args.summary_only)
