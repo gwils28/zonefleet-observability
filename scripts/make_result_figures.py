@@ -398,6 +398,114 @@ def e2_timeline() -> None:
     viz.save(fig, "e2_alertes")
 
 
+# --------------------------------------------------------------------------- E3
+FAMILY_COLOR = {
+    "covariate nuisible": viz.BLUE,
+    "covariate bénin": viz.AQUA,
+    "concept pur": viz.MAGENTA,
+    "choc propagé": viz.YELLOW,
+}
+
+
+@group("e3")
+def e3_frontier() -> None:
+    s = pd.read_csv(T / "e3_summary.csv")
+    s = s[s["family"] != "aucune"]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharex=True, sharey=True)
+    for ax, w, title in [
+        (axes[0], "transition", "14 premiers jours après l'injection"),
+        (axes[1], "steady", "Régime établi (jour 15 et après)"),
+    ]:
+        lim = (-0.15, 0.42)
+        ax.axhline(0, color=viz.GRID, lw=1)
+        ax.axvline(0, color=viz.GRID, lw=1)
+        ax.plot(lim, lim, color=viz.MUTED, ls="--", lw=1)
+        for fam, c in FAMILY_COLOR.items():
+            t = s[s["family"] == fam]
+            ax.scatter(
+                t[f"delta_real_{w}"],
+                t[f"delta_est_{w}"],
+                s=30 + 120 * t["severity"].rank(pct=True),
+                color=c,
+                label=fam,
+                edgecolor=viz.SURFACE,
+                lw=1,
+            )
+        ax.set_xlim(lim)
+        ax.set_ylim(-0.15, 0.25)
+        ax.set_xlabel("hausse de l'erreur réalisée (MAE log, vs sans dérive)")
+        ax.set_title(title)
+        ax.grid(axis="x")
+    axes[0].set_ylabel("hausse de l'erreur estimée par DLE")
+    axes[0].annotate("estimé = réalisé", (0.17, 0.19), rotation=33, fontsize=9, color=viz.INK2)
+    axes[1].annotate("concept pur : DLE ne bouge pas", (0.20, 0.012), fontsize=9, color=viz.INK2)
+    axes[0].legend(loc="upper left")
+    fig.tight_layout()
+    viz.save(fig, "e3_frontiere")
+
+
+@group("e3")
+def e3_series() -> None:
+    from zonefleet.experiments.e3_frontier import ONSET
+
+    d = pd.read_csv(T / "e3_daily.csv", parse_dates=["date"]).set_index("date")
+    base = d[d["scenario"] == "aucune dérive"]
+    picks = [
+        ("covariate nuisible κ=2", "Covariate shift nuisible (κ = 2)"),
+        ("covariate bénin κ=2", "Covariate shift bénin (κ = 2)"),
+        ("concept pur x0.5", "Concept drift pur (demande x0,5, X gelé)"),
+        ("choc propagé x0.5", "Choc de niveau propagé (x0,5)"),
+    ]
+    fig, axes = plt.subplots(2, 2, figsize=(12, 6.4), sharex=True, sharey=True)
+    for ax, (sc, title) in zip(axes.flat, picks, strict=True):
+        t = d[d["scenario"] == sc]
+        ax.plot(base.index, base["realized"], color=viz.NEUTRAL, lw=1, label="réalisée sans dérive")
+        ax.plot(t.index, t["estimated"], color=viz.BLUE, lw=1.6, label="estimée (DLE)")
+        ax.plot(t.index, t["realized"], color=viz.ORANGE, lw=1.3, label="réalisée")
+        ax.axvline(ONSET, color=viz.INK2, lw=1)
+        ax.set_title(title, fontsize=11)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    axes[0, 0].legend(loc="upper right", fontsize=8.5)
+    axes[0, 0].set_ylabel("MAE log journalière")
+    axes[1, 0].set_ylabel("MAE log journalière")
+    fig.tight_layout()
+    viz.save(fig, "e3_series")
+
+
+@group("e3")
+def e3_transition() -> None:
+    from zonefleet.experiments.e3_frontier import ONSET
+
+    d = pd.read_csv(T / "e3_daily.csv", parse_dates=["date"]).set_index("date")
+    t = d[d["scenario"] == "choc propagé x0.5"]
+    t = t[(t.index >= ONSET - pd.Timedelta(days=14)) & (t.index < ONSET + pd.Timedelta(days=35))]
+    fig, ax = plt.subplots(figsize=(11, 3.8))
+    for k, lab in [(1, "lag 24 h"), (7, "lag 168 h"), (14, "lag 336 h")]:
+        x = ONSET + pd.Timedelta(days=k)
+        ax.axvline(x, color=viz.GRID, lw=1)
+        ax.annotate(
+            f"{lab} absorbe le choc",
+            (x, 0.97),
+            xycoords=("data", "axes fraction"),
+            xytext=(3, 0),
+            textcoords="offset points",
+            fontsize=8.5,
+            color=viz.INK2,
+            va="top",
+        )
+    ax.plot(t.index, t["estimated"], color=viz.BLUE, label="estimée (DLE)")
+    ax.plot(t.index, t["realized"], color=viz.ORANGE, label="réalisée")
+    ax.axvline(ONSET, color=viz.INK2, lw=1.2)
+    ax.set_ylabel("MAE log journalière")
+    ax.set_title(
+        "Choc x0,5 le 3 mars : DLE ne voit la transition qu'à mesure que les lags la voient"
+    )
+    ax.legend(loc="center right")
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
+    fig.tight_layout()
+    viz.save(fig, "e3_transition")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
