@@ -47,6 +47,7 @@ website:
           - href: experiences/e1-covid.qmd
           - href: experiences/e2-congestion.qmd
           - href: experiences/e3-frontiere.qmd
+          - href: experiences/e4-backtest.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability
