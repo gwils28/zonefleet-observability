@@ -184,6 +184,69 @@ def e3_summary() -> pd.DataFrame:
     )
 
 
+POLICY_E4 = {
+    "P1_drift": "P1 dérive seule",
+    "P1b_drift_clean": "P1b dérive nettoyée",
+    "P2_dle": "P2 DLE seul",
+    "P3_drift_and_dle": "P3 dérive ET DLE",
+    "P3b_clean_and_dle": "P3b dérive nettoyée ET DLE",
+    "P4_realized": "P4 labels retardés",
+}
+
+
+@table("e4_main")
+def e4_main() -> pd.DataFrame:
+    s = pd.read_csv(T / "e4_summary.csv")
+    s = s[s["k"] == 1.0].copy()
+
+    def ci(v, lo, hi, scale=1.0, d=0):
+        if pd.isna(v):
+            return "-"
+        return f"{fr(scale * v, d)} [{fr(scale * lo, d)} ; {fr(scale * hi, d)}]"
+
+    return pd.DataFrame(
+        {
+            "Signal": s["smooth"].map({1: "journalier", 7: "lissé 7 j"}),
+            "Politique": s["policy"].map(POLICY_E4),
+            "Rappel (%) [IC 90 %]": [
+                ci(r.recall, r.recall_lo, r.recall_hi, 100) for r in s.itertuples()
+            ],
+            "Délai médian (j)": s["median_delay"].map(lambda v: fr(v, 1)),
+            "Fausses alertes / 30 j": [
+                ci(
+                    r.false_alerts_per_30d,
+                    r.false_alerts_per_30d_lo,
+                    r.false_alerts_per_30d_hi,
+                    1,
+                    2,
+                )
+                for r in s.itertuples()
+            ],
+            "Jours nuls en alerte (%)": s["share_null_days_in_alert"].map(lambda v: fr(100 * v, 1)),
+            "Alerte sur dérive non nuisible (%)": s["benign_alert_rate"].map(
+                lambda v: fr(100 * v, 0)
+            ),
+        }
+    )
+
+
+@table("e4_by_kind")
+def e4_by_kind() -> pd.DataFrame:
+    r = pd.read_csv(T / "e4_results.csv")
+    r = r[(r["smooth"] == 1) & (r["k"] == 1.0) & r["harmful"]]
+    t = r.groupby(["policy", "kind"])["detected"].mean().unstack()
+    n = r.drop_duplicates("id")["kind"].value_counts()
+    cols = {
+        "covariate_harmful": "covariate nuisible",
+        "level": "choc propagé",
+        "concept": "concept pur",
+    }
+    out = pd.DataFrame({"Politique": [POLICY_E4[p] for p in t.index]})
+    for k, lab in cols.items():
+        out[f"{lab} (n = {n.get(k, 0)})"] = (100 * t[k]).map(lambda v: fr(v, 0) + " %").to_numpy()
+    return out
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in REGISTRY.items():
