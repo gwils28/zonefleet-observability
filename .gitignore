@@ -27,3 +27,7 @@ site/.quarto/
 .env.*
 CLAUDE.local.md
 .claude/settings.local.json
+
+# MLflow local (registry de démonstration)
+mlflow.db
+results/mlflow/
