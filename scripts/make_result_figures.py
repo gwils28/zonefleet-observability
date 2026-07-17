@@ -668,6 +668,77 @@ def e4_delays() -> None:
     viz.save(fig, "e4_delais")
 
 
+# --------------------------------------------------------------------------- E5
+POLICY_E5 = {
+    "jamais": viz.NEUTRAL,
+    "calendrier": viz.BLUE,
+    "réflexe": viz.YELLOW,
+    "réflexe court": viz.MAGENTA,
+    "gardé": viz.VIOLET,
+}
+
+
+@group("e5")
+def e5_trajectories() -> None:
+    d = pd.read_csv(T / "e5_daily.csv", parse_dates=["date"])
+    sw = pd.read_csv(T / "e5_switches.csv", parse_dates=["date"])
+    fig, axes = plt.subplots(2, 1, figsize=(12, 7), sharex=True, sharey=True)
+    for ax, delay, title in [
+        (axes[0], 1, "Labels à J + 1 (journaux de courses de l'opérateur)"),
+        (axes[1], 60, "Labels à J + 60 (publication TLC)"),
+    ]:
+        for pol, c in POLICY_E5.items():
+            t = d[(d["delay"] == delay) & (d["policy"] == pol)].set_index("date")["mae_log"]
+            ax.plot(
+                t.index,
+                t.rolling(7, min_periods=1).mean(),
+                color=c,
+                lw=1.8 if pol != "jamais" else 2.4,
+                label=pol,
+            )
+            for x in sw[(sw["delay"] == delay) & (sw["policy"] == pol)]["date"]:
+                ax.plot([x], [0.05], marker="|", ms=10, color=c, mew=2)
+        ax.axvline(pd.Timestamp("2020-03-13"), color=viz.INK2, lw=1)
+        ax.set_title(title, fontsize=11)
+        ax.set_ylabel("MAE log (moy. 7 j)")
+        ax.set_ylim(0, 1.25)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    axes[0].legend(loc="upper right", ncols=5, fontsize=9)
+    axes[0].annotate(
+        "traits en bas : remplacements de modèle",
+        (0.01, 0.12),
+        xycoords="axes fraction",
+        fontsize=8.5,
+        color=viz.INK2,
+    )
+    fig.suptitle(
+        "Erreur réalisée du modèle en service en 2020, selon la politique de réentraînement",
+        x=0.01,
+        ha="left",
+        fontweight="bold",
+    )
+    fig.tight_layout()
+    viz.save(fig, "e5_trajectoires")
+
+
+@group("e5")
+def e5_bars() -> None:
+    s = pd.read_csv(T / "e5_summary.csv")
+    periods = ["choc (13 mars-12 avril)", "printemps (13 avril-30 juin)", "second semestre"]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 3.8), sharey=True)
+    for ax, delay in [(axes[0], 1), (axes[1], 60)]:
+        t = s[s["delay"] == delay].set_index("policy")
+        x = np.arange(len(periods))
+        for j, (pol, c) in enumerate(POLICY_E5.items()):
+            ax.bar(x + (j - 2) * 0.16, t.loc[pol, periods], width=0.15, color=c, label=pol)
+        ax.set_xticks(x, ["choc", "printemps", "2nd semestre"])
+        ax.set_title(f"L = {delay} jour{'s' if delay > 1 else ''}")
+    axes[0].set_ylabel("MAE log moyenne")
+    axes[0].legend(loc="upper right", fontsize=8.5)
+    fig.tight_layout()
+    viz.save(fig, "e5_periodes")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
