@@ -1,0 +1,36 @@
+policy,delay,date,note
+calendrier,1,2020-02-01,mensuel
+calendrier,1,2020-03-01,mensuel
+calendrier,1,2020-04-01,mensuel
+calendrier,1,2020-05-01,mensuel
+calendrier,1,2020-06-01,mensuel
+calendrier,1,2020-07-01,mensuel
+calendrier,1,2020-08-01,mensuel
+calendrier,1,2020-09-01,mensuel
+calendrier,1,2020-10-01,mensuel
+calendrier,1,2020-11-01,mensuel
+calendrier,1,2020-12-01,mensuel
+réflexe,1,2020-03-22,alerte
+réflexe court,1,2020-03-22,8 j de labels
+gardé,1,2020-04-20,promu (0.343 < 0.773)
+gardé,1,2020-05-25,promu (0.342 < 0.361)
+gardé,1,2020-07-06,promu (0.325 < 0.345)
+gardé,1,2020-09-21,promu (0.313 < 0.332)
+gardé,1,2020-11-16,promu (0.282 < 0.298)
+gardé,1,2020-12-14,promu (0.286 < 0.305)
+calendrier,60,2020-02-01,mensuel
+calendrier,60,2020-03-01,mensuel
+calendrier,60,2020-04-01,mensuel
+calendrier,60,2020-05-01,mensuel
+calendrier,60,2020-06-01,mensuel
+calendrier,60,2020-07-01,mensuel
+calendrier,60,2020-08-01,mensuel
+calendrier,60,2020-09-01,mensuel
+calendrier,60,2020-10-01,mensuel
+calendrier,60,2020-11-01,mensuel
+calendrier,60,2020-12-01,mensuel
+réflexe,60,2020-03-22,alerte
+gardé,60,2020-06-18,promu (0.343 < 0.773)
+gardé,60,2020-07-23,promu (0.342 < 0.361)
+gardé,60,2020-09-03,promu (0.325 < 0.345)
+gardé,60,2020-11-19,promu (0.313 < 0.332)
