@@ -21,3 +21,5 @@ e2:          ## E2 : tarification de congestion, CBD vs hors CBD
 	uv run python -m zonefleet.experiments.e2_congestion
 e3:          ## E3 : frontière covariate shift / concept drift (≈ 2 min)
 	uv run python -m zonefleet.experiments.e3_frontier
+e4:          ## E4 : backtest du moniteur, 240 scénarios (≈ 11 min)
+	uv run python -m zonefleet.experiments.e4_backtest
