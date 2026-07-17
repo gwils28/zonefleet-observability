@@ -506,6 +506,168 @@ def e3_transition() -> None:
     viz.save(fig, "e3_transition")
 
 
+# --------------------------------------------------------------------------- E4
+POLICY_SHORT = {
+    "P1_drift": "P1 dérive",
+    "P1b_drift_clean": "P1b dérive nettoyée",
+    "P2_dle": "P2 DLE",
+    "P3_drift_and_dle": "P3 dérive ET DLE",
+    "P3b_clean_and_dle": "P3b dérive nettoyée ET DLE",
+    "P4_realized": "P4 labels (D + 60 j)",
+}
+POLICY_COLOR = {
+    "P1b_drift_clean": viz.AQUA,
+    "P2_dle": viz.BLUE,
+    "P3b_clean_and_dle": viz.VIOLET,
+    "P4_realized": viz.ORANGE,
+}
+
+
+@group("e4")
+def e4_tradeoff() -> None:
+    s = pd.read_csv(T / "e4_summary.csv")
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.4), sharey=True)
+    for ax, w, title in [
+        (axes[0], 1, "Signal journalier"),
+        (axes[1], 7, "Signal lissé sur 7 jours"),
+    ]:
+        for pol, c in POLICY_COLOR.items():
+            d = s[(s["smooth"] == w) & (s["policy"] == pol)].sort_values("k")
+            ax.plot(
+                d["false_alerts_per_30d"],
+                100 * d["recall"],
+                color=c,
+                marker="o",
+                ms=5,
+                label=POLICY_SHORT[pol],
+            )
+            if pol in ("P2_dle", "P3b_clean_and_dle"):
+                for _, r in d.iloc[[0, -1]].iterrows():
+                    ax.annotate(
+                        f"k={r['k']:g}",
+                        (r["false_alerts_per_30d"], 100 * r["recall"]),
+                        xytext=(5, 3),
+                        textcoords="offset points",
+                        fontsize=8,
+                        color=viz.INK2,
+                    )
+        ax.set_xlabel("fausses alertes par 30 jours (allumages)")
+        ax.set_title(title)
+        ax.grid(axis="x")
+    axes[0].set_ylabel("rappel sur les scénarios nuisibles (%)")
+    axes[0].legend(loc="lower right", fontsize=8.5)
+    fig.suptitle(
+        "Compromis rappel / fausses alertes, seuils k de 0,5 à 3 écarts-types",
+        x=0.01,
+        ha="left",
+        fontweight="bold",
+    )
+    fig.tight_layout()
+    viz.save(fig, "e4_compromis")
+
+
+@group("e4")
+def e4_recall_by_kind() -> None:
+    r = pd.read_csv(T / "e4_results.csv")
+    r = r[(r["smooth"] == 1) & (r["k"] == 1.0) & r["harmful"]]
+    t = r.groupby(["policy", "kind"])["detected"].mean().unstack()
+    pols = ["P1b_drift_clean", "P2_dle", "P3b_clean_and_dle", "P4_realized"]
+    kinds = [
+        ("covariate_harmful", "covariate nuisible", viz.BLUE),
+        ("level", "choc propagé", viz.YELLOW),
+        ("concept", "concept pur", viz.MAGENTA),
+    ]
+    fig, ax = plt.subplots(figsize=(10, 3.8))
+    x = np.arange(len(pols))
+    for j, (kind, lab, c) in enumerate(kinds):
+        n = r.loc[r["kind"] == kind, "id"].nunique()
+        ax.bar(
+            x + (j - 1) * 0.26,
+            100 * t.loc[pols, kind],
+            width=0.25,
+            color=c,
+            label=f"{lab} (n = {n})",
+        )
+    ax.set_xticks(x, [POLICY_SHORT[p] for p in pols])
+    ax.set_ylabel("rappel (%)")
+    ax.set_title("Rappel par type de dérive nuisible (k = 1, signal journalier)")
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.12), ncols=3, fontsize=9)
+    fig.tight_layout()
+    viz.save(fig, "e4_rappel_par_type")
+
+
+@group("e4")
+def e4_harm() -> None:
+    r = pd.read_csv(T / "e4_results.csv")
+    r = r[(r["smooth"] == 1) & (r["k"] == 1.0)].drop_duplicates("id")
+    kinds = [
+        ("none", "aucune", viz.NEUTRAL),
+        ("covariate_benign", "covariate bénin", viz.AQUA),
+        ("covariate_harmful", "covariate nuisible", viz.BLUE),
+        ("level", "choc propagé", viz.YELLOW),
+        ("concept", "concept pur", viz.MAGENTA),
+    ]
+    fig, ax = plt.subplots(figsize=(10, 3.6))
+    rng = np.random.default_rng(0)
+    for i, (kind, _lab, c) in enumerate(kinds):
+        h = 100 * r.loc[r["kind"] == kind, "harm"]
+        ax.scatter(
+            h, i + rng.uniform(-0.22, 0.22, len(h)), s=16, color=c, edgecolor=viz.SURFACE, lw=0.6
+        )
+    ax.axvline(10, color=viz.ALERT, ls="--", lw=1)
+    ax.annotate(
+        "seuil de nuisance : +10 %",
+        (10, 4.45),
+        xytext=(5, 0),
+        textcoords="offset points",
+        fontsize=9,
+        color=viz.INK2,
+    )
+    ax.set_yticks(range(len(kinds)), [k[1] for k in kinds])
+    ax.set_xlabel("hausse de la MAE log réalisée sur 28 jours, vs sans dérive (%)")
+    ax.set_title("240 scénarios : qui est réellement nuisible ?")
+    ax.grid(axis="x")
+    ax.grid(axis="y", visible=False)
+    fig.tight_layout()
+    viz.save(fig, "e4_nuisance")
+
+
+@group("e4")
+def e4_delays() -> None:
+    r = pd.read_csv(T / "e4_results.csv")
+    r = r[(r["k"] == 1.0) & r["harmful"] & r["detected"]]
+    pols = ["P1b_drift_clean", "P2_dle", "P3b_clean_and_dle", "P4_realized"]
+    fig, ax = plt.subplots(figsize=(10, 3.4))
+    rng = np.random.default_rng(1)
+    for i, pol in enumerate(pols):
+        for w, dy, mk in [(1, -0.15, "o"), (7, 0.15, "s")]:
+            d = r[(r["policy"] == pol) & (r["smooth"] == w)]["delay_days"]
+            ax.scatter(
+                d,
+                i + dy + rng.uniform(-0.06, 0.06, len(d)),
+                s=14,
+                marker=mk,
+                color=POLICY_COLOR[pol],
+                alpha=0.7 if w == 1 else 0.45,
+                lw=0,
+            )
+    ax.set_yticks(range(len(pols)), [POLICY_SHORT[p] for p in pols])
+    ax.set_xlabel("délai de détection sur l'horloge de décision (jours après l'injection)")
+    ax.set_title("Délais : quelques jours pour les signaux avancés, deux mois pour les labels")
+    ax.grid(axis="x")
+    ax.grid(axis="y", visible=False)
+    ax.annotate(
+        "ronds : signal journalier · carrés : lissé 7 j",
+        (0.99, 0.03),
+        xycoords="axes fraction",
+        ha="right",
+        fontsize=8.5,
+        color=viz.INK2,
+    )
+    fig.tight_layout()
+    viz.save(fig, "e4_delais")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
