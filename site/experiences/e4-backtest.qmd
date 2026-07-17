@@ -1,0 +1,117 @@
+---
+title: "E4 : backtester le moniteur"
+description: "240 dérives injectées au hasard, dont 42 nulles : rappel, délai et fausses alertes de six politiques d'alerte. La condition jointe nettoyée est la seule à ne jamais réveiller l'astreinte pour rien."
+---
+
+::: {.callout-note appearance="minimal"}
+Script : `uv run python -m zonefleet.experiments.e4_backtest` (≈ 11 min) · tables :
+`results/tables/e4_*.csv` · modèle 2024 figé, référence sept.-déc. 2024, injections dans
+l'analysis calme janv.-juin 2025 · scores par ligne réutilisant les modèles NannyML
+(`rowscore.py`, égalité testée).
+:::
+
+## Pourquoi tester le moniteur
+
+Un moniteur est un classifieur binaire (« le modèle va-t-il mal ? ») qui tourne tous les
+jours. Comme tout classifieur, il a un rappel, un taux de fausses alertes et un délai.
+Ne pas les mesurer, c'est brancher sur une astreinte un système dont on ignore s'il
+détecte quoi que ce soit, et combien de nuits il fera perdre. C'est le cadre de
+[DriftGuard](../veille/driftguard.qmd) (rappel x délai), transposé à une vérité terrain
+qui arrive 60 jours trop tard.
+
+## Protocole
+
+| Élément | Choix |
+|---|---|
+| Scénarios | 240, tirés au hasard (graine fixée) : aucune dérive (42), covariate nuisible (50), covariate bénin (44), concept pur (49), choc propagé (55) |
+| Paramètres tirés | intensité (κ de 0,25 à 2 ; facteur de 0,5 à 0,95), sous-ensemble (ville, CBD, hors CBD, soir, nuit), date de début (3 février au 15 mai 2025) |
+| Nuisible | MAE log réalisée en hausse de **plus de 10 %** sur les 28 jours suivants, par rapport au contrefactuel sans dérive |
+| Détection | un **allumage** d'alerte (front montant, après 2 jours de persistance) sur un jour cible des 28 jours suivant l'injection ; une alarme déjà allumée ne détecte rien |
+| Délai | sur l'**horloge de décision** : veille du jour cible pour les signaux avancés, jour cible + 60 jours pour les labels |
+| Fausses alertes | allumages sur les jours sans dérive (avant l'injection, et scénarios nuls), par 30 jours ; plus la part de ces jours passés en alerte |
+| Seuils | DLE et réalisé : moyenne + k écarts-types des jours de référence, k de 0,5 à 3 ; PCA : seuil NannyML ; PSI : 0,25 |
+| Variantes | signal journalier brut, ou lissé sur 7 jours |
+
+Les politiques comparées sont décrites dans [politiques d'alerte](../concepts/politiques-alerte.qmd).
+P1b et P3b (« dérive nettoyée » : PCA ou PSI sur `lag_24` et `lag_168` seulement) ont été
+**déclarées avant l'exécution** (notes du 15 juillet), après les artefacts relevés en E1/E2.
+
+## Qui est réellement nuisible ?
+
+![Hausse d'erreur réalisée sur 28 jours, pour chaque scénario. Les covariate shifts nuisibles le sont tous ; les bénins améliorent tous le modèle ; deux concept drifts sur trois dépassent le seuil ; les chocs propagés ne le dépassent presque jamais, le modèle à lags les absorbe.](../figures/e4_nuisance.png){#fig-harm}
+
+87 scénarios sont nuisibles : 50 covariate shifts, 31 concept drifts, 6 chocs propagés.
+Cette répartition est elle-même un résultat : sur un modèle à lags, **un choc de niveau
+propagé est rarement nuisible sur 28 jours** (il ne l'est qu'une semaine ou deux), alors
+qu'un concept drift l'est souvent et longtemps.
+
+## Résultats à k = 1
+
+{{< include ../_tables/e4_main.md >}}
+
+::: {.callout-important}
+## Ce que dit le tableau
+- **P1, la dérive seule (toutes features)**, est inutilisable : en alerte **100 % des
+  jours**, elle ne peut plus rien détecter. La température et la moyenne glissante sur
+  7 jours suffisent à la saturer.
+- **P1b, la dérive nettoyée**, détecte beaucoup (67 %) avec peu de fausses alertes, mais
+  alerte sur **55 %** des dérives *bénignes* : elle ne sait pas si le modèle va mieux ou
+  plus mal.
+- **P2, DLE seul**, détecte 56 % des nuisibles, mais avec **1,2 fausse alerte par mois**
+  (les vagues de froid de l'hiver 2025, vues en E2) et 14 % des jours sans dérive en alerte.
+- **P3b, dérive nettoyée ET DLE**, est la seule politique à **zéro fausse alerte** ; elle
+  perd 11 points de rappel par rapport à DLE seul (45 % contre 56 %), en récupère 6 avec
+  le lissage sur 7 jours (51 %), pour un délai médian de 3 jours.
+- **P4, les labels**, détecte le plus (70 %), avec un délai médian de **61 jours**.
+:::
+
+::: {.callout-warning}
+## Limite de l'intervalle sur les fausses alertes
+Les intervalles bootstrap rééchantillonnent les scénarios. Or les jours « sans dérive »
+proviennent tous de la **même période réelle** (janvier-juin 2025) : ils ne sont pas
+indépendants d'un scénario à l'autre. L'incertitude sur le taux de fausses alertes est
+donc **sous-estimée** ; il faudrait d'autres années calmes pour la mesurer vraiment.
+:::
+
+## Le compromis selon le seuil
+
+![Rappel contre fausses alertes par mois, quand le seuil k varie de 0,5 à 3 écarts-types. La condition jointe nettoyée (violet) reste collée à l'axe des fausses alertes nulles sur toute la plage ; DLE seul (bleu) achète son rappel par des fausses alertes ; les labels (orange) ne valent que si l'on peut attendre deux mois.](../figures/e4_compromis.png){#fig-tradeoff}
+
+Pour DLE seul, aucun seuil n'atteint à la fois un rappel de 50 % et moins d'une fausse
+alerte par mois en signal journalier ; le lissage sur 7 jours rapproche le compromis. Pour
+la condition jointe, le seuil le plus bas (k = 0,5) donne **54 % de rappel sans fausse
+alerte** (56 % lissé) : la dérive nettoyée sert de filtre, DLE de juge.
+
+## Par type de dérive
+
+{{< include ../_tables/e4_by_kind.md >}}
+
+![Rappel par type de dérive nuisible, à k = 1.](../figures/e4_rappel_par_type.png){#fig-kind}
+
+- Sur les **covariate shifts nuisibles**, toutes les politiques avancées détectent de
+  76 % à 96 % : c'est leur terrain.
+- Sur les **concept drifts purs**, les « détections » de P1b (16 %) et P2 (26 %) sont
+  **fortuites** : une fausse alerte qui tombe par hasard dans la fenêtre. Leur ordre de
+  grandeur suit celui du taux de fausses alertes de chaque politique ; P3b, qui n'en a
+  pas, est à **0 %**, ce qui est la vérité : ces dérives sont invisibles sans labels
+  ([E3](e3-frontiere.qmd)).
+- **Seuls les labels** voient le concept drift (55 %), deux mois plus tard.
+
+Conséquence : le **plafond de rappel** des signaux avancés est fixé par la part de concept
+drift parmi les dérives nuisibles. Ici, 31 sur 87 : aucune politique sans labels ne peut
+dépasser environ 64 % de rappel *honnête*.
+
+## Délais
+
+![Délai de détection des scénarios nuisibles détectés, sur l'horloge de décision. Les signaux avancés détectent le jour de l'injection ou dans les jours qui suivent ; le lissage ajoute environ trois jours ; les labels arrivent après deux mois.](../figures/e4_delais.png){#fig-delays}
+
+## Ce que E4 établit
+
+1. **Alerter sur la dérive seule est intenable** si l'on n'a pas nettoyé les features :
+   alarme permanente. Nettoyée, elle reste bavarde sur les dérives bénignes.
+2. **La condition jointe nettoyée (P3b) est la seule politique sans fausse alerte**, au
+   prix d'environ 10 points de rappel sur DLE seul ; c'est la politique d'**astreinte**.
+3. **Le lissage sur 7 jours** améliore le rappel de la condition jointe (45 % → 51 %)
+   pour 3 jours de délai : le bon réglage pour un positionnement de flotte quotidien.
+4. **Le concept drift fixe un plafond** que seuls des labels plus rapides peuvent percer :
+   c'est l'argument d'architecture principal du [system design](../system-design.qmd).
