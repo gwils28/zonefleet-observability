@@ -48,6 +48,7 @@ website:
           - href: experiences/e2-congestion.qmd
           - href: experiences/e3-frontiere.qmd
           - href: experiences/e4-backtest.qmd
+          - href: experiences/e5-reentrainement.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability
