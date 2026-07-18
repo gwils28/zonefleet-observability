@@ -69,3 +69,14 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   nuisible modéré (+10 %) reste sous le bruit jour à jour.
 - Grille de k étendue à 0,5. La nuisance d'un scénario est mesurée sur le signal brut,
   indépendamment du lissage.
+
+## 2026-07-17 : E5, deux délais de labels et un résultat imprévu
+
+- Ajout : E5 est rejouée pour L = 1 jour (journaux de l'opérateur) en plus de L = 60 jours
+  (publication TLC). Raison : à L = 60, aucune politique ne peut réagir au choc, ce qui
+  rendrait la comparaison triviale ; ZoneFleet connaît ses courses le lendemain.
+- Réentraînements avec 300 arbres au lieu de 500 (temps de calcul) ; le champion de
+  départ reste le modèle figé de E1.
+- Résultat imprévu, rapporté tel quel : le calendrier mensuel bat la politique gardée sur
+  l'année 2020 (MAE log 0,363 contre 0,411 à L = 1). La recommandation du site en tient
+  compte (politique gardée plus réentraînement de fond trimestriel).

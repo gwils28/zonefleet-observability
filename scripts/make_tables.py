@@ -247,6 +247,24 @@ def e4_by_kind() -> pd.DataFrame:
     return out
 
 
+@table("e5_summary")
+def e5_summary() -> pd.DataFrame:
+    s = pd.read_csv(T / "e5_summary.csv")
+    cols = [
+        "choc (13 mars-12 avril)",
+        "printemps (13 avril-30 juin)",
+        "second semestre",
+        "13 mars-31 déc.",
+    ]
+    out = pd.DataFrame(
+        {"Délai des labels": s["delay"].map(lambda d: f"L = {d} j"), "Politique": s["policy"]}
+    )
+    for c in cols:
+        out[c] = s[c].map(lambda v: fr(v, 3))
+    out["Remplacements"] = s["retrains"]
+    return out
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in REGISTRY.items():

@@ -23,3 +23,5 @@ e3:          ## E3 : frontière covariate shift / concept drift (≈ 2 min)
 	uv run python -m zonefleet.experiments.e3_frontier
 e4:          ## E4 : backtest du moniteur, 240 scénarios (≈ 11 min)
 	uv run python -m zonefleet.experiments.e4_backtest
+e5:          ## E5 : politiques de réentraînement sur 2020 (≈ 10 min)
+	uv run python -m zonefleet.experiments.e5_retraining
