@@ -129,3 +129,53 @@ rentabilité :
 3. **Proxys indépendants de X.** Demandes non servies (applications ouvertes sans
    véhicule), temps d'attente, annulations : ils bougent avec la vraie demande, pas avec
    les lags.
+
+## 4. Politique de réentraînement
+
+Ne pas réentraîner par réflexe : E5 le montre sur l'année COVID, le réentraînement
+déclenché par l'alerte fait **pire que l'inaction** (MAE log 0,565 contre 0,524 sur
+mars-décembre), et le réentraînement sur les seuls jours post-choc sur-apprend le pire
+moment (0,58 au second semestre, la pire politique de l'année).
+
+```{mermaid}
+flowchart TD
+  A["alerte PAGE"] --> B{"dérive confirmée ?<br/>(jointe ou réalisée)"}
+  B -- non --> X["ne rien faire,<br/>surveiller"]
+  B -- oui --> C{">= 28 jours de labels<br/>postérieurs à l'alerte ?"}
+  C -- non --> W["attendre ;<br/>garde-fou de positionnement actif"]
+  C -- oui --> D{"fenêtre de labels non pilotée<br/>à 100 % par le modèle ?"}
+  D -- non --> Y["refuser : boucle<br/>de rétroaction"]
+  D -- oui --> E["entraîner un challenger<br/>(8 derniers mois disponibles)"]
+  E --> F{"gain >= 5 % sur 14 jours<br/>postérieurs à son entraînement ?"}
+  F -- oui --> G["promouvoir (alias champion),<br/>recalculer les seuils"]
+  F -- non --> H["archiver, réessayer<br/>la semaine suivante"]
+```
+
+Un résultat de E5 nuance la règle : avec des labels à J + 1, un **réentraînement mensuel
+planifié** fait un peu mieux que la politique gardée sur l'année 2020 (0,363 contre
+0,411), parce qu'il s'adapte sans attendre de confirmation. Recommandation :
+**politique gardée + réentraînement de fond trimestriel**, ce dernier soumis à la même
+validation champion/challenger. On garde l'adaptation de fond sans les 11 changements de
+production non motivés par an.
+
+## 5. Garde-fous contre la boucle de rétroaction
+
+Le modèle positionne la flotte ; la flotte conditionne les courses servies ; les courses
+servies sont les labels du prochain modèle. Une zone sous-prévue devient une zone
+sous-servie, dont la demande observée baisse : la demande est **censurée par l'offre**.
+
+| Garde-fou | Mécanisme | Coût |
+|---|---|---|
+| Zones témoins | 5 % des zones positionnées par une règle indépendante du modèle (historique, seasonal naive) | un peu d'efficacité sur ces zones |
+| Demande non servie | journaliser les demandes sans véhicule disponible, et les ajouter aux labels | instrumentation de l'application |
+| Fenêtres interdites | `retrain_decision` refuse une fenêtre de labels pilotée à 100 % par le modèle | réentraînement parfois retardé |
+| Action limits | le déplacement de flotte décidé par la prévision est plafonné par zone et par heure (Sculley, *action limits*) | réactivité bornée |
+| Comparaison témoin | l'erreur réalisée sur les zones témoins sert de référence non biaisée | aucune |
+
+## 6. Ce que cette architecture ne promet pas
+
+- Elle ne détecte pas un concept drift pur avant les labels : elle le **borne** (fenêtre
+  aveugle courte, tickets de dérive, proxys).
+- Ses taux de fausses alertes sont mesurés sur une seule période calme réelle (2025) ;
+  il faudra les recalibrer sur un an de production.
+- Les seuils dépendent du modèle : chaque promotion impose de recalculer la référence.
