@@ -1,0 +1,59 @@
+---
+title: "Registry : champion, challenger et promotion conditionnelle"
+description: "Le cycle de vie du forecaster dans un registry MLflow local : ce qui est enregistré, comment un challenger devient champion, et pourquoi jamais automatiquement sur la seule dérive."
+---
+
+## Ce que le registry garantit
+
+Un modèle en production doit pouvoir répondre à trois questions : **qui est-il** (sur
+quelles données a-t-il été entraîné), **pourquoi est-il là** (sur quelle comparaison a-t-il
+été promu), **comment revenir en arrière** (quelle version le précédait). Le module
+`zonefleet.ops.registry` encode ces trois réponses dans un registry MLflow local
+(fichier SQLite, `results/mlflow/`).
+
+| Enregistré à chaque version | Pourquoi |
+|---|---|
+| période d'entraînement (`trained_from`, `trained_to`) | savoir quel monde le modèle a vu |
+| hyperparamètres LightGBM | reproduire l'entraînement |
+| métriques de référence (`mae_log_ref`...) | seuils du moniteur recalculés à la promotion |
+| empreinte SHA-256 du panel | relier le modèle à une version exacte des données |
+| le modèle sérialisé | servir et comparer |
+
+## Le cycle de vie
+
+```{mermaid}
+stateDiagram-v2
+  [*] --> Enregistré : register()
+  Enregistré --> Challenger : entraîné après une dérive confirmée
+  Challenger --> Champion : gain >= 5 % sur une fenêtre postérieure (promote_if_better)
+  Challenger --> Archivé : gain insuffisant
+  Champion --> Archivé : remplacé
+  Archivé --> Champion : retour arrière (set_alias)
+```
+
+- L'alias **`champion`** est la seule chose que le service de prévision et l'asset
+  Dagster `champion_model` lisent. Promouvoir ou revenir en arrière = déplacer un alias.
+- Un challenger n'est **jamais** promu sur la seule base de la dérive : il doit faire
+  mieux que le champion, de 5 % au moins, sur des labels **postérieurs** à son
+  entraînement (`promote_if_better`). C'est la règle que [E5](../experiences/e5-reentrainement.qmd)
+  évalue sur le choc COVID.
+- À chaque promotion, les seuils du moniteur (référence + k écarts-types) sont
+  recalculés sur la référence du nouveau champion : un seuil hérité d'un autre modèle est
+  un « fixed threshold in a dynamic system » au sens de Sculley.
+
+## Dans le code
+
+```python
+from zonefleet.ops import registry
+
+v = registry.register(model, {"mae_log_ref": 0.253}, tags={"split": "congestion"})
+registry.set_alias("champion", v)
+...
+promoted = registry.promote_if_better(champion_error=0.31, challenger_error=0.27,
+                                      challenger_version=v_new)
+model = registry.load("champion")
+```
+
+Le test `test_registry_roundtrip_and_promotion` vérifie l'aller-retour (le modèle chargé
+prédit exactement comme l'original) et les deux branches de la promotion (gain de 2 %
+refusé, gain de 20 % accepté).
