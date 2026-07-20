@@ -75,3 +75,57 @@ Trois règles d'hygiène tirées des expériences :
    distribution resserrée, PSI artificiellement explosif.
 3. **Métrique relative pour décider** : la MAE en courses baisse quand le volume
    s'effondre ([métriques](concepts/metriques.qmd)).
+
+## 2. Réduire le bruit d'alerte : encoder le ET logique
+
+La bonne pratique défendue ici : **ne pas alerter sur la dérive seule**, mais sur la
+condition jointe « dérive des entrées **et** hausse de la perte estimée ». E4 la chiffre
+sur 240 scénarios :
+
+| Politique (k = 1) | Rappel | Fausses alertes / mois | Alerte sur dérive bénigne |
+|---|---|---|---|
+| dérive seule (toutes features) | 0 % (alarme permanente) | - | - |
+| dérive nettoyée seule | 67 % | 0,16 | 55 % |
+| DLE seul | 56 % | 1,19 | 23 % |
+| **dérive nettoyée ET DLE** | **45 %** (51 % lissé 7 j) | **0** | 13 % |
+| labels (J + 60) | 70 % | 0,62 | 2 % |
+
+Encodage retenu, en trois niveaux de sévérité (`ops.decisions.alert_severity`) :
+
+```text
+PAGE    si  (psi_lag24 > 0,25 OU psi_lag168 > 0,25 OU pca_alert)
+         ET dle_mae_log_lisse_7j > seuil_reference(k = 1)
+         pendant 2 jours consécutifs
+     ou  perte réalisée > seuil pendant 2 jours (labels arrivés : audit, réentraînement)
+
+TICKET  si  dérive nettoyée seule pendant 7 jours   -> revue hebdomadaire, pas d'astreinte
+
+RIEN    sinon
+```
+
+Pourquoi garder le ticket : quand DLE se tait, la dérive reste le seul indice d'un
+concept drift naissant (elle a vu 83 % des chocs propagés en E4). Elle n'a simplement pas
+le droit de réveiller quelqu'un.
+
+Seuils : moyenne + k écarts-types des chunks de **référence hors échantillon**, recalculés
+à chaque promotion de modèle (Sculley : un seuil fixe dans un système dynamique est une
+dette). Le choix k = 1 avec lissage 7 jours est le meilleur compromis mesuré pour un
+positionnement quotidien : 3 jours de délai médian, aucune fausse alerte.
+
+## 3. L'angle mort, et comment le réduire
+
+Le concept drift pur est **invisible sans labels** : E3 mesure un suivi de DLE exactement
+nul, E4 un rappel de 0 % pour la condition jointe. Sur un modèle à lags, **tout choc
+brutal commence ainsi** et le reste une à deux semaines. Trois parades, par ordre de
+rentabilité :
+
+1. **Raccourcir L.** ZoneFleet connaît ses propres courses le lendemain : brancher le
+   monitoring réalisé sur les journaux internes plutôt que sur la publication TLC fait
+   passer la fenêtre aveugle de 61 jours à 2. C'est de loin le levier le plus puissant
+   ([E5](experiences/e5-reentrainement.qmd) : à L = 60, aucune politique ne réagit au choc).
+2. **Labels partiels précoces.** Même sans journaux complets, les premières heures de
+   chaque jour (ou un échantillon de zones) donnent une erreur réalisée partielle,
+   bruyante mais sans délai.
+3. **Proxys indépendants de X.** Demandes non servies (applications ouvertes sans
+   véhicule), temps d'attente, annulations : ils bougent avec la vraie demande, pas avec
+   les lags.
