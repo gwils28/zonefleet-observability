@@ -49,6 +49,10 @@ website:
           - href: experiences/e3-frontiere.qmd
           - href: experiences/e4-backtest.qmd
           - href: experiences/e5-reentrainement.qmd
+      - text: MLOps
+        menu:
+          - href: mlops/dagster.qmd
+          - href: mlops/mlflow.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability

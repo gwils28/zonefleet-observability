@@ -25,3 +25,7 @@ e4:          ## E4 : backtest du moniteur, 240 scénarios (≈ 11 min)
 	uv run python -m zonefleet.experiments.e4_backtest
 e5:          ## E5 : politiques de réentraînement sur 2020 (≈ 10 min)
 	uv run python -m zonefleet.experiments.e5_retraining
+registry:    ## Enregistre les modèles figés dans le registry MLflow local (alias champion)
+	uv run python scripts/register_models.py
+dagster:     ## Interface Dagster du monitoring (http://localhost:3000)
+	uv run dagster dev -m zonefleet.ops.definitions

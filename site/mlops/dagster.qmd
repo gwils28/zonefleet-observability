@@ -1,0 +1,88 @@
+---
+title: "Orchestration : le monitoring comme graphe d'assets Dagster"
+description: "Pourquoi des assets plutôt que des tâches, le graphe du monitoring ZoneFleet, ses contrôles qualité et son exécution quotidienne."
+---
+
+## Pourquoi des assets
+
+Sculley et al. décrivent les *pipeline jungles* : des chaînes de scripts qui se
+préparent mutuellement des fichiers, où personne ne sait plus quelle donnée dépend de
+quelle autre. Dagster inverse le point de vue : on ne déclare pas des tâches, on déclare
+des **données** (assets) et leurs dépendances. Le graphe, la traçabilité et la fraîcheur
+de chaque donnée en découlent.
+
+## Le graphe du monitoring
+
+```{mermaid}
+flowchart LR
+  subgraph donnees["groupe donnees"]
+    S["tlc_schema_report"] --> P["panel"]
+    W["weather"]
+  end
+  subgraph modele["groupe modele"]
+    P --> F["feature_matrix"]
+    W --> F
+    C["champion_model<br/>(alias MLflow)"]
+    F --> PR["predictions"]
+    C --> PR
+  end
+  subgraph monitoring["groupe monitoring"]
+    PR --> M["monitoring_signals"]
+    M --> A["alert_decision<br/>page / ticket / aucune"]
+    M --> R["retrain_recommendation"]
+  end
+  S -. "check : contract_respected" .-> S
+  P -. "check : panel_is_valid" .-> P
+```
+
+| Asset | Contenu | Contrôle |
+|---|---|---|
+| `tlc_schema_report` | rapport du data contract sur chaque fichier brut | `contract_respected` : aucune violation |
+| `panel` | panel zone x heure | `panel_is_valid` : doublons, volumes négatifs, plafond |
+| `weather` | météo locale en cache | - |
+| `feature_matrix` | features à lags ≥ 24 h | - |
+| `champion_model` | modèle désigné par l'alias `champion` du registry (repli : modèle figé du SPEC) | - |
+| `predictions` | prévisions sur référence et analysis | - |
+| `monitoring_signals` | signaux journaliers (dérive, DLE, réalisé) | - |
+| `alert_decision` | sévérité du dernier jour, en métadonnée | - |
+| `retrain_recommendation` | décision et raison (politique gardée de E5) | - |
+
+Les décisions (`alert_severity`, `retrain_decision`) sont des **fonctions pures** du
+module `zonefleet.ops.decisions`, testées sans Dagster : l'orchestrateur appelle la
+logique, il ne la contient pas.
+
+## Exécution
+
+```bash
+uv sync --all-extras
+uv run dagster dev -m zonefleet.ops.definitions          # interface sur http://localhost:3000
+uv run dagster asset materialize -m zonefleet.ops.definitions --select '*'
+```
+
+Le job `monitoring_quotidien` matérialise tout le graphe ; il est planifié chaque jour à
+6 h (heure de New York), après la clôture des données de la veille et avant le
+positionnement de la flotte.
+
+## Ce que l'orchestration ne fait pas
+
+- **Elle ne décide pas du réentraînement** : elle le recommande, avec sa raison. La
+  promotion d'un challenger passe par le registry et une validation sur une fenêtre
+  postérieure (voir [registry](mlflow.qmd)).
+- **Elle ne remplace pas le backtest du moniteur** : un graphe qui tourne tous les jours
+  avec des seuils mal réglés produit des alertes inutiles tous les jours (voir
+  [E4](../experiences/e4-backtest.qmd)).
+
+## Vérification de bout en bout
+
+La matérialisation complète du graphe (`--select '*'`) a été exécutée sur le panel
+versionné : 9 assets et 2 contrôles qualité passés, le champion chargé depuis le
+registry MLflow (version 2, modèle 2024), les signaux journaliers calculés en environ
+11 secondes. Rejouée jour par jour, la sévérité produite est :
+
+| Analysis | aucune | ticket | page |
+|---|---|---|---|
+| janv.-juin 2025 (congestion) | 179 jours | 0 | 0 |
+| janv.-juin 2020 (COVID) | 72 jours | 6 | 102 |
+
+Pour 2020, le rejeu dispose des labels : une partie des pages provient de la performance
+réalisée, qui n'aurait été connue qu'avec 60 jours de retard (voir [E1](../experiences/e1-covid.qmd)).
