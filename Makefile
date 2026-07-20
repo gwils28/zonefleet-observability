@@ -29,3 +29,6 @@ registry:    ## Enregistre les modèles figés dans le registry MLflow local (al
 	uv run python scripts/register_models.py
 dagster:     ## Interface Dagster du monitoring (http://localhost:3000)
 	uv run dagster dev -m zonefleet.ops.definitions
+notebook:    ## Régénère et exécute le notebook tutoriel
+	uv run python scripts/build_notebook.py
+	uv run jupyter nbconvert --to notebook --execute --inplace site/notebooks/tutoriel-dle.ipynb
