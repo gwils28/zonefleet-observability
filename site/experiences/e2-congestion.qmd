@@ -58,6 +58,10 @@ C'est le cas d'école de la **dérive sans impact** :
   pilotée par la dérive aurait été réveillée **tous les jours pendant six mois** pour un
   modèle en parfaite santé.
 - **P2, P3, P4** : aucune alerte. P4 confirme a posteriori qu'il n'y avait rien à voir.
+- **P1b, dérive nettoyée** : un seul allumage global, en mai, et 23 jours d'alerte sur les
+  zones hors CBD à partir de mi-mars (la demande hors CBD progresse plus vite, les lags
+  sortent de leur distribution d'automne). **P3b** reste muette : la condition jointe
+  filtre aussi ce résidu.
 
 ### Anatomie des fausses alertes
 
