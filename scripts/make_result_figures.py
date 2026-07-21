@@ -144,8 +144,10 @@ def e0_traces() -> None:
 # --------------------------------------------------------------------------- E1/E2
 POLICY_FR = {
     "P1_drift": "P1 dérive seule",
+    "P1b_drift_clean": "P1b dérive nettoyée",
     "P2_dle": "P2 DLE seul",
     "P3_drift_and_dle": "P3 dérive ET DLE",
+    "P3b_clean_and_dle": "P3b nettoyée ET DLE",
     "P4_realized": "P4 labels (D + 60 j)",
 }
 
@@ -173,8 +175,8 @@ def policy_timeline(ax, sig: pd.DataFrame, shock) -> None:
     for i, col in enumerate(POLICY_FR):
         days = sig.index[sig[col].astype(bool)]
         ax.scatter(days, [i] * len(days), marker="|", s=120, color=viz.ALERT, lw=1.6)
-    ax.set_yticks(range(4), list(POLICY_FR.values()))
-    ax.set_ylim(-0.6, 3.6)
+    ax.set_yticks(range(len(POLICY_FR)), list(POLICY_FR.values()))
+    ax.set_ylim(-0.6, len(POLICY_FR) - 0.4)
     ax.invert_yaxis()
     ax.axvline(shock, color=viz.INK2, lw=1)
     ax.grid(axis="y", visible=False)
@@ -319,7 +321,7 @@ def e1_timeline() -> None:
     from zonefleet.config import COVID_EMERGENCY
 
     sig = pd.read_csv(T / "e1_signals.csv", parse_dates=["date"]).set_index("date")
-    fig, ax = plt.subplots(figsize=(12, 2.8))
+    fig, ax = plt.subplots(figsize=(12, 3.6))
     policy_timeline(ax, sig, COVID_EMERGENCY)
     ax.set_title("Jours en alerte par politique (après persistance de 2 jours), E1")
     fig.tight_layout()
@@ -391,7 +393,7 @@ def e2_timeline() -> None:
     from zonefleet.config import CONGESTION_START
 
     sig = pd.read_csv(T / "e2_signals.csv", parse_dates=["date"]).set_index("date")
-    fig, ax = plt.subplots(figsize=(12, 2.8))
+    fig, ax = plt.subplots(figsize=(12, 3.6))
     policy_timeline(ax, sig, CONGESTION_START)
     ax.set_title("Jours en alerte par politique, E2 : seule la dérive seule alerte, tous les jours")
     fig.tight_layout()
