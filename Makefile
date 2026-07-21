@@ -1,7 +1,7 @@
 .PHONY: help data weather panel test lint check e0 e1 e2 e3 e4 e5 experiments figures notebook registry dagster site all
 
 help:        ## Liste des cibles
-	@grep -E '^[a-z]+:.*##' Makefile | sed 's/:.*##/ :/'
+	@grep -E '^[a-z0-9]+:.*##' Makefile | sed 's/:.*##/ :/'
 data:        ## Télécharge ~3 Go de fichiers TLC et vérifie le manifeste SHA-256
 	./scripts/download_data.sh
 weather:     ## Met en cache la météo Open-Meteo (data/processed/weather.csv, versionné)
