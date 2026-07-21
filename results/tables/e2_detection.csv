@@ -3,3 +3,5 @@ P1_drift,2025-01-05,2025-01-04,-1.0,3
 P2_dle,,,,0
 P3_drift_and_dle,,,,0
 P4_realized,,,,0
+P1b_drift_clean,2025-05-19,2025-05-18,133.0,0
+P3b_clean_and_dle,,,,0
