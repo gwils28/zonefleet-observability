@@ -52,6 +52,8 @@ website:
           - text: "---"
           - href: notebooks/tutoriel-dle.ipynb
             text: "Notebook : DLE pas à pas"
+      - href: system-design.qmd
+        text: System design
       - text: MLOps
         menu:
           - href: mlops/dagster.qmd
