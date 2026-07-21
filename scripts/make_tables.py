@@ -94,8 +94,10 @@ def e0_mstl() -> pd.DataFrame:
 
 POLICY_FR = {
     "P1_drift": "P1 dérive seule",
+    "P1b_drift_clean": "P1b dérive nettoyée",
     "P2_dle": "P2 DLE seul",
     "P3_drift_and_dle": "P3 dérive ET DLE",
+    "P3b_clean_and_dle": "P3b dérive nettoyée ET DLE",
     "P4_realized": "P4 labels retardés",
 }
 

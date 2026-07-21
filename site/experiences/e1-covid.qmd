@@ -86,6 +86,11 @@ Trois enseignements :
   parce que DLE sous-estime.
 - **P4, labels** : en alerte 102 jours sur 110, mais la première décision n'est possible
   que le **14 mai**.
+- **P1b, dérive nettoyée** (PCA ou PSI sur `lag_24` et `lag_168` seulement, variante
+  introduite pour E4) : décision le **14 mars**, un jour après l'état d'urgence, **sans
+  aucune fausse alerte avant**. Retirer la température et la moyenne glissante suffit à
+  transformer une alarme permanente en détecteur précoce. P3b (P1b ET DLE) décide le
+  22 mars, comme P2 : sur ce choc, c'est DLE qui fixe le délai de la condition jointe.
 
 ## Ce que E1 établit
 
