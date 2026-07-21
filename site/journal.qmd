@@ -1,0 +1,63 @@
+---
+title: "Journal de bord"
+description: "Le plan du jour, les décisions prises, les déviations au protocole et ce qui reste ouvert."
+---
+
+## Le plan de départ
+
+Le projet est parti d'un plan de travail d'environ une heure, en deux livrables :
+
+| Bloc | Prévu | Où c'est traité |
+|---|---|---|
+| Veille (12 min) | NannyML (DLE, PCA), DriftGuard | [NannyML](veille/nannyml.qmd), [DriftGuard](veille/driftguard.qmd) |
+| Code (25 min) | forecaster LightGBM, choc COVID, DLE + dérive, estimé vs réalisé | [E0](modele/e0.qmd), [E1](experiences/e1-covid.qmd) |
+| System design (15 min) | observabilité avec H jours de retard, en 8-12 lignes | [system design](system-design.qmd) |
+| Lecture (5 min) | Sculley et al. 2015 | [Sculley](veille/sculley.qmd) |
+| Cas client (1-2 mois) | ZoneFleet : données, modèle, observabilité, réentraînement, backtest du moniteur | [ZoneFleet](zonefleet.qmd), [E2](experiences/e2-congestion.qmd) à [E5](experiences/e5-reentrainement.qmd) |
+
+Le critère de réussite du bloc code était explicite : *la courbe d'erreur estimée suit
+l'erreur réalisée à travers le choc covariable, et l'on sait nommer le régime où
+l'estimation décroche*. E1 le montre sur données réelles, E3 le mesure proprement.
+
+## Méthode de travail
+
+- **Protocole figé avant les résultats** (`SPEC.md`, 2 juillet) ; toute déviation est
+  consignée dans `docs/notes/implementation.md`, avec sa date, sa raison et son impact.
+- **Chiffres publiés lus dans `results/`**, jamais tapés à la main : les tables du site
+  sont générées par `scripts/make_tables.py`, les figures par trois scripts.
+- **Tests avant confiance** : contrat de données, absence de fuite temporelle, pureté
+  des injections, égalité avec NannyML du scoreur par ligne.
+- **Garde-fous déterministes** dans `.claude/` : hook qui refuse toute écriture dans
+  `data/raw/`, hook typographique.
+
+## Déviations au protocole, en bref
+
+Le détail est dans `docs/notes/implementation.md`.
+
+| Date | Décision | Raison | Effet |
+|---|---|---|---|
+| 7 juillet | retrait des features de saison (`doy_sin`, `doy_cos`) | extrapolation hors du support d'entraînement | MAE de référence 29,5 → 22,7 |
+| 7 juillet | signal de dérive = PCA **ou** PSI | la PCA ne voit pas les déplacements le long des composantes (test dédié) | dérive plus sensible, donc plus bavarde |
+| 15 juillet | variante « dérive nettoyée » (P1b, P3b) déclarée avant E4 | artefacts de E1/E2 : température, `roll_mean_168`, features calendaires | E4 compare la condition jointe à un adversaire honnête |
+| 16 juillet | E3 mesurée contre un contrefactuel sans dérive | l'avant/après confondait l'injection et la saison | taux de suivi interprétables |
+| 16 juillet | E4 : détection par front montant, lissage 7 jours | une alarme permanente affichait un faux rappel de 100 % | P1 correctement classée inutilisable |
+| 17 juillet | E5 rejouée à L = 1 et L = 60 jours | à L = 60, aucune politique ne peut réagir | comparaison informative ; résultat imprévu rapporté |
+
+## Résultats imprévus
+
+Trois résultats contredisent l'intuition de départ ; ils sont rapportés tels quels.
+
+1. **La tarification de congestion ne dégrade pas le modèle** ([E2](experiences/e2-congestion.qmd)),
+   contrairement à l'hypothèse du cas client.
+2. **La reconstruction PCA ne voit pas le choc COVID** ([E1](experiences/e1-covid.qmd)) :
+   un choc de niveau se déplace le long de la première composante.
+3. **Un réentraînement mensuel planifié bat la politique gardée** sur l'année 2020 quand
+   les labels sont rapides ([E5](experiences/e5-reentrainement.qmd)).
+
+## Ce qui reste ouvert
+
+- Mesurer le taux de fausses alertes sur plusieurs périodes calmes (une seule ici).
+- Étendre aux VTC (FHVHV), plus sensibles au prix.
+- Remplacer la météo réalisée par une vraie prévision à 24 h.
+- Conformaliser les quantiles (couverture réelle de 72 % pour 80 % visés).
+- Localiser la dérive par zone, à la manière du diagnostic hiérarchique de DriftGuard.
