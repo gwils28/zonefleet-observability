@@ -7,7 +7,7 @@ project:
 lang: fr
 
 website:
-  title: "ZoneFleet : un modèle ne tombe pas en panne, il dérive"
+  title: "ZoneFleet"
   description: "Observabilité d'un forecaster de demande zone x heure (NYC TLC) : dérive, performance estimée sans labels, frontière covariate shift / concept drift, backtest du moniteur."
   site-url: https://gwils28.github.io/zonefleet-observability/
   repo-url: https://github.com/gwils28/zonefleet-observability
