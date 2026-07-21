@@ -126,7 +126,9 @@ def thresholds(ref_daily: pd.DataFrame, k: float) -> dict[str, float]:
     }
 
 
-def policy_flags(daily: pd.DataFrame, thr: dict[str, float]) -> pd.DataFrame:
+def policy_flags(
+    daily: pd.DataFrame, thr: dict[str, float], persistence: int = PERSISTENCE
+) -> pd.DataFrame:
     psi_all = daily[[c for c in daily if c.startswith("psi_")]].max(axis=1)
     psi_clean = daily[["psi_lag_24", "psi_lag_168"]].max(axis=1)
     pca = daily["recon"] > thr["recon"]
@@ -140,7 +142,7 @@ def policy_flags(daily: pd.DataFrame, thr: dict[str, float]) -> pd.DataFrame:
         "P3b_clean_and_dle": clean & est,
         "P4_realized": real,
     }
-    return pd.DataFrame({k: persistent(v, PERSISTENCE) for k, v in raw.items()})
+    return pd.DataFrame({k: persistent(v, persistence) for k, v in raw.items()})
 
 
 def rising(flag: pd.Series) -> pd.Series:
@@ -149,16 +151,18 @@ def rising(flag: pd.Series) -> pd.Series:
     return f & ~f.shift(1, fill_value=False)
 
 
-def harm_of(sc, raw: pd.DataFrame, base_raw: pd.DataFrame) -> float:
-    """Hausse relative de la MAE log réalisée sur 28 jours, contre le contrefactuel."""
-    win = (raw.index >= sc.onset) & (raw.index < sc.onset + pd.Timedelta(days=WINDOW_DAYS))
+def harm_of(sc, raw: pd.DataFrame, base_raw: pd.DataFrame, window: int = WINDOW_DAYS) -> float:
+    """Hausse relative de la MAE log réalisée sur `window` jours, contre le contrefactuel."""
+    win = (raw.index >= sc.onset) & (raw.index < sc.onset + pd.Timedelta(days=window))
     return raw.loc[win, "real"].mean() / base_raw.loc[win, "real"].mean() - 1
 
 
-def evaluate(sc, daily, harm, flags) -> list[dict]:
+def evaluate(
+    sc, daily, harm, flags, window: int = WINDOW_DAYS, harm_threshold: float = HARM
+) -> list[dict]:
     """Une ligne par politique : détection, délai, fausses alertes."""
     onset = sc.onset
-    win = (daily.index >= onset) & (daily.index < onset + pd.Timedelta(days=WINDOW_DAYS))
+    win = (daily.index >= onset) & (daily.index < onset + pd.Timedelta(days=window))
     null = (daily.index >= PRE_START) & ((daily.index < onset) | (sc.kind == "none"))
     out = []
     for pol in flags.columns:
@@ -178,7 +182,7 @@ def evaluate(sc, daily, harm, flags) -> list[dict]:
                 "subset": sc.subset,
                 "onset": onset,
                 "harm": harm,
-                "harmful": harm > HARM,
+                "harmful": harm > harm_threshold,
                 "policy": pol,
                 "detected": len(hits) > 0,
                 "delay_days": delay,
