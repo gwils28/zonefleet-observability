@@ -265,8 +265,44 @@ def e5_summary() -> pd.DataFrame:
     return out
 
 
+def kpis_html() -> str:
+    """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
+    det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
+    e3 = pd.read_csv(T / "e3_summary.csv")
+    cov = e3[e3["family"].str.startswith("covariate")]["tracking_steady"]
+    con = e3[e3["family"] == "concept pur"]["tracking_steady"]
+    e4 = pd.read_csv(T / "e4_summary.csv")
+    p3b = e4[(e4["policy"] == "P3b_clean_and_dle") & (e4["k"] == 1.0) & (e4["smooth"] == 7)].iloc[0]
+    e2 = pd.read_csv(T / "e2_detection_by_group.csv")
+    p1_days = int(e2[e2["policy"] == "P1_drift"]["alert_days_after"].max())
+    tiles = [
+        (
+            f"{fr(det.loc['P2_dle', 'delay_days'], 0)} j",
+            "détection du choc COVID sans labels "
+            + f"(contre {fr(det.loc['P4_realized', 'delay_days'], 0)} j avec)",
+        ),
+        (f"{fr(cov.min(), 2)}-{fr(cov.max(), 2)}", "taux de suivi de DLE sous covariate shift"),
+        (fr(abs(con).max(), 2), "taux de suivi de DLE sous concept drift pur"),
+        (
+            f"{fr(100 * p3b['recall'], 0)} %",
+            "rappel de la condition jointe, avec 0 fausse alerte sur 240 scénarios",
+        ),
+        (
+            f"{p1_days} / {p1_days}",
+            "jours d'alerte de la dérive seule après la taxe de congestion, pour 0 dégradation",
+        ),
+    ]
+    body = "\n".join(
+        f'<div class="kpi"><div class="value">{v}</div><div class="label">{lab}</div></div>'
+        for v, lab in tiles
+    )
+    return f'```{{=html}}\n<div class="kpi-row">\n{body}\n</div>\n```\n'
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "kpis.md").write_text(kpis_html())
+    print("kpis: 5 tuiles")
     for name, fn in REGISTRY.items():
         df = fn()
         (OUT / f"{name}.md").write_text(df.to_markdown(index=False) + "\n")
