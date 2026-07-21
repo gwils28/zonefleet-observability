@@ -60,6 +60,12 @@ website:
         menu:
           - href: mlops/dagster.qmd
           - href: mlops/mlflow.qmd
+      - text: À propos
+        menu:
+          - href: journal.qmd
+            text: Journal de bord
+          - href: references.qmd
+            text: Références
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability
