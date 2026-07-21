@@ -49,10 +49,23 @@ website:
           - href: experiences/e3-frontiere.qmd
           - href: experiences/e4-backtest.qmd
           - href: experiences/e5-reentrainement.qmd
+          - text: "---"
+          - href: notebooks/tutoriel-dle.ipynb
+            text: "Notebook : DLE pas à pas"
+      - href: zonefleet.qmd
+        text: Cas ZoneFleet
+      - href: system-design.qmd
+        text: System design
       - text: MLOps
         menu:
           - href: mlops/dagster.qmd
           - href: mlops/mlflow.qmd
+      - text: À propos
+        menu:
+          - href: journal.qmd
+            text: Journal de bord
+          - href: references.qmd
+            text: Références
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability

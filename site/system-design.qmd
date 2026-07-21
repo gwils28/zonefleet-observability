@@ -1,0 +1,181 @@
+---
+title: "System design : observer un forecaster dont la vérité arrive H jours trop tard"
+description: "Décision d'architecture en 10 lignes, puis le raisonnement complet : indicateurs avancés et leur hiérarchie, encodage de la condition jointe, politique de réentraînement et garde-fous contre les boucles de rétroaction."
+---
+
+## La décision en dix lignes
+
+::: {.callout-tip appearance="simple"}
+1. **Pendant la fenêtre aveugle** (H + L jours), surveiller trois familles de signaux,
+   toutes calculables à l'émission : dérive des entrées, dérive des prédictions,
+   performance **estimée** (DLE, échelle relative).
+2. **Hiérarchie** : la performance estimée décide, la dérive qualifie, la dérive des
+   prédictions sert de garde-fou de cohérence (Sculley, *prediction bias*).
+3. **Page** seulement sur la condition jointe *dérive ET perte estimée*, persistante
+   2 jours ; la dérive seule ouvre un **ticket** hebdomadaire, jamais une astreinte.
+4. Les seuils viennent de la **référence** (hors échantillon), recalculés à chaque
+   promotion, sur un signal **lissé 7 jours** pour l'alerte et brut pour le diagnostic.
+5. La **performance réalisée** (labels à t + L) ne sert pas à alerter vite : elle audite
+   le moniteur et déclenche le réentraînement.
+6. **Angle mort assumé** : le concept drift pur est invisible sans labels ; on le couvre
+   par des labels précoces (journaux de courses internes, L ≈ 1 jour) et des proxys
+   externes (demande non servie).
+7. **Réentraînement gardé** : dérive confirmée ET ≥ 28 jours de labels post-alerte, puis
+   champion/challenger sur une fenêtre postérieure, promotion si gain ≥ 5 %.
+8. **Jamais de réentraînement réflexe** : à L = 60 jours, il apprend sur l'ancien monde ;
+   sur 9 jours de labels, il apprend du bruit.
+9. **Anti-boucle de rétroaction** : zones témoins à positionnement indépendant du
+   modèle, journal de la demande non servie, refus d'apprendre sur une fenêtre pilotée
+   à 100 % par le modèle.
+10. Le moniteur est un modèle : il se **backteste** (rappel x délai x fausses alertes)
+    avant d'être branché sur une astreinte.
+:::
+
+## Schéma
+
+```text
+                ┌──────────────────────────── fenêtre aveugle (H + L) ───────────────────────────┐
+  émission τ    │                                                                                │  t + L
+  features ─────┼─> forecaster figé ─> prévisions ─> positionnement flotte                        │  labels TLC
+     │          │        │                  │                                                    │     │
+     │          │        ▼                  ▼                                                    │     ▼
+     │          │   DLE (nanny) ───> perte estimée (log, lissée 7 j) ──┐                          │  perte réalisée
+     ├──────────┼─> PSI / PCA ─────> dérive des entrées ───────────────┼──> ET, 2 jours ──> PAGE │     │
+     │          │                                                      │                         │     ├──> audit du moniteur
+     └──────────┼─> KS prédictions ─> dérive des prédictions ──────────┘    dérive seule 7 j ──> TICKET   │
+                │                                                                                │     └──> réentraînement gardé
+                └────────────────────────────────────────────────────────────────────────────────┘           (≥ 28 j labels, C/C, +5 %)
+```
+
+Chaque ligne de ce résumé s'appuie sur une mesure du projet ; les sections suivantes
+donnent le raisonnement et renvoient aux expériences.
+
+## 1. Indicateurs avancés : que surveiller pendant la fenêtre aveugle
+
+Pendant H + L jours, seules trois familles de signaux existent. Elles ne se valent pas.
+
+| Signal | Ce qu'il voit | Ce qu'il ne voit pas | Rôle |
+|---|---|---|---|
+| **Performance estimée** (DLE, MAE sur log1p) | covariate shift vers des régions d'erreur différentes, y compris les dérives qui *améliorent* le modèle | concept drift pur ; régions rares de la référence (biais) | **décide** : c'est le seul signal exprimé dans l'unité de l'impact |
+| **Dérive des entrées** (PSI sur `lag_24`, `lag_168` ; PCA) | tout déplacement de X, qu'il nuise ou non | concept drift pur ; dérives le long des composantes (PCA) | **qualifie** : confirme que quelque chose a bougé dans le monde |
+| **Dérive des prédictions** (KS sur la médiane prédite) | changement de ce que le modèle *dit* | si le modèle a raison | **cohérence** : signale un modèle qui « s'emballe » ou un amont cassé |
+
+Hiérarchie retenue : DLE au sommet, parce que c'est le seul signal qui distingue une
+dérive nuisible d'une dérive bénigne ([E3](experiences/e3-frontiere.qmd) : suivi de 0,82
+à 0,99 en covariate shift, dans les deux sens). La dérive des entrées descend d'un cran :
+utilisée seule, elle alerte sur 55 % des dérives bénignes une fois nettoyée, et 100 % du
+temps sinon ([E4](experiences/e4-backtest.qmd)).
+
+Trois règles d'hygiène tirées des expériences :
+
+1. **Pas de feature saisonnière ni calendaire** dans les tests univariés journaliers :
+   la température dérive tous les jours de l'hiver, `dow` est constant dans un chunk
+   d'un jour ([E1](experiences/e1-covid.qmd), [E2](experiences/e2-congestion.qmd)).
+2. **Pas de PSI journalier sur une feature lissée à la semaine** (`roll_mean_168`) :
+   distribution resserrée, PSI artificiellement explosif.
+3. **Métrique relative pour décider** : la MAE en courses baisse quand le volume
+   s'effondre ([métriques](concepts/metriques.qmd)).
+
+## 2. Réduire le bruit d'alerte : encoder le ET logique
+
+La bonne pratique défendue ici : **ne pas alerter sur la dérive seule**, mais sur la
+condition jointe « dérive des entrées **et** hausse de la perte estimée ». E4 la chiffre
+sur 240 scénarios :
+
+| Politique (k = 1) | Rappel | Fausses alertes / mois | Alerte sur dérive bénigne |
+|---|---|---|---|
+| dérive seule (toutes features) | 0 % (alarme permanente) | - | - |
+| dérive nettoyée seule | 67 % | 0,16 | 55 % |
+| DLE seul | 56 % | 1,19 | 23 % |
+| **dérive nettoyée ET DLE** | **45 %** (51 % lissé 7 j) | **0** | 13 % |
+| labels (J + 60) | 70 % | 0,62 | 2 % |
+
+Encodage retenu, en trois niveaux de sévérité (`ops.decisions.alert_severity`) :
+
+```text
+PAGE    si  (psi_lag24 > 0,25 OU psi_lag168 > 0,25 OU pca_alert)
+         ET dle_mae_log_lisse_7j > seuil_reference(k = 1)
+         pendant 2 jours consécutifs
+     ou  perte réalisée > seuil pendant 2 jours (labels arrivés : audit, réentraînement)
+
+TICKET  si  dérive nettoyée seule pendant 7 jours   -> revue hebdomadaire, pas d'astreinte
+
+RIEN    sinon
+```
+
+Pourquoi garder le ticket : quand DLE se tait, la dérive reste le seul indice d'un
+concept drift naissant (elle a vu 83 % des chocs propagés en E4). Elle n'a simplement pas
+le droit de réveiller quelqu'un.
+
+Seuils : moyenne + k écarts-types des chunks de **référence hors échantillon**, recalculés
+à chaque promotion de modèle (Sculley : un seuil fixe dans un système dynamique est une
+dette). Le choix k = 1 avec lissage 7 jours est le meilleur compromis mesuré pour un
+positionnement quotidien : 3 jours de délai médian, aucune fausse alerte.
+
+## 3. L'angle mort, et comment le réduire
+
+Le concept drift pur est **invisible sans labels** : E3 mesure un suivi de DLE exactement
+nul, E4 un rappel de 0 % pour la condition jointe. Sur un modèle à lags, **tout choc
+brutal commence ainsi** et le reste une à deux semaines. Trois parades, par ordre de
+rentabilité :
+
+1. **Raccourcir L.** ZoneFleet connaît ses propres courses le lendemain : brancher le
+   monitoring réalisé sur les journaux internes plutôt que sur la publication TLC fait
+   passer la fenêtre aveugle de 61 jours à 2. C'est de loin le levier le plus puissant
+   ([E5](experiences/e5-reentrainement.qmd) : à L = 60, aucune politique ne réagit au choc).
+2. **Labels partiels précoces.** Même sans journaux complets, les premières heures de
+   chaque jour (ou un échantillon de zones) donnent une erreur réalisée partielle,
+   bruyante mais sans délai.
+3. **Proxys indépendants de X.** Demandes non servies (applications ouvertes sans
+   véhicule), temps d'attente, annulations : ils bougent avec la vraie demande, pas avec
+   les lags.
+
+## 4. Politique de réentraînement
+
+Ne pas réentraîner par réflexe : E5 le montre sur l'année COVID, le réentraînement
+déclenché par l'alerte fait **pire que l'inaction** (MAE log 0,565 contre 0,524 sur
+mars-décembre), et le réentraînement sur les seuls jours post-choc sur-apprend le pire
+moment (0,58 au second semestre, la pire politique de l'année).
+
+```{mermaid}
+flowchart TD
+  A["alerte PAGE"] --> B{"dérive confirmée ?<br/>(jointe ou réalisée)"}
+  B -- non --> X["ne rien faire,<br/>surveiller"]
+  B -- oui --> C{">= 28 jours de labels<br/>postérieurs à l'alerte ?"}
+  C -- non --> W["attendre ;<br/>garde-fou de positionnement actif"]
+  C -- oui --> D{"fenêtre de labels non pilotée<br/>à 100 % par le modèle ?"}
+  D -- non --> Y["refuser : boucle<br/>de rétroaction"]
+  D -- oui --> E["entraîner un challenger<br/>(8 derniers mois disponibles)"]
+  E --> F{"gain >= 5 % sur 14 jours<br/>postérieurs à son entraînement ?"}
+  F -- oui --> G["promouvoir (alias champion),<br/>recalculer les seuils"]
+  F -- non --> H["archiver, réessayer<br/>la semaine suivante"]
+```
+
+Un résultat de E5 nuance la règle : avec des labels à J + 1, un **réentraînement mensuel
+planifié** fait un peu mieux que la politique gardée sur l'année 2020 (0,363 contre
+0,411), parce qu'il s'adapte sans attendre de confirmation. Recommandation :
+**politique gardée + réentraînement de fond trimestriel**, ce dernier soumis à la même
+validation champion/challenger. On garde l'adaptation de fond sans les 11 changements de
+production non motivés par an.
+
+## 5. Garde-fous contre la boucle de rétroaction
+
+Le modèle positionne la flotte ; la flotte conditionne les courses servies ; les courses
+servies sont les labels du prochain modèle. Une zone sous-prévue devient une zone
+sous-servie, dont la demande observée baisse : la demande est **censurée par l'offre**.
+
+| Garde-fou | Mécanisme | Coût |
+|---|---|---|
+| Zones témoins | 5 % des zones positionnées par une règle indépendante du modèle (historique, seasonal naive) | un peu d'efficacité sur ces zones |
+| Demande non servie | journaliser les demandes sans véhicule disponible, et les ajouter aux labels | instrumentation de l'application |
+| Fenêtres interdites | `retrain_decision` refuse une fenêtre de labels pilotée à 100 % par le modèle | réentraînement parfois retardé |
+| Action limits | le déplacement de flotte décidé par la prévision est plafonné par zone et par heure (Sculley, *action limits*) | réactivité bornée |
+| Comparaison témoin | l'erreur réalisée sur les zones témoins sert de référence non biaisée | aucune |
+
+## 6. Ce que cette architecture ne promet pas
+
+- Elle ne détecte pas un concept drift pur avant les labels : elle le **borne** (fenêtre
+  aveugle courte, tickets de dérive, proxys).
+- Ses taux de fausses alertes sont mesurés sur une seule période calme réelle (2025) ;
+  il faudra les recalibrer sur un an de production.
+- Les seuils dépendent du modèle : chaque promotion impose de recalculer la référence.

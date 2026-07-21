@@ -1,7 +1,7 @@
-.PHONY: help data weather panel test lint check experiments figures site all
+.PHONY: help data weather panel test lint check e0 e1 e2 e3 e4 e5 experiments figures notebook registry dagster site all
 
 help:        ## Liste des cibles
-	@grep -E '^[a-z]+:.*##' Makefile | sed 's/:.*##/ :/'
+	@grep -E '^[a-z0-9]+:.*##' Makefile | sed 's/:.*##/ :/'
 data:        ## Télécharge ~3 Go de fichiers TLC et vérifie le manifeste SHA-256
 	./scripts/download_data.sh
 weather:     ## Met en cache la météo Open-Meteo (data/processed/weather.csv, versionné)
@@ -29,3 +29,15 @@ registry:    ## Enregistre les modèles figés dans le registry MLflow local (al
 	uv run python scripts/register_models.py
 dagster:     ## Interface Dagster du monitoring (http://localhost:3000)
 	uv run dagster dev -m zonefleet.ops.definitions
+notebook:    ## Régénère et exécute le notebook tutoriel
+	uv run python scripts/build_notebook.py
+	uv run jupyter nbconvert --to notebook --execute --inplace site/notebooks/tutoriel-dle.ipynb
+experiments: e0 e1 e2 e3 e4 e5  ## Toutes les expériences du SPEC
+figures:     ## Figures et tables du site (depuis results/)
+	uv run python scripts/make_concept_figures.py
+	uv run python scripts/make_data_figures.py
+	uv run python scripts/make_result_figures.py
+	uv run python scripts/make_tables.py
+site:        ## Rendu du site Quarto (site/_site)
+	quarto render site
+all: check experiments figures notebook site

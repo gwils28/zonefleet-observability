@@ -1,0 +1,42 @@
+---
+title: "Références"
+description: "Sources primaires citées dans le projet : articles, documentation, données."
+---
+
+## Articles
+
+- D. Sculley, G. Holt, D. Golovin, E. Davydov, T. Phillips, D. Ebner, V. Chaudhary,
+  M. Young, J.-F. Crespo, D. Dennison (2015). *Hidden Technical Debt in Machine Learning
+  Systems*. Advances in Neural Information Processing Systems 28, p. 2494-2502.
+  [proceedings.neurips.cc](https://proceedings.neurips.cc/paper/2015/hash/86df7dcfd896fcaf2674f757a2463eba-Abstract.html)
+  · fiche : [Sculley](veille/sculley.qmd)
+- S. Alam, M. A. Rahman, B. Sadeqa (2026). *DriftGuard: A Hierarchical Framework for
+  Concept Drift Detection and Remediation in Supply Chain Forecasting*. arXiv:2601.08928.
+  [arxiv.org](https://arxiv.org/abs/2601.08928) · fiche : [DriftGuard](veille/driftguard.qmd)
+
+## Logiciels et documentation
+
+- NannyML 0.13 : [dépôt](https://github.com/nannyml/nannyml) ·
+  [estimation de performance (DLE, CBPE)](https://nannyml.readthedocs.io/en/stable/how_it_works/performance_estimation.html) ·
+  [dérive multivariée](https://nannyml.readthedocs.io/en/stable/how_it_works/multivariate_drift.html)
+  · fiche : [NannyML](veille/nannyml.qmd)
+- LightGBM 4.5 : [documentation](https://lightgbm.readthedocs.io/)
+- statsforecast (MSTL) : [documentation](https://nixtlaverse.nixtla.io/statsforecast/)
+- Dagster 1.13 : [documentation](https://docs.dagster.io/)
+- MLflow 3.18 : [registry](https://mlflow.org/docs/latest/model-registry.html)
+- duckdb : [documentation](https://duckdb.org/docs/)
+- Quarto : [documentation](https://quarto.org/)
+
+## Données
+
+- NYC Taxi & Limousine Commission, *TLC Trip Record Data* (taxis jaunes et verts,
+  2019-2020, 2024-2025) et *Taxi Zone Lookup Table* :
+  [nyc.gov](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
+- Open-Meteo, *Historical Weather API* (réanalyse ERA5) :
+  [open-meteo.com](https://open-meteo.com/en/docs/historical-weather-api)
+- Jours fériés US : paquet Python [`holidays`](https://pypi.org/project/holidays/)
+
+## Fiches de veille
+
+Les faits repris de chaque source, avec les incohérences internes relevées, sont dans
+`docs/notes/veille_fiches.md` du dépôt.
