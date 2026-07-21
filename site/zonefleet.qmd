@@ -1,0 +1,123 @@
+---
+title: "Cas client : ZoneFleet"
+subtitle: "Opérateur de mobilité last-mile · projet d'observabilité de 1 à 2 mois"
+description: "Le cahier des charges ZoneFleet, ce que le projet a livré pour chaque exigence, et ce que les données ont contredit."
+---
+
+::: {.callout-note appearance="minimal"}
+**ZoneFleet est un client fictif.** Les données, elles, sont réelles (NYC TLC 2019-2020 et
+2024-2025) ; chaque chiffre de cette page renvoie à une table de `results/`.
+:::
+
+## Le contexte
+
+ZoneFleet prévoit la **demande horaire de courses par zone** pour positionner sa flotte
+(chauffeurs, véhicules) à l'avance. Un modèle déployé il y a 18 mois se dégrade en
+silence : véhicules à vide dans certaines zones, pénurie dans d'autres, et **aucune
+alarme**, car personne ne surveille la santé du modèle. Quelques points de MAPE de dérive
+non détectés se traduisent en baisse du taux d'utilisation de la flotte et en courses
+perdues, soit plusieurs points de marge.
+
+Le projet n'est pas « un meilleur modèle » : c'est **une observabilité complète**.
+
+```{mermaid}
+flowchart LR
+  subgraph Avant["Avant le projet"]
+    M1["modèle déployé"] --> P1["positionnement"]
+    P1 --> R1["courses"]
+    R1 -. "60 jours plus tard,<br/>si quelqu'un regarde" .-> Q1["« le modèle a dérivé »"]
+  end
+  subgraph Apres["Après le projet"]
+    M2["modèle figé, versionné"] --> P2["positionnement"]
+    M2 --> O["observabilité :<br/>contrat de données,<br/>dérive, DLE, alertes"]
+    O --> D{"dérive ET<br/>perte estimée ?"}
+    D -- oui --> A["astreinte : diagnostic,<br/>garde-fou de positionnement"]
+    D -- non --> T["ticket hebdomadaire"]
+    R2["courses réalisées (D + 60)"] --> V["validation du moniteur,<br/>réentraînement gardé"]
+  end
+```
+
+## Cahier des charges et livraison
+
+### A. Préparation des données
+
+| Exigence | Livré | Où |
+|---|---|---|
+| Agrégation courses → panel zone x heure, jointure des zones | 96 fichiers, 60 zones, 2,1 M lignes, ~5 s avec duckdb | [panel](donnees/panel.qmd), `data.py` |
+| Calendrier, météo, événements | calendrier US et météo ERA5 ; **événements non intégrés** (pas de source historique propre), absorbés par la persistance des alertes | [sources](donnees/sources.qmd) |
+| Ruptures de schéma versionnées par un data contract | contrat YAML, ruptures connues et datées vs inconnues, changements de type journalisés | [data contract](donnees/data-contract.qmd) |
+| Demande intermittente, `log1p` | cible en log1p ; les 60 zones retenues sont peu intermittentes (≤ 6 % d'heures à zéro) | [panel](donnees/panel.qmd) |
+
+### B. Le modèle surveillé
+
+| Exigence | Livré | Où |
+|---|---|---|
+| Baselines seasonal naive et MSTL | les deux, MSTL réajusté chaque jour | [E0](modele/e0.qmd) |
+| LightGBM global, lags, calendrier, météo | 15 features, lags ≥ 24 h, zone catégorielle | [features](modele/features.qmd) |
+| Sorties quantiles | q10, q50, q90 ; couverture 80 % réelle de 72 %, documentée | [E0](modele/e0.qmd) |
+| Modèle figé, objet du monitoring | sérialisé, versionné dans MLflow | [MLOps](mlops/mlflow.qmd) |
+
+### C. Observabilité
+
+| Exigence | Livré | Où |
+|---|---|---|
+| Dérive des entrées univariée (KS, Wasserstein, PSI) et multivariée (PCA) | les quatre, avec leurs artefacts et l'angle mort de la PCA | [concepts](concepts/derive-univariee.qmd), [E1](experiences/e1-covid.qmd) |
+| Dérive des prédictions | KS et Wasserstein sur la médiane prédite (log) | `monitoring.prediction_drift` |
+| Performance estimée sans labels (DLE) | deux échelles (courses, log) ; frontière covariate / concept mesurée | [E3](experiences/e3-frontiere.qmd) |
+| Performance réalisée à l'arrivée des labels | MAE, RMSE, MASE à échelle figée, pinball, couverture | [métriques](concepts/metriques.qmd) |
+| Alerte sur condition jointe | politiques P1 à P4 (+ variantes), backtestées | [E4](experiences/e4-backtest.qmd) |
+
+### D. Réentraînement et mise en production
+
+| Exigence | Livré | Où |
+|---|---|---|
+| Déclencheur : dérive confirmée ET volume suffisant de labels | `retrain_decision` : confirmée, ≥ 28 jours de labels post-alerte | [E5](experiences/e5-reentrainement.qmd) |
+| Pas de réentraînement réflexe | mesuré : pire que l'inaction sur l'année COVID | [E5](experiences/e5-reentrainement.qmd) |
+| Champion / challenger | alias MLflow, promotion si gain ≥ 5 % sur labels postérieurs | [registry](mlops/mlflow.qmd) |
+| Garde-fou anti-boucle de rétroaction | zones témoins, demande non servie, fenêtres pilotées refusées | [system design](system-design.qmd) |
+| Orchestration, registry, data contract | Dagster (9 assets, 2 contrôles), MLflow local, contrat YAML | [Dagster](mlops/dagster.qmd) |
+
+### E. Backtester le moniteur lui-même
+
+| Exigence | Livré | Où |
+|---|---|---|
+| Shifts synthétiques, délai x faux positifs | 240 scénarios, rappel, délai, fausses alertes, IC bootstrap | [E4](experiences/e4-backtest.qmd) |
+| Cadre type DriftGuard | repris (rappel x délai) et adapté aux labels retardés (horloge de décision) | [DriftGuard](veille/driftguard.qmd) |
+
+## Ce que les données ont contredit
+
+Le cahier des charges supposait que la tarification de congestion avait « déplacé la
+relation entre features et demande ». Sur les taxis jaunes et verts, [E2](experiences/e2-congestion.qmd)
+montre l'inverse : la demande se recompose (moins de croissance la nuit dans le CBD,
+plus le soir) mais **le modèle figé ne se dégrade pas** ; son erreur relative après le
+5 janvier 2025 est même inférieure à celle de sa référence. C'est une **dérive sans
+impact** : exactement le cas où un moniteur mal conçu réveille l'astreinte 177 jours de
+suite.
+
+Le second choc de l'énoncé, le COVID, est bien un concept drift d'école, et c'est sur lui
+que la frontière de la performance estimée se lit ([E1](experiences/e1-covid.qmd)).
+
+## Recommandations à ZoneFleet
+
+1. **Brancher le monitoring réalisé sur vos journaux de courses**, pas sur la
+   publication TLC : la fenêtre aveugle passe de 61 jours à 2. C'est le premier
+   investissement, devant tout le reste.
+2. **Astreinte sur la condition jointe uniquement** (dérive nettoyée ET perte estimée,
+   lissée 7 jours, persistante 2 jours) : zéro fausse alerte mesurée, 51 % des dérives
+   nuisibles détectées en 3 jours médians, le reste revenant aux labels.
+3. **Dérive seule en ticket hebdomadaire**, pour ne pas perdre l'indice d'un concept
+   drift naissant.
+4. **Réentraînement gardé + fond trimestriel**, toujours via champion/challenger.
+5. **Zones témoins et journal de la demande non servie** avant tout réentraînement sur
+   des données pilotées par le modèle.
+6. **Recalibrer les seuils après un an de production** : les taux de fausses alertes
+   mesurés ici reposent sur une seule période calme.
+
+## Ce que le projet n'a pas couvert
+
+- **VTC (FHVHV)** : plus sensibles au prix, ils pourraient réagir autrement à la taxe de
+  congestion ; hors périmètre (volume de données).
+- **Événements** (concerts, matchs) : pas de source historique propre.
+- **Prévision météo réelle** : la météo réalisée a servi de prévision (hypothèse optimiste).
+- **Coût métier** : la traduction des points d'erreur en véhicules à vide et en courses
+  perdues demande les données de flotte de ZoneFleet.
