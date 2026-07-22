@@ -1,0 +1,26 @@
+# Installation : uv run pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.3
+    hooks:
+      - id: ruff
+        exclude: \.ipynb$
+      - id: ruff-format
+        exclude: \.ipynb$
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=12000"]
+      - id: end-of-file-fixer
+        exclude: \.(ipynb|csv)$
+      - id: trailing-whitespace
+        exclude: \.(ipynb|csv|md)$
+      - id: check-yaml
+  - repo: local
+    hooks:
+      - id: no-em-dash
+        name: pas de tiret cadratin
+        entry: python3 scripts/hooks/check_no_em_dash.py
+        language: system
+        types: [text]
