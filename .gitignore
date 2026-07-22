@@ -31,3 +31,5 @@ CLAUDE.local.md
 # MLflow local (registry de démonstration)
 mlflow.db
 results/mlflow/
+coverage.xml
+.coverage
