@@ -764,7 +764,9 @@ def e4_sensitivity() -> None:
     axes[0, 0].set_ylabel("rappel (%)")
     axes[1, 0].set_ylabel("fausses alertes / 30 j")
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncols=4, fontsize=9, bbox_to_anchor=(0.5, -0.04))
+    fig.legend(
+        handles, labels, loc="lower center", ncols=4, fontsize=9, bbox_to_anchor=(0.5, -0.04)
+    )
     fig.suptitle(
         "Sensibilité de E4 (k = 1, lissé 7 j) : un paramètre varie, les autres au protocole",
         x=0.01,
