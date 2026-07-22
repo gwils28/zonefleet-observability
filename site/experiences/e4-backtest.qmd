@@ -115,3 +115,26 @@ dépasser environ 64 % de rappel *honnête*.
    pour 3 jours de délai : le bon réglage pour un positionnement de flotte quotidien.
 4. **Le concept drift fixe un plafond** que seuls des labels plus rapides peuvent percer :
    c'est l'argument d'architecture principal du [system design](../system-design.qmd).
+
+## Sensibilité au protocole
+
+Trois choix du protocole ont été fixés a priori : persistance de 2 jours, nuisance à
++10 %, fenêtre de 28 jours. `e4_sensitivity.py` les fait varier un par un, sur les
+signaux journaliers déjà calculés (aucune injection relancée), au réglage retenu
+(k = 1, signal lissé 7 jours).
+
+![Rappel (en haut) et fausses alertes (en bas) de chaque politique quand un seul paramètre du protocole varie.](../figures/e4_sensibilite.png){#fig-sensitivity}
+
+Condition jointe nettoyée (P3b) :
+
+{{< include ../_tables/e4_sensitivity.md >}}
+
+- **La persistance est le paramètre critique.** À 1 jour, P3b perd sa propriété
+  principale (0,58 fausse alerte par mois au lieu de 0) et P1b passe à 1,6. À 2 ou
+  3 jours, P3b reste à zéro : 2 jours est le minimum qui tient, 3 n'apporte rien sauf
+  un jour de délai.
+- **Le seuil de nuisance et la fenêtre** déplacent les rappels de toutes les politiques
+  ensemble (plus la nuisance exigée est forte, plus elle est facile à détecter), sans
+  changer leur ordre ni les taux de fausses alertes.
+- Le classement de E4 tient sur toute la grille : P3b est la seule politique sans
+  fausse alerte dès que la persistance atteint 2 jours.

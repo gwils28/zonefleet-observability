@@ -267,6 +267,26 @@ def e5_summary() -> pd.DataFrame:
     return out
 
 
+@table("e4_sensitivity")
+def e4_sensitivity() -> pd.DataFrame:
+    s = pd.read_csv(T / "e4_sensitivity.csv")
+    s = s[s["policy"] == "P3b_clean_and_dle"]
+    unit = {"persistance": " j", "nuisance": "", "fenêtre": " j"}
+    return pd.DataFrame(
+        {
+            "Paramètre": s["parameter"],
+            "Valeur": [
+                (fr(100 * v, 0) + " %") if p == "nuisance" else fr(v, 0) + unit[p]
+                for p, v in zip(s["parameter"], s["value"], strict=True)
+            ],
+            "Scénarios nuisibles": s["n_harmful"],
+            "Rappel P3b (%)": s["recall"].map(lambda v: fr(100 * v, 0)),
+            "Fausses alertes / 30 j": s["false_alerts_per_30d"].map(lambda v: fr(v, 2)),
+            "Délai médian (j)": s["median_delay"].map(lambda v: fr(v, 0)),
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
