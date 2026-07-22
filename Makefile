@@ -41,3 +41,5 @@ figures:     ## Figures et tables du site (depuis results/)
 site:        ## Rendu du site Quarto (site/_site)
 	quarto render site
 all: check experiments figures notebook site
+e4s:         ## E4 bis : sensibilité au protocole (relit le cache de E4, ≈ 10 s)
+	uv run python -m zonefleet.experiments.e4_sensitivity
