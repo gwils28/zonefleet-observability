@@ -741,6 +741,39 @@ def e5_bars() -> None:
     viz.save(fig, "e5_periodes")
 
 
+@group("e4")
+def e4_sensitivity() -> None:
+    s = pd.read_csv(T / "e4_sensitivity.csv")
+    params = [
+        ("persistance", "persistance (jours)"),
+        ("nuisance", "seuil de nuisance"),
+        ("fenêtre", "fenêtre (jours)"),
+    ]
+    fig, axes = plt.subplots(2, 3, figsize=(12, 5.6), sharey="row")
+    for j, (p, lab) in enumerate(params):
+        for pol, c in POLICY_COLOR.items():
+            d = s[(s["parameter"] == p) & (s["policy"] == pol)].sort_values("value")
+            x = d["value"] * (100 if p == "nuisance" else 1)
+            axes[0, j].plot(
+                x, 100 * d["recall"], color=c, marker="o", ms=5, label=POLICY_SHORT[pol]
+            )
+            axes[1, j].plot(x, d["false_alerts_per_30d"], color=c, marker="o", ms=5)
+        axes[1, j].set_xlabel(lab + (" (%)" if p == "nuisance" else ""))
+        axes[0, j].set_xticks(x)
+        axes[1, j].set_xticks(x)
+    axes[0, 0].set_ylabel("rappel (%)")
+    axes[1, 0].set_ylabel("fausses alertes / 30 j")
+    axes[0, 0].legend(loc="lower left", fontsize=8)
+    fig.suptitle(
+        "Sensibilité de E4 (k = 1, lissé 7 j) : un paramètre varie, les autres au protocole",
+        x=0.01,
+        ha="left",
+        fontweight="bold",
+    )
+    fig.tight_layout()
+    viz.save(fig, "e4_sensibilite")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
