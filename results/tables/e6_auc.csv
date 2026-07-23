@@ -1,0 +1,9 @@
+cas,signal,auc
+choc propagé CBD,perte estimée (DLE),1.0
+choc propagé CBD,PSI lag_168,0.4554
+choc propagé CBD,PSI lag_168 vs contrefactuel (a posteriori),1.0
+choc propagé CBD,erreur réalisée (labels),1.0
+concept pur CBD,perte estimée (DLE),0.5
+concept pur CBD,PSI lag_168,0.2143
+concept pur CBD,PSI lag_168 vs contrefactuel (a posteriori),0.5
+concept pur CBD,erreur réalisée (labels),1.0
