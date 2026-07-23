@@ -1,0 +1,61 @@
+zone,est_before,est_after,real_before,real_after,delta_est,delta_real,psi_lag_168,name,borough,cbd
+7,0.2079,0.338,0.2038,1.1824,0.1302,0.9786,1.835,Astoria,Queens,False
+13,0.2533,0.5152,0.2245,1.2913,0.2619,1.0668,1.5992,Battery Park City,Manhattan,True
+24,0.2489,0.3612,0.2381,0.8875,0.1123,0.6494,1.1769,Bloomingdale,Manhattan,False
+33,0.2932,0.4083,0.2687,0.9658,0.1152,0.6971,1.1832,Brooklyn Heights,Brooklyn,False
+41,0.1913,0.2995,0.1859,0.7296,0.1082,0.5437,0.9737,Central Harlem,Manhattan,False
+42,0.2174,0.3047,0.2141,0.6553,0.0874,0.4412,0.8869,Central Harlem North,Manhattan,False
+43,0.2292,0.4144,0.2009,1.0239,0.1852,0.823,1.2526,Central Park,Manhattan,False
+48,0.1395,0.3761,0.1245,0.899,0.2366,0.7744,2.0914,Clinton East,Manhattan,True
+50,0.2321,0.3988,0.2159,1.209,0.1667,0.9932,1.8379,Clinton West,Manhattan,True
+65,0.2836,0.3932,0.255,0.9502,0.1096,0.6951,1.1053,Downtown Brooklyn/MetroTech,Brooklyn,False
+68,0.1614,0.3653,0.1435,1.1103,0.2039,0.9667,2.0351,East Chelsea,Manhattan,True
+74,0.1782,0.2806,0.1572,0.647,0.1024,0.4898,0.9725,East Harlem North,Manhattan,False
+75,0.1676,0.2679,0.1493,0.604,0.1002,0.4547,0.8323,East Harlem South,Manhattan,False
+79,0.1875,0.3944,0.1569,1.1397,0.2069,0.9827,1.9066,East Village,Manhattan,True
+82,0.2183,0.3598,0.2166,1.1678,0.1414,0.9512,1.9307,Elmhurst,Queens,False
+87,0.252,0.464,0.2215,1.2971,0.2121,1.0756,1.5569,Financial District North,Manhattan,True
+88,0.2935,0.4349,0.2419,1.2415,0.1414,0.9996,1.5408,Financial District South,Manhattan,True
+90,0.1794,0.3643,0.1476,1.1365,0.1849,0.9889,1.7788,Flatiron,Manhattan,True
+95,0.2796,0.3789,0.2621,0.9514,0.0993,0.6893,1.3215,Forest Hills,Queens,False
+97,0.277,0.3731,0.2653,0.8712,0.0961,0.6058,0.858,Fort Greene,Brooklyn,False
+100,0.1704,0.3682,0.1429,1.0971,0.1978,0.9543,1.9864,Garment District,Manhattan,True
+107,0.1784,0.3739,0.1555,1.0503,0.1955,0.8948,1.7065,Gramercy,Manhattan,True
+113,0.1924,0.4547,0.1766,1.3658,0.2623,1.1893,1.7039,Greenwich Village North,Manhattan,True
+114,0.2028,0.4537,0.1858,1.5132,0.2509,1.3274,1.891,Greenwich Village South,Manhattan,True
+125,0.2723,0.4985,0.2305,1.387,0.2262,1.1564,1.7775,Hudson Sq,Manhattan,True
+129,0.252,0.33,0.2551,1.2726,0.078,1.0175,1.8608,Jackson Heights,Queens,False
+132,0.2137,0.4953,0.1988,1.2661,0.2815,1.0674,2.1214,JFK Airport,Queens,False
+137,0.187,0.3237,0.1596,0.7028,0.1367,0.5431,1.3887,Kips Bay,Manhattan,True
+138,0.3681,0.5881,0.344,1.0735,0.22,0.7295,1.7346,LaGuardia Airport,Queens,False
+140,0.177,0.3238,0.1611,0.7405,0.1468,0.5794,1.1538,Lenox Hill East,Manhattan,False
+141,0.1552,0.3492,0.1486,0.9232,0.194,0.7746,1.6187,Lenox Hill West,Manhattan,False
+142,0.1876,0.3721,0.1694,0.9529,0.1845,0.7836,1.4848,Lincoln Square East,Manhattan,False
+143,0.2065,0.4167,0.1892,0.9645,0.2102,0.7753,1.1431,Lincoln Square West,Manhattan,False
+144,0.2302,0.4523,0.2112,1.4681,0.222,1.2569,1.7886,Little Italy/NoLiTa,Manhattan,True
+148,0.219,0.3918,0.205,1.442,0.1728,1.237,2.0151,Lower East Side,Manhattan,True
+151,0.1979,0.3404,0.1815,0.7736,0.1425,0.5921,0.9679,Manhattan Valley,Manhattan,False
+158,0.2347,0.5365,0.2155,1.6568,0.3018,1.4413,1.8486,Meatpacking/West Village West,Manhattan,True
+161,0.2071,0.4986,0.1594,1.3866,0.2916,1.2273,1.8173,Midtown Center,Manhattan,True
+162,0.1902,0.4161,0.1525,1.1751,0.2259,1.0227,1.8247,Midtown East,Manhattan,True
+163,0.1768,0.3882,0.1508,1.2606,0.2113,1.1098,1.867,Midtown North,Manhattan,True
+164,0.1667,0.3876,0.142,1.3464,0.2209,1.2044,2.0497,Midtown South,Manhattan,True
+166,0.2138,0.3487,0.2014,0.8821,0.1349,0.6806,1.1745,Morningside Heights,Manhattan,False
+170,0.1742,0.3821,0.145,1.09,0.2079,0.9451,1.7583,Murray Hill,Manhattan,True
+186,0.2029,0.4067,0.1879,1.0444,0.2038,0.8564,2.2481,Penn Station/Madison Sq West,Manhattan,True
+211,0.2405,0.5093,0.2194,1.4611,0.2688,1.2417,1.9034,SoHo,Manhattan,True
+229,0.1664,0.3476,0.1443,1.0485,0.1812,0.9042,1.7149,Sutton Place/Turtle Bay North,Manhattan,True
+230,0.1777,0.4083,0.1539,1.2713,0.2306,1.1174,2.1023,Times Sq/Theatre District,Manhattan,True
+231,0.2113,0.5201,0.1863,1.4749,0.3088,1.2886,1.7099,TriBeCa/Civic Center,Manhattan,True
+233,0.2019,0.4251,0.1748,1.0853,0.2232,0.9105,1.5994,UN/Turtle Bay South,Manhattan,True
+234,0.176,0.4262,0.1587,1.2754,0.2502,1.1167,1.7623,Union Sq,Manhattan,True
+236,0.1927,0.378,0.1769,0.9732,0.1853,0.7963,1.2254,Upper East Side North,Manhattan,False
+237,0.2011,0.4208,0.1692,1.0537,0.2197,0.8845,1.458,Upper East Side South,Manhattan,False
+238,0.1766,0.3363,0.1652,0.7204,0.1597,0.5552,1.1521,Upper West Side North,Manhattan,False
+239,0.1787,0.3699,0.1591,0.9186,0.1912,0.7595,1.2966,Upper West Side South,Manhattan,False
+244,0.2499,0.345,0.2505,0.7603,0.0951,0.5097,1.1664,Washington Heights South,Manhattan,False
+246,0.2251,0.4365,0.2263,1.4758,0.2114,1.2495,2.099,West Chelsea/Hudson Yards,Manhattan,True
+249,0.1807,0.4573,0.1586,1.2828,0.2766,1.1242,1.9295,West Village,Manhattan,True
+261,0.2674,0.4823,0.2261,1.3359,0.2149,1.1099,1.6944,World Trade Center,Manhattan,True
+262,0.2167,0.4299,0.1966,0.9445,0.2132,0.7479,1.1007,Yorkville East,Manhattan,False
+263,0.1712,0.3458,0.1464,0.8582,0.1746,0.7118,1.3989,Yorkville West,Manhattan,False
