@@ -43,3 +43,5 @@ site:        ## Rendu du site Quarto (site/_site)
 all: check experiments figures notebook site
 e4s:         ## E4 bis : sensibilité au protocole (relit le cache de E4, ≈ 10 s)
 	uv run python -m zonefleet.experiments.e4_sensitivity
+e6:          ## E6 : localisation de la dérive par zone (≈ 10 s)
+	uv run python -m zonefleet.experiments.e6_localisation
