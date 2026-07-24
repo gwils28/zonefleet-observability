@@ -777,6 +777,126 @@ def e4_sensitivity() -> None:
     viz.save(fig, "e4_sensibilite")
 
 
+# --------------------------------------------------------------------------- E6
+def _zone_map(ax, values: pd.Series, cmap: str, vmin: float, vmax: float, title: str):
+    import geopandas as gpd
+
+    from zonefleet.config import DATA_RAW
+
+    shp = DATA_RAW / "ref" / "taxi_zones.zip"
+    g = gpd.read_file(f"zip://{shp}!taxi_zones/taxi_zones.shp")
+    g = g[g["borough"] == "Manhattan"].merge(
+        values.rename("v"), left_on="LocationID", right_index=True, how="left"
+    )
+    g[g["v"].isna()].plot(ax=ax, color="#ecebe7", edgecolor=viz.SURFACE, linewidth=0.4)
+    sub = g[g["v"].notna()]
+    sub.plot(
+        ax=ax,
+        column="v",
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        edgecolor=viz.SURFACE,
+        linewidth=0.4,
+        legend=True,
+        legend_kwds={"shrink": 0.6},
+    )
+    ax.set_axis_off()
+    ax.set_title(title, fontsize=10.5)
+
+
+@group("e6")
+def e6_maps() -> None:
+    from zonefleet.config import DATA_RAW
+
+    if not (DATA_RAW / "ref" / "taxi_zones.zip").exists():
+        print("shapefile absent : cartes E6 non régénérées")
+        return
+    z = pd.read_csv(T / "e6_zones_covid.csv").set_index("zone")
+    fig, axes = plt.subplots(1, 2, figsize=(9, 6.2))
+    vmax = z["delta_real"].max()
+    _zone_map(axes[0], z["delta_real"], "Oranges", 0, vmax, "Hausse réalisée (labels, D + 60 j)")
+    _zone_map(
+        axes[1],
+        z["delta_est"],
+        "Blues",
+        0,
+        z["delta_est"].max(),
+        "Hausse estimée (DLE, sans labels)",
+    )
+    fig.suptitle(
+        "COVID, 13 mars-12 avril 2020 : hausse de la MAE log par zone (Manhattan)",
+        x=0.01,
+        ha="left",
+        fontweight="bold",
+    )
+    fig.tight_layout()
+    viz.save(fig, "e6_cartes_covid")
+
+
+@group("e6")
+def e6_scatter() -> None:
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
+    for ax, f, title in [
+        (axes[0], "e6_zones_covid.csv", "COVID (mois du choc vs janv.-mars)"),
+        (axes[1], "e6_zones_congestion.csv", "Taxe de congestion (févr.-juin 2025 vs réf.)"),
+    ]:
+        z = pd.read_csv(T / f)
+        for flag, c, lab in [(True, viz.BLUE, "CBD"), (False, viz.AQUA, "hors CBD")]:
+            t = z[z["cbd"] == flag]
+            ax.scatter(
+                t["delta_real"],
+                t["delta_est"],
+                s=26,
+                color=c,
+                label=lab,
+                edgecolor=viz.SURFACE,
+                lw=0.8,
+            )
+        r = z["delta_est"].corr(z["delta_real"])
+        ax.set_title(
+            f"{title}\ncorrélation inter-zones : {r:.2f}".replace(
+                f"{r:.2f}", f"{r:.2f}".replace(".", ",")
+            ),
+            fontsize=10.5,
+        )
+        ax.set_xlabel("hausse réalisée (MAE log)")
+        ax.grid(axis="x")
+    axes[0].set_ylabel("hausse estimée par DLE")
+    axes[0].legend(loc="upper left")
+    fig.tight_layout()
+    viz.save(fig, "e6_estime_vs_realise_zones")
+
+
+@group("e6")
+def e6_auc() -> None:
+    a = pd.read_csv(T / "e6_auc.csv")
+    sigs = list(dict.fromkeys(a["signal"]))
+    colors = [viz.BLUE, viz.AQUA, viz.VIOLET, viz.ORANGE]
+    fig, ax = plt.subplots(figsize=(10, 3.6))
+    cases = list(dict.fromkeys(a["cas"]))
+    x = np.arange(len(cases))
+    for j, (sig, c) in enumerate(zip(sigs, colors, strict=True)):
+        v = a[a["signal"] == sig].set_index("cas").loc[cases, "auc"]
+        ax.bar(x + (j - 1.5) * 0.2, v, width=0.19, color=c, label=sig)
+    ax.axhline(0.5, color=viz.MUTED, ls="--", lw=1)
+    ax.annotate(
+        "hasard",
+        (1.45, 0.5),
+        xytext=(0, 3),
+        textcoords="offset points",
+        fontsize=8.5,
+        color=viz.INK2,
+    )
+    ax.set_xticks(x, cases)
+    ax.set_ylabel("AUC (zones CBD vs autres)")
+    ax.set_ylim(0, 1.05)
+    ax.set_title("Quel signal localise une dérive limitée aux 32 zones CBD ?")
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.12), ncols=2, fontsize=8.5)
+    fig.tight_layout()
+    viz.save(fig, "e6_auc")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)

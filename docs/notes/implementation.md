@@ -80,3 +80,15 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Résultat imprévu, rapporté tel quel : le calendrier mensuel bat la politique gardée sur
   l'année 2020 (MAE log 0,363 contre 0,411 à L = 1). La recommandation du site en tient
   compte (politique gardée plus réentraînement de fond trimestriel).
+
+## 2026-07-23 : E6, variante a posteriori du PSI par zone
+
+- Le protocole déclaré (issue #37) mesurait le PSI de `lag_168` par zone contre la
+  fenêtre précédant l'injection. Résultat : AUC 0,46 pour localiser un choc limité au
+  CBD, contre 1,0 pour la perte estimée.
+- Diagnostic : la fenêtre de comparaison (janvier-février) et la fenêtre analysée (mars)
+  diffèrent par la saison ; le choc x0,6 ramène même les zones CBD vers leur niveau
+  d'hiver, ce qui **réduit** leur PSI.
+- Variante ajoutée après coup, et étiquetée comme telle partout : PSI rapporté au
+  contrefactuel sans dérive. AUC 1,0. Leçon opérationnelle (sans contrefactuel en
+  production) : comparer le PSI par zone à une base saisonnière, pas à une référence fixe.

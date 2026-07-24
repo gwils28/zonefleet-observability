@@ -287,6 +287,32 @@ def e4_sensitivity() -> pd.DataFrame:
     )
 
 
+@table("e6_auc")
+def e6_auc() -> pd.DataFrame:
+    a = pd.read_csv(T / "e6_auc.csv")
+    w = a.pivot(index="signal", columns="cas", values="auc")
+    w = w.loc[list(dict.fromkeys(a["signal"]))]
+    return pd.DataFrame(
+        {"Signal": w.index, **{c: w[c].map(lambda v: fr(v, 2)).to_numpy() for c in w.columns}}
+    )
+
+
+@table("e6_top_covid")
+def e6_top_covid() -> pd.DataFrame:
+    z = pd.read_csv(T / "e6_zones_covid.csv")
+    z["rank_est"] = z["delta_est"].rank(ascending=False).astype(int)  # rang parmi les 60 zones
+    z = z.sort_values("delta_real", ascending=False).head(8)
+    return pd.DataFrame(
+        {
+            "Zone": z["name"],
+            "CBD": z["cbd"].map({True: "oui", False: "non"}),
+            "Hausse réalisée": z["delta_real"].map(lambda v: fr(v, 2)),
+            "Hausse estimée": z["delta_est"].map(lambda v: fr(v, 2)),
+            "Rang estimé (sur 60)": z["rank_est"].to_numpy(),
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
