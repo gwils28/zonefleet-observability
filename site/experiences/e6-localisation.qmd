@@ -30,10 +30,12 @@ nocturne et de bureaux du sud de Manhattan :
 
 {{< include ../_tables/e6_top_covid.md >}}
 
-**Sans un seul label**, la perte estimée place ces huit zones parmi ses huit premières
-sur 60. L'ampleur est fausse (0,2 à 0,3 estimé contre 1,2 à 1,4 réalisé), le
-**classement** est juste. Pour un opérateur, c'est la moitié utile de l'information :
-savoir où regarder.
+**Sans un seul label**, la perte estimée place quatre de ces huit zones dans ses huit
+premières sur 60 (TriBeCa 1re, Meatpacking 2e, Midtown Center 3e, SoHo 6e) et six dans
+ses seize premières ; Lower East Side fait exception (40e). L'ampleur est fausse
+(0,2 à 0,3 estimé contre 1,2 à 1,4 réalisé), le **classement** est largement juste
+(corrélation de rang de Spearman 0,74 sur les 60 zones). Pour un opérateur, c'est la
+moitié utile de l'information : savoir où regarder en premier.
 
 ## Sur des dérives injectées dans le seul CBD
 
