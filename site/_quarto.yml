@@ -38,10 +38,12 @@ website:
           - href: donnees/sources.qmd
           - href: donnees/data-contract.qmd
           - href: donnees/panel.qmd
+          - href: donnees/fiche-donnees.qmd
       - text: Modèle
         menu:
           - href: modele/features.qmd
           - href: modele/e0.qmd
+          - href: modele/fiche-modele.qmd
       - text: Expériences
         menu:
           - href: experiences/e1-covid.qmd
@@ -61,12 +63,17 @@ website:
         menu:
           - href: mlops/dagster.qmd
           - href: mlops/mlflow.qmd
+          - text: "---"
+          - href: exploitation/runbook.qmd
+          - href: exploitation/adr.qmd
       - text: À propos
         menu:
           - href: journal.qmd
             text: Journal de bord
           - href: references.qmd
             text: Références
+          - href: glossaire.qmd
+          - href: faq.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability

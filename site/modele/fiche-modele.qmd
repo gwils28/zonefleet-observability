@@ -1,0 +1,48 @@
+---
+title: "Fiche modèle"
+description: "Model card du forecaster ZoneFleet : usage prévu, données, performances, limites connues, conditions de surveillance."
+---
+
+| Rubrique | Contenu |
+|---|---|
+| **Nom** | `zonefleet-demand` (registry MLflow) |
+| **Version de référence** | v2 : entraînée janv.-août 2024, alias `champion` ; v1 : entraînée janv.-août 2019 (E1) |
+| **Type** | 3 modèles LightGBM quantiles (0,1 ; 0,5 ; 0,9), régression globale sur log1p |
+| **Sortie** | courses prévues par zone et par heure, émise 24 h avant la cible |
+| **Usage prévu** | positionnement de flotte la veille, sous incertitude (quantiles) |
+| **Hors usage** | tarification, prévision au-delà de 24 h, zones hors des 60 surveillées, VTC |
+
+## Données d'entraînement
+
+NYC TLC (taxis jaunes et verts), 60 zones les plus actives de 2019, agrégées par heure
+locale ; météo ERA5 réalisée (hypothèse de prévision parfaite) ; calendrier US. Voir la
+[fiche données](../donnees/fiche-donnees.qmd).
+
+## Features
+
+15 features, toutes connues à l'émission : lags 24 à 336 h, moyennes glissantes
+terminées à t - 24 h, heure, jour, week-end, férié, température, précipitations, zone,
+indicateur CBD. Les features de saison sont exclues (extrapolation).
+
+## Performances (référence hors échantillon)
+
+{{< include ../_tables/e0_metrics.md >}}
+
+## Limites connues
+
+- **Intervalles trop étroits** : couverture réelle de l'intervalle [q10, q90] de 72 %
+  pour 80 % visés, avec un creux à 66 % à la pointe du matin.
+- **Inertie après un choc** : le lag hebdomadaire porte l'essentiel du modèle ; un
+  changement brutal met une à deux semaines à être absorbé (E3).
+- **Hétéroscédasticité forte** : erreur relative 2,5 fois plus forte dans les situations
+  de faible niveau (nuit, zones peu actives).
+- **Météo optimiste** : en production, une vraie prévision à J + 1 dégradera un peu les
+  performances.
+
+## Conditions de surveillance
+
+- Référence de monitoring : la période de référence hors échantillon de la version
+  (sept.-déc. de l'année d'entraînement).
+- Seuils recalculés à chaque promotion (moyenne + 1 écart-type, signal lissé 7 jours).
+- Politique d'alerte : dérive nettoyée ET perte estimée, persistance 2 jours (E4).
+- Angle mort documenté : concept drift pur (E3), à couvrir par des labels rapides.

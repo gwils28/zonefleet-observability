@@ -1,0 +1,48 @@
+---
+title: "Questions fréquentes"
+description: "Les objections qu'on entend sur le monitoring sans labels, et ce que les mesures du projet y répondent."
+---
+
+### « Pourquoi ne pas simplement attendre les labels ? »
+Parce qu'ils arrivent 60 jours après l'émission avec la publication TLC. Sur le COVID,
+la première alerte fondée sur les labels aurait été possible le 14 mai, contre le
+22 mars avec la perte estimée et le 14 mars avec la dérive nettoyée ([E1](experiences/e1-covid.qmd)).
+
+### « DLE est-il fiable ? »
+Sous covariate shift, oui : il suit 85 à 99 % de la hausse réelle d'erreur. Sous concept
+drift pur, il ne voit rien (suivi nul). Pendant un choc brutal, il voit la direction mais
+sous-estime l'ampleur d'un facteur 2 à 5 ([E3](experiences/e3-frontiere.qmd), [E1](experiences/e1-covid.qmd)).
+
+### « Pourquoi ne pas alerter dès qu'une feature dérive ? »
+Parce que la température dérive tous les jours de l'hiver : l'alarme sonnerait en
+permanence. Même nettoyée, la dérive seule alerte sur 55 % des dérives qui *améliorent*
+le modèle ([E4](experiences/e4-backtest.qmd)).
+
+### « La condition jointe ne rate-t-elle pas trop de choses ? »
+Elle détecte 45 à 51 % des dérives nuisibles, contre 56 % pour DLE seul, mais sans
+aucune fausse alerte. Ce qu'elle rate est surtout du concept drift, que **aucun** signal
+sans labels ne peut voir ; le plafond honnête est d'environ 64 % ici.
+
+### « Pourquoi la reconstruction PCA ne voit-elle pas le COVID ? »
+Parce qu'un choc de niveau déplace tous les lags ensemble, le long de la première
+composante principale : la PCA reconstruit ce point sans erreur, même très loin de la
+référence ([dérive multivariée](concepts/derive-multivariee.qmd)).
+
+### « Faut-il réentraîner après une alerte ? »
+Pas tout de suite. Sur l'année COVID, réentraîner dès l'alerte fait pire que ne rien
+faire ; attendre 28 jours de labels et valider un challenger évite les accidents
+([E5](experiences/e5-reentrainement.qmd)).
+
+### « La taxe de congestion n'a-t-elle donc rien changé ? »
+Elle a recomposé la demande (moins de croissance la nuit dans le CBD, plus le soir),
+mais le modèle à lags l'a absorbée : son erreur est restée sous celle de sa référence
+([E2](experiences/e2-congestion.qmd)).
+
+### « Les fausses alertes mesurées sont-elles fiables ? »
+Elles reposent sur une seule période calme réelle (janvier-juin 2025) : l'intervalle de
+confiance est sous-estimé. Un an de production permettrait de les recalibrer.
+
+### « Peut-on savoir où se situe le problème ? »
+En partie : la perte estimée par zone classe correctement les zones touchées (corrélation
+de rang 0,74 sur le COVID) et localise parfaitement un choc limité au CBD. Le PSI par
+zone contre une référence fixe, lui, se perd dans la saison ([E6](experiences/e6-localisation.qmd)).

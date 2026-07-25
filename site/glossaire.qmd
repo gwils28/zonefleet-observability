@@ -1,0 +1,69 @@
+---
+title: "Glossaire"
+description: "Les termes du projet, définis une fois."
+---
+
+**Chunk**
+: Paquet de lignes sur lequel un signal de monitoring est calculé ; ici un jour
+  (60 zones x 24 heures = 1 440 lignes).
+
+**Concept drift**
+: Changement de la relation entre entrées et cible, P(y | X). **Pur** si les entrées
+  P(X) ne bougent pas : invisible sans labels ([E3](experiences/e3-frontiere.qmd)).
+
+**Condition jointe**
+: Règle d'alerte exigeant à la fois une dérive des entrées et une hausse de la perte
+  estimée ([politiques](concepts/politiques-alerte.qmd)).
+
+**Contrefactuel**
+: Le même scénario sans dérive injectée, sur les mêmes jours ; sert à isoler l'effet
+  d'une injection.
+
+**Covariate shift**
+: Changement de la distribution des entrées P(X), la relation P(y | X) restant stable.
+
+**Data contract**
+: Description versionnée de ce que le pipeline attend des fichiers bruts : colonnes,
+  types, ruptures connues et datées ([page](donnees/data-contract.qmd)).
+
+**DLE (Direct Loss Estimation)**
+: Méthode NannyML qui estime la perte d'un modèle de régression sans labels, à l'aide
+  d'un second modèle (le nanny model) ([page](concepts/dle.qmd)).
+
+**Fenêtre aveugle**
+: Intervalle entre l'émission d'une prévision et l'arrivée de son label : H + L.
+
+**Front montant**
+: Jour où une alerte s'allume ; une alarme déjà allumée ne détecte rien (E4).
+
+**Horloge de décision**
+: Date à laquelle une alerte peut réellement être levée : veille du jour cible pour les
+  signaux avancés, jour cible + L pour les labels.
+
+**MASE**
+: Erreur absolue moyenne divisée par celle du seasonal naive sur l'entraînement
+  (échelle figée).
+
+**Nanny model**
+: Modèle LightGBM qui apprend, sur la référence, à prédire l'erreur du modèle surveillé.
+
+**Persistance**
+: Nombre de jours consécutifs de dépassement exigé avant d'alerter (2 ici).
+
+**PSI (Population Stability Index)**
+: Écart de répartition d'une variable dans les déciles de la référence ; repère : > 0,25
+  = dérive forte ([page](concepts/derive-univariee.qmd)).
+
+**Référence**
+: Période hors échantillon sur laquelle le moniteur apprend ce qui est « normal ».
+
+**Reconstruction PCA**
+: Erreur de reconstruction d'une ligne après projection sur les composantes principales
+  de la référence ([page](concepts/derive-multivariee.qmd)).
+
+**Seasonal naive**
+: Prévision « même heure la semaine précédente » (lag 168 h).
+
+**Taux de suivi**
+: Hausse de l'erreur estimée divisée par la hausse de l'erreur réalisée ; 1 = DLE suit,
+  0 = DLE aveugle (E3).

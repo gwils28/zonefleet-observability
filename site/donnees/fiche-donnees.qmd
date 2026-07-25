@@ -1,0 +1,55 @@
+---
+title: "Fiche données"
+description: "Datasheet du panel ZoneFleet : motivation, composition, collecte, traitements, usages et limites."
+---
+
+## Motivation
+
+Le panel sert à entraîner et surveiller un forecaster de demande horaire par zone. Il
+couvre deux périodes contenant chacune une rupture réelle et datée, pour étudier le
+comportement d'un moniteur face au monde qui change.
+
+## Composition
+
+| Élément | Valeur |
+|---|---|
+| Unité | une zone TLC x une heure locale |
+| Zones | 60 (les plus actives de 2019, liste figée), dont 32 dans la zone de tarification de congestion |
+| Périodes | 2019-01-01 à 2020-12-31, 2024-01-01 à 2025-12-31 |
+| Lignes | 2 105 280 |
+| Variables | `pickups` (jaunes + verts), `yellow`, `green`, `dst_repaired` |
+| Fichier | `data/processed/panel.parquet` (10 Mo, versionné) |
+
+## Collecte
+
+- Source : fichiers Parquet mensuels de la NYC Taxi & Limousine Commission, publiés avec
+  environ deux mois de retard, téléchargés depuis le CDN officiel ; empreintes SHA-256
+  versionnées (`configs/manifest_sha256.txt`).
+- Les courses sont enregistrées par les taximètres : ce sont des **courses servies**, pas
+  des demandes ; une demande sans véhicule disponible n'apparaît pas.
+
+## Traitements
+
+1. Validation du schéma de chaque fichier par le data contract (bloquant si une colonne
+   requise manque ou change de type).
+2. Comptage des prises en charge par zone et par heure (duckdb) ; exclusion des courses
+   hors du mois du fichier et des zones inconnues.
+3. Grille complète zone x heure, zéros explicites.
+4. Réparation des heures de changement d'heure (printemps interpolé, automne divisé par
+   deux), marquées par `dst_repaired`.
+5. Contrôles : doublons, volumes négatifs, plafond de 3 000 courses par zone et par heure.
+
+## Usages et limites
+
+- **Adapté** : prévision et monitoring horaires par zone, étude de ruptures.
+- **Non adapté** : estimation de la demande latente (censure par l'offre), analyse des
+  VTC (absents), analyse individuelle (agrégats seulement).
+- **Biais connus** : poids décroissant des taxis verts (7 % des courses en 2019, 1,2 %
+  en 2025) ; sélection des zones sur 2019 (zones devenues actives depuis absentes).
+- **Données personnelles** : aucune ; les fichiers TLC publics sont déjà agrégés à la
+  zone et ne contiennent pas d'identifiant de passager.
+
+## Maintenance
+
+`make data` puis `make panel` reconstruisent le panel à l'identique ; une rupture de
+schéma inconnue est journalisée dans `results/tables/schema_timeline.csv`.
