@@ -84,3 +84,40 @@ def test_e3_summary_is_relative_to_counterfactual():
     out = summarize(daily, shares).set_index("scenario")
     assert abs(out.loc["s", "tracking_steady"] - 0.5) < 1e-9
     assert abs(out.loc["s", "delta_real_transition"] - 0.10) < 1e-9
+
+
+def test_e5_policies_on_toy_world(toy_world, monkeypatch):
+    from zonefleet.experiments import e5_retraining as E5
+
+    df = toy_world.features()
+    champion = toy_world.frozen_model("covid")
+    monkeypatch.setattr(E5, "YEAR", (pd.Timestamp("2020-01-01"), pd.Timestamp("2020-07-01")))
+    never = E5.simulate("jamais", 1, df, champion)
+    assert len(never.switches) == 1
+    reflex = E5.simulate("réflexe", 60, df, champion)
+    assert reflex.switches[1][0] == E5.FIRST_ALERT
+    short60 = E5.simulate("réflexe court", 60, df, champion)
+    assert len(short60.switches) == 1  # aucun label post-choc à L = 60 : pas de remplacement
+    daily = E5.realized(reflex, df)
+    assert set(daily.columns) == {"date", "mae_log", "mae", "policy", "delay"}
+    assert daily["date"].min() == pd.Timestamp("2020-01-01")
+
+
+def test_e6_zone_delta_and_auc():
+    import numpy as np
+
+    from zonefleet.experiments import e6_localisation as E6
+
+    dates = pd.date_range("2025-01-01", periods=20, freq="D")
+    rows = pd.DataFrame(
+        {
+            "date": np.tile(dates, 2),
+            "zone": np.repeat([7, 13], 20),
+            "est": np.r_[np.full(20, 0.2), np.r_[np.full(10, 0.2), np.full(10, 0.5)]],
+            "real": 0.3,
+            "lag_168": np.random.default_rng(0).normal(size=40),
+        }
+    )
+    z = E6.zone_delta(rows, rows, ("2025-01-11", "2025-01-21"), ("2025-01-01", "2025-01-11"))
+    assert z.loc[13, "delta_est"] > z.loc[7, "delta_est"]
+    assert E6.auc(pd.Series([True, False, True]), pd.Series([0.9, 0.1, 0.8])) == 1.0
