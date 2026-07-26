@@ -63,3 +63,14 @@ def test_aggregate_all_and_tlc_files(tmp_path, monkeypatch):
     long = D.aggregate_all(D.tlc_files())
     assert set(long["service"]) == {"yellow", "green"}
     assert pd.api.types.is_datetime64_any_dtype(long["ts"])
+
+
+def test_cbd_share_reads_only_2025_files_with_the_column(tmp_path):
+    f19 = write_tlc(tmp_path, "yellow", "2019-03", [("2019-03-01 08:10", 161)])
+    rows = [("2025-03-01 08:10", 161), ("2025-03-01 09:10", 161), ("2025-03-01 09:20", 7)]
+    f25 = write_tlc(tmp_path, "yellow", "2025-03", rows)
+    t = pq.read_table(f25).append_column("cbd_congestion_fee", pa.array([0.75, 0.75, 0.0]))
+    pq.write_table(t, f25)
+    share = D.cbd_share([f19, f25]).set_index("zone")
+    assert share.loc[161, "cbd_share"] == 1.0 and share.loc[7, "cbd_share"] == 0.0
+    assert share["trips"].sum() == 3
