@@ -76,3 +76,25 @@ def test_dagster_graph_loads():
 
     keys = {k.to_user_string() for k in defs.resolve_asset_graph().get_all_asset_keys()}
     assert {"panel", "monitoring_signals", "alert_decision", "retrain_recommendation"} <= keys
+
+
+def test_monitoring_assets_on_toy_world(toy_world, monkeypatch):
+    dg = pytest.importorskip("dagster")
+    import zonefleet.features as F
+    from tests.conftest import toy_panel, toy_weather
+    from zonefleet.ops import definitions as D
+
+    monkeypatch.setattr(
+        F, "zone_table", lambda: pd.DataFrame({"zone": [1, 2], "cbd": [True, False]})
+    )
+    cfg = D.MonitoringConfig(split="covid")
+    feats = D.feature_matrix(panel=toy_panel(), weather=toy_weather())
+    model = toy_world.frozen_model("covid")
+    pred = D.predictions(config=cfg, feature_matrix=feats, champion_model=model)
+    assert set(pred["period"]) == {"reference", "analysis"}
+    sig = D.monitoring_signals(predictions=pred)
+    assert {"drift", "drift_clean", "perf_est", "perf_real"} <= set(sig.columns)
+    sev = D.alert_decision(dg.build_asset_context(), monitoring_signals=sig)
+    assert sev in {"page", "ticket", "aucune"}
+    rec = D.retrain_recommendation(dg.build_asset_context(), monitoring_signals=sig)
+    assert set(rec) == {"retrain", "reason"}
