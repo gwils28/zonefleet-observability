@@ -101,3 +101,24 @@ Trois enseignements :
    ([E2](e2-congestion.qmd)) et dans le backtest ([E4](e4-backtest.qmd)).
 3. Une politique de production ne peut pas se reposer sur DLE seul pour l'**ampleur** :
    le chiffre estimé est un minorant pendant les ruptures.
+
+## Variante : chunks d'une semaine (E1 bis)
+
+La taille du chunk est un réglage à part entière : plus grand, il réduit le bruit
+d'échantillonnage ; plus long, il retarde la décision (une semaine n'est complète que
+le dimanche). `e1_chunks.py` recalcule DLE sur des semaines calendaires (lundi à
+dimanche), protocole déclaré dans l'issue #44.
+
+![Erreur relative estimée et réalisée, en chunks journaliers (à gauche) et hebdomadaires (à droite), avec l'intervalle de confiance de NannyML.](../figures/e1_chunks.png){#fig-chunks}
+
+{{< include ../_tables/e1_chunks.md >}}
+
+- L'intervalle de confiance de DLE est **2,7 fois plus étroit** en semaines (3,7 % de
+  l'estimation contre 9,9 %).
+- **Sans persistance**, le chunk journalier décide plus tôt (18 mars) mais au prix de
+  3 fausses alertes avant le choc ; le chunk hebdomadaire décide le 21 mars, sans fausse
+  alerte. La surprise envisagée (une semaine plus rapide qu'un jour) ne se produit pas.
+- Le chunk hebdomadaire se comporte comme le chunk journalier **avec 2 jours de
+  persistance** (décision le 22 mars, 0 fausse alerte) : deux façons d'acheter de la
+  robustesse avec quelques jours de délai. La persistance garde la granularité
+  journalière utile au diagnostic ; c'est elle que retient la politique d'astreinte.
