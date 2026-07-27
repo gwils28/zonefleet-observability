@@ -41,14 +41,18 @@ def metrics_table() -> pd.DataFrame:
 
 
 def by_zone(split: str) -> pd.DataFrame:
-    ref = predictions(split).query("period == 'reference'")
-    g = ref.groupby("zone", observed=True)[["pickups", "q10", "q50", "q90", "snaive", "cbd"]]
+    """Erreur, gain sur le seasonal naive et couverture, par zone (référence)."""
+    ref = predictions(split).query("period == 'reference'").copy()
+    ref["abs_lgbm"] = (ref["pickups"] - ref["q50"]).abs()
+    ref["abs_snaive"] = (ref["pickups"] - ref["snaive"]).abs()
+    ref["inside"] = (ref["pickups"] >= ref["q10"]) & (ref["pickups"] <= ref["q90"])
+    g = ref.groupby("zone", observed=True)
     out = pd.DataFrame(
         {
             "mean_pickups": g["pickups"].mean(),
-            "mae_lightgbm": g.apply(lambda d: mae(d["pickups"], d["q50"])),
-            "mae_snaive": g.apply(lambda d: mae(d["pickups"], d["snaive"])),
-            "coverage_80": g.apply(lambda d: ((d.pickups >= d.q10) & (d.pickups <= d.q90)).mean()),
+            "mae_lightgbm": g["abs_lgbm"].mean(),
+            "mae_snaive": g["abs_snaive"].mean(),
+            "coverage_80": g["inside"].mean(),
             "cbd": g["cbd"].first(),
         }
     )
