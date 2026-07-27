@@ -45,3 +45,5 @@ e4s:         ## E4 bis : sensibilité au protocole (relit le cache de E4, ≈ 10
 	uv run python -m zonefleet.experiments.e4_sensitivity
 e6:          ## E6 : localisation de la dérive par zone (≈ 10 s)
 	uv run python -m zonefleet.experiments.e6_localisation
+e1c:         ## E1 bis : taille de chunk (jour ou semaine)
+	uv run python -m zonefleet.experiments.e1_chunks

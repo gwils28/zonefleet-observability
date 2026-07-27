@@ -313,6 +313,25 @@ def e6_top_covid() -> pd.DataFrame:
     )
 
 
+@table("e1_chunks")
+def e1_chunks_table() -> pd.DataFrame:
+    c = pd.read_csv(T / "e1_chunks_summary.csv", parse_dates=["first_decision"])
+    return pd.DataFrame(
+        {
+            "Chunk": c["chunk"],
+            "Nombre": c["n_chunks"],
+            "Corrélation avant le choc": c["corr_pre"].map(lambda v: fr(v, 2)),
+            "Corrélation après": c["corr_post"].map(lambda v: fr(v, 2)),
+            "Largeur relative de l'IC (médiane)": c["ci_rel_width_median"].map(
+                lambda v: fr(100 * v, 1) + " %"
+            ),
+            "1re décision (sans persistance)": c["first_decision"].dt.strftime("%d/%m/%Y"),
+            "Délai (j)": c["delay_days"].map(lambda v: fr(v, 0)),
+            "Fausses alertes avant": c["false_alert_chunks_before"],
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
