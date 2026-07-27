@@ -77,6 +77,13 @@ donc **sous-estimée** ; il faudrait d'autres années calmes pour la mesurer vra
 
 ![Rappel contre fausses alertes par mois, quand le seuil k varie de 0,5 à 3 écarts-types. La condition jointe nettoyée (violet) reste collée à l'axe des fausses alertes nulles sur toute la plage ; DLE seul (bleu) achète son rappel par des fausses alertes ; les labels (orange) ne valent que si l'on peut attendre deux mois.](../figures/e4_compromis.png){#fig-tradeoff}
 
+::: {.callout-tip collapse="true"}
+## Version interactive (signal lissé 7 jours)
+survoler pour lire k, le rappel, les fausses alertes et le délai.
+
+{{< include ../_widgets/e4_compromis.md >}}
+:::
+
 Pour DLE seul, aucun seuil n'atteint à la fois un rappel de 50 % et moins d'une fausse
 alerte par mois en signal journalier ; le lissage sur 7 jours rapproche le compromis. Pour
 la condition jointe, le seuil le plus bas (k = 0,5) donne **54 % de rappel sans fausse
