@@ -897,6 +897,43 @@ def e6_auc() -> None:
     viz.save(fig, "e6_auc")
 
 
+@group("e1")
+def e1_chunks() -> None:
+    from zonefleet.config import COVID_EMERGENCY
+
+    s = pd.read_csv(T / "e1_chunks_series.csv", parse_dates=["date", "decision"])
+    fig, axes = plt.subplots(1, 2, figsize=(12, 3.9), sharey=True)
+    for ax, label in [(axes[0], "jour"), (axes[1], "semaine")]:
+        d = s[s["chunk"] == label].sort_values("date")
+        x = d["date"] if label == "jour" else d["date"] + pd.Timedelta(days=3)
+        ax.fill_between(x, d["lower"], d["upper"], color=viz.BLUE, alpha=0.18, lw=0, step=None)
+        ax.plot(
+            x,
+            d["estimated"],
+            color=viz.BLUE,
+            marker="o" if label == "semaine" else None,
+            ms=4,
+            label="estimée (DLE)",
+        )
+        ax.plot(
+            x,
+            d["realized"],
+            color=viz.ORANGE,
+            marker="o" if label == "semaine" else None,
+            ms=4,
+            label="réalisée",
+        )
+        ax.plot(x, d["threshold"], color=viz.MUTED, ls="--", lw=1, label="seuil")
+        ax.axvline(COVID_EMERGENCY, color=viz.INK2, lw=1)
+        ax.set_title(f"Chunks d'un{'e' if label == 'semaine' else ''} {label}", fontsize=11)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+        ax.set_ylim(0, 1.6)
+    axes[0].set_ylabel("MAE log")
+    axes[0].legend(loc="upper left")
+    fig.tight_layout()
+    viz.save(fig, "e1_chunks")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
