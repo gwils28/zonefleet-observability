@@ -38,9 +38,9 @@ aveugle.
 
 ![Pour chaque scénario, hausse de l'erreur réalisée (abscisse) contre hausse de l'erreur estimée par DLE (ordonnée), sur les 14 premiers jours puis en régime établi. La taille des points croît avec l'intensité. Sur la diagonale, DLE dit vrai ; sur l'axe horizontal, il est aveugle.](../figures/e3_frontiere.png){#fig-frontier}
 
-::: {.callout-tip collapse="true"}
+::: {.callout-tip}
 ## Version interactive
-survoler un point pour voir le scénario et son taux de suivi.
+Survoler un point pour voir le scénario et son taux de suivi.
 
 {{< include ../_widgets/e3_frontiere.md >}}
 :::
