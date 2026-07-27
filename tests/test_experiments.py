@@ -121,3 +121,51 @@ def test_e6_zone_delta_and_auc():
     z = E6.zone_delta(rows, rows, ("2025-01-11", "2025-01-21"), ("2025-01-01", "2025-01-11"))
     assert z.loc[13, "delta_est"] > z.loc[7, "delta_est"]
     assert E6.auc(pd.Series([True, False, True]), pd.Series([0.9, 0.1, 0.8])) == 1.0
+
+
+def test_e0_tables_on_toy_world(toy_world, monkeypatch):
+    from zonefleet.experiments import e0_model as E0
+
+    monkeypatch.setattr(E0, "SPLITS", {"covid": E0.SPLITS["covid"]})
+    m = E0.metrics_table()
+    assert set(m["model"]) == {"lightgbm", "seasonal_naive"}
+    assert (m.loc[m["model"] == "lightgbm", "coverage_80"].between(0, 1)).all()
+    z = E0.by_zone("covid")
+    assert set(z["zone"]) == {1, 2} and "skill_vs_snaive" in z
+    c = E0.coverage_by_hour("covid")
+    assert len(c) == 24
+
+
+def test_e2_realized_by_group(toy_world, monkeypatch):
+    from zonefleet.experiments import e2_congestion as E2
+
+    monkeypatch.setattr(E2, "SPLIT", "covid")
+    monkeypatch.setattr(E2, "CONGESTION_START", pd.Timestamp("2020-01-05"))
+    r = E2.realized_by_group()
+    assert set(r["group"]) == {"cbd", "hors_cbd"} and len(r) == 6
+    assert (r["mae_log"] >= 0).all()
+
+
+def test_e4_scenario_daily_covariate_and_concept(toy_world):
+    from zonefleet.experiments import e4_backtest as E4
+    from zonefleet.rowscore import RowScorer
+
+    pred = toy_world.predictions("covid")
+    ref, an = (
+        pred[pred.period == "reference"],
+        pred[pred.period == "analysis"].reset_index(drop=True),
+    )
+    scorer = RowScorer().fit(ref)
+    base_rows = scorer.score_rows(an)
+    stats = (ref["lag_168"].mean(), ref["lag_168"].std())
+    onset = pd.Timestamp("2020-03-02")
+    Sc = __import__("collections").namedtuple("Sc", "id kind severity subset onset")
+    cov = E4.scenario_daily(
+        Sc(1, "covariate_harmful", 2.0, "all", onset), scorer, base_rows, an, None, stats
+    )
+    con = E4.scenario_daily(Sc(2, "concept", 0.5, "all", onset), scorer, base_rows, an, None, stats)
+    none = E4.scenario_daily(Sc(3, "none", 0.0, "all", onset), scorer, base_rows, an, None, stats)
+    post = none.index >= onset
+    assert con.loc[post, "real"].mean() > none.loc[post, "real"].mean()
+    assert abs(con.loc[post, "est"].mean() - none.loc[post, "est"].mean()) < 1e-12
+    assert cov.loc[post, "est"].mean() != none.loc[post, "est"].mean()
