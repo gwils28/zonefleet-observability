@@ -13,9 +13,9 @@ en cache) · tables : `results/tables/e1_*.csv` · référence sept.-déc. 2019 
 
 ![Erreur journalière estimée par DLE sans aucun label (bleu, avec intervalle de confiance) et erreur réalisée révélée a posteriori (orange). En haut, l'erreur relative ; en bas, l'erreur en courses. La bande rose marque le mois qui suit l'état d'urgence.](../figures/e1_estime_vs_realise.png){#fig-e1}
 
-::: {.callout-tip collapse="true"}
+::: {.callout-tip}
 ## Version interactive
-survoler pour lire les valeurs du jour.
+Survoler pour lire les valeurs du jour.
 
 {{< include ../_widgets/e1_estime_vs_realise.md >}}
 :::

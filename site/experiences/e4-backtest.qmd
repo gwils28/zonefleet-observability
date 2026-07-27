@@ -79,7 +79,7 @@ donc **sous-estimée** ; il faudrait d'autres années calmes pour la mesurer vra
 
 ::: {.callout-tip collapse="true"}
 ## Version interactive (signal lissé 7 jours)
-survoler pour lire k, le rappel, les fausses alertes et le délai.
+Survoler pour lire k, le rappel, les fausses alertes et le délai.
 
 {{< include ../_widgets/e4_compromis.md >}}
 :::
