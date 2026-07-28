@@ -1,0 +1,145 @@
+hour,coverage,split,method
+0,0.6951,covid,globale
+1,0.6937,covid,globale
+2,0.7208,covid,globale
+3,0.7434,covid,globale
+4,0.7393,covid,globale
+5,0.715,covid,globale
+6,0.7216,covid,globale
+7,0.6995,covid,globale
+8,0.6877,covid,globale
+9,0.7246,covid,globale
+10,0.7732,covid,globale
+11,0.7847,covid,globale
+12,0.7926,covid,globale
+13,0.7995,covid,globale
+14,0.8077,covid,globale
+15,0.7945,covid,globale
+16,0.8055,covid,globale
+17,0.7776,covid,globale
+18,0.7486,covid,globale
+19,0.7358,covid,globale
+20,0.7107,covid,globale
+21,0.7142,covid,globale
+22,0.7098,covid,globale
+23,0.7153,covid,globale
+0,0.6954,covid,par heure
+1,0.7036,covid,par heure
+2,0.7063,covid,par heure
+3,0.7423,covid,par heure
+4,0.7158,covid,par heure
+5,0.706,covid,par heure
+6,0.7167,covid,par heure
+7,0.7432,covid,par heure
+8,0.7295,covid,par heure
+9,0.7249,covid,par heure
+10,0.774,covid,par heure
+11,0.7776,covid,par heure
+12,0.7773,covid,par heure
+13,0.7803,covid,par heure
+14,0.8005,covid,par heure
+15,0.7866,covid,par heure
+16,0.773,covid,par heure
+17,0.7803,covid,par heure
+18,0.7574,covid,par heure
+19,0.7467,covid,par heure
+20,0.7107,covid,par heure
+21,0.7156,covid,par heure
+22,0.7158,covid,par heure
+23,0.7331,covid,par heure
+0,0.6508,covid,aucune
+1,0.6541,covid,aucune
+2,0.6855,covid,aucune
+3,0.712,covid,aucune
+4,0.7055,covid,aucune
+5,0.6784,covid,aucune
+6,0.6702,covid,aucune
+7,0.6413,covid,aucune
+8,0.6238,covid,aucune
+9,0.6601,covid,aucune
+10,0.7085,covid,aucune
+11,0.726,covid,aucune
+12,0.7246,covid,aucune
+13,0.735,covid,aucune
+14,0.7462,covid,aucune
+15,0.7254,covid,aucune
+16,0.7284,covid,aucune
+17,0.7145,covid,aucune
+18,0.6781,covid,aucune
+19,0.6694,covid,aucune
+20,0.6421,covid,aucune
+21,0.6519,covid,aucune
+22,0.659,covid,aucune
+23,0.6669,covid,aucune
+0,0.7041,congestion,globale
+1,0.7071,congestion,globale
+2,0.7404,congestion,globale
+3,0.7557,congestion,globale
+4,0.7522,congestion,globale
+5,0.7601,congestion,globale
+6,0.7557,congestion,globale
+7,0.6932,congestion,globale
+8,0.6981,congestion,globale
+9,0.7254,congestion,globale
+10,0.7519,congestion,globale
+11,0.7719,congestion,globale
+12,0.7822,congestion,globale
+13,0.7781,congestion,globale
+14,0.7781,congestion,globale
+15,0.7751,congestion,globale
+16,0.7781,congestion,globale
+17,0.7434,congestion,globale
+18,0.7295,congestion,globale
+19,0.7145,congestion,globale
+20,0.7126,congestion,globale
+21,0.7082,congestion,globale
+22,0.706,congestion,globale
+23,0.7254,congestion,globale
+0,0.7167,congestion,par heure
+1,0.7027,congestion,par heure
+2,0.7178,congestion,par heure
+3,0.7311,congestion,par heure
+4,0.7262,congestion,par heure
+5,0.7317,congestion,par heure
+6,0.7546,congestion,par heure
+7,0.7199,congestion,par heure
+8,0.7284,congestion,par heure
+9,0.7243,congestion,par heure
+10,0.7451,congestion,par heure
+11,0.7536,congestion,par heure
+12,0.7587,congestion,par heure
+13,0.7391,congestion,par heure
+14,0.7497,congestion,par heure
+15,0.7484,congestion,par heure
+16,0.7568,congestion,par heure
+17,0.7579,congestion,par heure
+18,0.7481,congestion,par heure
+19,0.741,congestion,par heure
+20,0.7284,congestion,par heure
+21,0.7407,congestion,par heure
+22,0.7388,congestion,par heure
+23,0.7689,congestion,par heure
+0,0.6724,congestion,aucune
+1,0.6686,congestion,aucune
+2,0.7022,congestion,aucune
+3,0.7123,congestion,aucune
+4,0.7186,congestion,aucune
+5,0.723,congestion,aucune
+6,0.7169,congestion,aucune
+7,0.6445,congestion,aucune
+8,0.6451,congestion,aucune
+9,0.6656,congestion,aucune
+10,0.6932,congestion,aucune
+11,0.7112,congestion,aucune
+12,0.7139,congestion,aucune
+13,0.7194,congestion,aucune
+14,0.7109,congestion,aucune
+15,0.6975,congestion,aucune
+16,0.715,congestion,aucune
+17,0.6806,congestion,aucune
+18,0.6727,congestion,aucune
+19,0.659,congestion,aucune
+20,0.6639,congestion,aucune
+21,0.6661,congestion,aucune
+22,0.6664,congestion,aucune
+23,0.6891,congestion,aucune
