@@ -63,3 +63,37 @@ référence (72 %), pas à la valeur nominale (80 %).
    c'est la condition 3 de DLE, satisfaite.
 3. Sa dépendance au lag hebdomadaire fixe l'**inertie** attendue après un choc : environ
    une semaine.
+
+## Extension : calibration conforme des quantiles (E0 bis)
+
+::: {.callout-note appearance="minimal"}
+Extension **hors du SPEC** (section 9), déclarée dans l'issue #49 ; elle ne modifie ni
+le modèle surveillé ni les expériences E1 à E6. Script :
+`uv run python -m zonefleet.experiments.e0_conformal`.
+:::
+
+La calibration conforme des quantiles (CQR) élargit l'intervalle [q10, q90] d'une
+correction apprise sur un échantillon de calibration : le quantile empirique du score
+max(q10 - y, y - q90), en échelle log1p. Sa garantie de couverture repose sur
+l'**échangeabilité** entre calibration et usage. Calibration ici : septembre-octobre de
+la référence ; évaluation : novembre-décembre, puis les analysis.
+
+![Couverture de l'intervalle 80 % avant et après calibration conforme (globale ou par heure).](../figures/e0_conforme.png){#fig-conformal}
+
+{{< include ../_tables/e0_conformal.md >}}
+
+- **La garantie ne tient pas, même sans choc** : sur la fin de la référence, la
+  couverture calibrée plafonne à 74 %. Septembre-octobre et novembre-décembre (fêtes,
+  Thanksgiving) ne sont pas échangeables ; la correction apprise est trop petite.
+- **En 2025, la calibration ramène la couverture à 79-81 %**, pour un intervalle 13 %
+  plus large : l'analysis printanière ressemble davantage à la calibration d'automne
+  que la fin d'année.
+- **Pendant le COVID, rien ne tient** (56 % au plancher) : c'est attendu, et c'est
+  justement une information de monitoring. Une **couverture réalisée** qui s'écarte de
+  sa valeur de calibration est un signal de santé à part entière, disponible avec les
+  labels.
+- La version **par heure** (Mondrian) n'apporte rien sur la version globale ici.
+
+Recommandation : calibrer sur une fenêtre glissante récente (les 4 dernières semaines
+de labels, disponibles à J + 1 chez ZoneFleet) plutôt que sur une référence fixe, et
+surveiller l'écart de couverture comme un indicateur réalisé.

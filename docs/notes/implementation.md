@@ -92,3 +92,11 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Variante ajoutée après coup, et étiquetée comme telle partout : PSI rapporté au
   contrefactuel sans dérive. AUC 1,0. Leçon opérationnelle (sans contrefactuel en
   production) : comparer le PSI par zone à une base saisonnière, pas à une référence fixe.
+
+## 2026-07-28 : extension hors SPEC, calibration conforme (E0 bis)
+
+- Ajout documenté comme extension (SPEC, section 9 : conformalisation hors périmètre),
+  sans toucher au modèle surveillé ni aux expériences publiées.
+- Résultat : la garantie CQR ne tient pas entre septembre-octobre et novembre-décembre
+  (74 % au lieu de 80 %) ; elle tient en 2025 (79-81 %) ; elle s'effondre pendant le
+  COVID (56 %). Les fiches et la page E0 le rapportent tel quel.

@@ -77,7 +77,7 @@ donc **sous-estimée** ; il faudrait d'autres années calmes pour la mesurer vra
 
 ![Rappel contre fausses alertes par mois, quand le seuil k varie de 0,5 à 3 écarts-types. La condition jointe nettoyée (violet) reste collée à l'axe des fausses alertes nulles sur toute la plage ; DLE seul (bleu) achète son rappel par des fausses alertes ; les labels (orange) ne valent que si l'on peut attendre deux mois.](../figures/e4_compromis.png){#fig-tradeoff}
 
-::: {.callout-tip collapse="true"}
+::: {.callout-tip}
 ## Version interactive (signal lissé 7 jours)
 Survoler pour lire k, le rappel, les fausses alertes et le délai.
 
