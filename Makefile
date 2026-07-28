@@ -48,3 +48,5 @@ e6:          ## E6 : localisation de la dérive par zone (≈ 10 s)
 	uv run python -m zonefleet.experiments.e6_localisation
 e1c:         ## E1 bis : taille de chunk (jour ou semaine)
 	uv run python -m zonefleet.experiments.e1_chunks
+e0c:         ## E0 bis (extension) : calibration conforme des quantiles
+	uv run python -m zonefleet.experiments.e0_conformal
