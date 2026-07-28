@@ -31,7 +31,9 @@ indicateur CBD. Les features de saison sont exclues (extrapolation).
 ## Limites connues
 
 - **Intervalles trop étroits** : couverture réelle de l'intervalle [q10, q90] de 72 %
-  pour 80 % visés, avec un creux à 66 % à la pointe du matin.
+  pour 80 % visés, avec un creux à 66 % à la pointe du matin. Une calibration conforme
+  la ramène à 79-81 % en régime calme (2025) mais pas à travers les fêtes ni les chocs
+  ([E0 bis](e0.qmd#extension-calibration-conforme-des-quantiles-e0-bis)).
 - **Inertie après un choc** : le lag hebdomadaire porte l'essentiel du modèle ; un
   changement brutal met une à deux semaines à être absorbé (E3).
 - **Hétéroscédasticité forte** : erreur relative 2,5 fois plus forte dans les situations
