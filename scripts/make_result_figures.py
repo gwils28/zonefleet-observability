@@ -934,6 +934,34 @@ def e1_chunks() -> None:
     viz.save(fig, "e1_chunks")
 
 
+@group("e0")
+def e0_conformal() -> None:
+    c = pd.read_csv(T / "e0_conformal.csv")
+    periods = ["test (fin de référence)", "analysis, 3 premiers mois", "analysis, 3 mois suivants"]
+    methods = [("aucune", viz.NEUTRAL), ("globale", viz.BLUE), ("par heure", viz.VIOLET)]
+    fig, axes = plt.subplots(1, 2, figsize=(12, 3.8), sharey=True)
+    for ax, split, title in [
+        (axes[0], "covid", "Modèle 2019 : référence puis COVID"),
+        (axes[1], "congestion", "Modèle 2024 : référence puis 2025"),
+    ]:
+        x = np.arange(len(periods))
+        for j, (m, col) in enumerate(methods):
+            v = (
+                c[(c["split"] == split) & (c["method"] == m)]
+                .set_index("period")
+                .loc[periods, "coverage"]
+            )
+            ax.bar(x + (j - 1) * 0.26, 100 * v, width=0.25, color=col, label=f"calibration {m}")
+        ax.axhline(80, color=viz.ALERT, ls="--", lw=1)
+        ax.set_xticks(x, ["fin de référence", "analysis 1-3 mois", "analysis 4-6 mois"])
+        ax.set_title(title, fontsize=11)
+    axes[0].set_ylabel("couverture de l'intervalle 80 % (%)")
+    axes[0].set_ylim(40, 90)
+    axes[0].legend(loc="lower left", fontsize=8.5)
+    fig.tight_layout()
+    viz.save(fig, "e0_conforme")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
