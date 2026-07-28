@@ -332,6 +332,27 @@ def e1_chunks_table() -> pd.DataFrame:
     )
 
 
+@table("e0_conformal")
+def e0_conformal_table() -> pd.DataFrame:
+    c = pd.read_csv(T / "e0_conformal.csv")
+    w = c.pivot_table(
+        index=["split", "period"], columns="method", values=["coverage", "width"], sort=False
+    )
+    rows = []
+    for (split, period), r in w.iterrows():
+        rows.append(
+            {
+                "Modèle": SPLIT_FR[split],
+                "Période": period,
+                "Couverture brute (%)": fr(100 * r[("coverage", "aucune")], 1),
+                "Couverture calibrée (%)": fr(100 * r[("coverage", "globale")], 1),
+                "Largeur brute": fr(r[("width", "aucune")], 1),
+                "Largeur calibrée": fr(r[("width", "globale")], 1),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
