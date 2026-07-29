@@ -234,3 +234,63 @@ def monitor(
             reference, analysis, ["lag_24", "lag_168", "roll_mean_168", "temperature_2m"]
         ),
     }
+
+
+def seasonal_psi(
+    history: pd.DataFrame,
+    analysis: pd.DataFrame,
+    columns: list[str],
+    half_window_days: int = 14,
+    lag_days: int = 364,
+    bins: int = 10,
+) -> pd.DataFrame:
+    """PSI journalier contre une base saisonnière : les 2 x `half_window_days` jours centrés
+    sur la même date `lag_days` plus tôt (364 = même jour de semaine un an avant).
+
+    `history` doit contenir l'année précédente ; une date sans base complète est ignorée.
+    """
+    hist_day = history[TS].dt.floor(CHUNK)
+    rows = []
+    for day, d in analysis.groupby(analysis[TS].dt.floor(CHUNK)):
+        center = day - pd.Timedelta(days=lag_days)
+        lo, hi = (
+            center - pd.Timedelta(days=half_window_days),
+            center + pd.Timedelta(days=half_window_days),
+        )
+        base = history[(hist_day >= lo) & (hist_day < hi)]
+        if base.empty:
+            continue
+        for col in columns:
+            rows.append({"date": day, "feature": col, "psi": psi(base[col], d[col], bins)})
+    return pd.DataFrame(rows)
+
+
+def seasonal_zscore(
+    history: pd.DataFrame,
+    analysis: pd.DataFrame,
+    columns: list[str],
+    half_window_days: int = 14,
+    lag_days: int = 364,
+) -> pd.DataFrame:
+    """Écart standardisé de la moyenne du jour à la base saisonnière des moyennes journalières.
+
+    Corrige le défaut du PSI journalier contre une fenêtre longue (distributions de
+    largeurs incomparables) : on compare une moyenne journalière à des moyennes
+    journalières. |z| > 3 signale un jour hors de la variabilité de la même saison.
+    """
+    hist_daily = history.groupby(history[TS].dt.floor(CHUNK))[columns].mean()
+    an_daily = analysis.groupby(analysis[TS].dt.floor(CHUNK))[columns].mean()
+    rows = []
+    for day, vals in an_daily.iterrows():
+        center = day - pd.Timedelta(days=lag_days)
+        base = hist_daily[
+            (hist_daily.index >= center - pd.Timedelta(days=half_window_days))
+            & (hist_daily.index < center + pd.Timedelta(days=half_window_days))
+        ]
+        if len(base) < half_window_days:
+            continue
+        for col in columns:
+            sd = base[col].std()
+            z = (vals[col] - base[col].mean()) / sd if sd > 0 else 0.0
+            rows.append({"date": day, "feature": col, "z": float(z)})
+    return pd.DataFrame(rows)
