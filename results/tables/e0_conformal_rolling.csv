@@ -1,0 +1,13 @@
+split,delay,period,coverage,width
+covid,1,test (fin de référence),0.7543,72.5613
+covid,1,"analysis, 3 premiers mois",0.7232,78.0116
+covid,1,"analysis, 3 mois suivants",0.8571,22.5592
+covid,60,test (fin de référence),0.7321,69.5438
+covid,60,"analysis, 3 premiers mois",0.68,71.6571
+covid,60,"analysis, 3 mois suivants",0.7096,20.4232
+congestion,1,test (fin de référence),0.7554,47.2956
+congestion,1,"analysis, 3 premiers mois",0.8273,48.8832
+congestion,1,"analysis, 3 mois suivants",0.7981,44.98
+congestion,60,test (fin de référence),0.7316,44.8433
+congestion,60,"analysis, 3 premiers mois",0.8334,51.7614
+congestion,60,"analysis, 3 mois suivants",0.8008,45.3475
