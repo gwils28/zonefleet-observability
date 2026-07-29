@@ -33,3 +33,18 @@ def test_calibration_restores_coverage_on_exchangeable_data():
     assert before < 0.5 and abs(after - 0.8) < 0.02
     by_hour = C.apply(test, C.fit(cal, 0.2, by="hour"), by="hour")
     assert abs(C.coverage_width(by_hour, "lo_cal", "hi_cal")[0] - 0.8) < 0.03
+
+
+def test_rolling_uses_only_published_labels():
+    rng = np.random.default_rng(1)
+    ts = pd.date_range("2020-01-01", periods=24 * 60, freq="h")
+    y = rng.lognormal(3, 0.3, len(ts))
+    df = pd.DataFrame({"ts": ts, "pickups": y, "q10": y * 0.95, "q90": y * 1.05})
+    late = ts >= "2020-02-15"
+    df.loc[late, "pickups"] *= 3  # rupture : seuls les labels publiés peuvent la révéler
+    out = C.rolling(df, window_days=14, delay_days=7)
+    c = out.groupby(out["ts"].dt.date)["correction"].first()
+    d = pd.Timestamp
+    assert c[d("2020-01-03").date()] == 0.0  # pas encore d'historique
+    # le 20 février, les labels connus s'arrêtent au 13 : la rupture du 15 est invisible
+    assert c[d("2020-02-20").date()] < 0.5 < c[d("2020-02-28").date()]
