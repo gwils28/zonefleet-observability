@@ -79,7 +79,46 @@ def main() -> None:
     out.round(4).to_csv(TABLES / "e0_conformal.csv", index=False)
     pd.concat(hourly).round(4).to_csv(TABLES / "e0_conformal_by_hour.csv", index=False)
     print(out.round(3).to_string())
+    rolling_main()
 
 
 if __name__ == "__main__":
     main()
+
+
+def rolling_study(window_days: int = 28) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Calibration glissante (labels à J + 1 et J + 60) sur référence + analysis."""
+    daily, rows = [], []
+    for split in ("covid", "congestion"):
+        p = predictions(split).sort_values("ts")
+        for delay in (1, 60):
+            out = C.rolling(p, window_days=window_days, delay_days=delay, alpha=ALPHA)
+            out["inside"] = (out["pickups"] >= out["lo_cal"]) & (out["pickups"] <= out["hi_cal"])
+            out["inside_raw"] = (out["pickups"] >= out["q10"]) & (out["pickups"] <= out["q90"])
+            d = out.groupby(out["ts"].dt.floor("D")).agg(
+                coverage=("inside", "mean"),
+                coverage_raw=("inside_raw", "mean"),
+                correction=("correction", "first"),
+            )
+            daily.append(d.rename_axis("date").reset_index().assign(split=split, delay=delay))
+            for name, df in periods(split).items():
+                if name == "calibration":
+                    continue
+                sub = out[out["ts"].isin(df["ts"]) & out["zone"].isin(df["zone"].unique())]
+                rows.append(
+                    {
+                        "split": split,
+                        "delay": delay,
+                        "period": name,
+                        "coverage": sub["inside"].mean(),
+                        "width": (sub["hi_cal"] - sub["lo_cal"]).mean(),
+                    }
+                )
+    return pd.DataFrame(rows), pd.concat(daily, ignore_index=True)
+
+
+def rolling_main() -> None:
+    summ, daily = rolling_study()
+    summ.round(4).to_csv(TABLES / "e0_conformal_rolling.csv", index=False)
+    daily.round(4).to_csv(TABLES / "e0_conformal_rolling_daily.csv", index=False)
+    print(summ.round(3).to_string())

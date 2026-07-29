@@ -962,6 +962,40 @@ def e0_conformal() -> None:
     viz.save(fig, "e0_conforme")
 
 
+@group("e0")
+def e0_conformal_rolling() -> None:
+    d = pd.read_csv(T / "e0_conformal_rolling_daily.csv", parse_dates=["date"])
+    fig, axes = plt.subplots(2, 1, figsize=(12, 6.4), sharey=True)
+    for ax, split, title in [
+        (axes[0], "covid", "Modèle 2019 : sept. 2019-juin 2020"),
+        (axes[1], "congestion", "Modèle 2024 : sept. 2024-juin 2025"),
+    ]:
+        raw = d[(d["split"] == split) & (d["delay"] == 1)].set_index("date")
+        ax.plot(
+            raw.index,
+            100 * raw["coverage_raw"].rolling(7).mean(),
+            color=viz.NEUTRAL,
+            lw=2,
+            label="intervalle brut",
+        )
+        for delay, c in [(60, viz.YELLOW), (1, viz.BLUE)]:
+            t = d[(d["split"] == split) & (d["delay"] == delay)].set_index("date")
+            ax.plot(
+                t.index,
+                100 * t["coverage"].rolling(7).mean(),
+                color=c,
+                label=f"calibration glissante, labels à J + {delay}",
+            )
+        ax.axhline(80, color=viz.ALERT, ls="--", lw=1)
+        ax.set_title(title, fontsize=11)
+        ax.set_ylabel("couverture (moy. 7 j, %)")
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
+    axes[0].axvline(pd.Timestamp("2020-03-13"), color=viz.INK2, lw=1)
+    axes[0].legend(loc="lower left", fontsize=8.5)
+    fig.tight_layout()
+    viz.save(fig, "e0_conforme_glissant")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)

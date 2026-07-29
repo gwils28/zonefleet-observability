@@ -50,3 +50,35 @@ def apply(df: pd.DataFrame, corr: dict, by: str | None = None) -> pd.DataFrame:
 def coverage_width(df: pd.DataFrame, lo: str, hi: str) -> tuple[float, float]:
     inside = (df["pickups"] >= df[lo]) & (df["pickups"] <= df[hi])
     return float(inside.mean()), float((df[hi] - df[lo]).mean())
+
+
+def rolling(
+    df: pd.DataFrame, window_days: int = 28, delay_days: int = 1, alpha: float = 0.2
+) -> pd.DataFrame:
+    """Intervalle calibré jour par jour sur les `window_days` derniers jours de labels connus.
+
+    Pour le jour cible D, la correction utilise les lignes dont la cible est dans
+    [D - delay - window, D - delay) : aucun label non publié n'est lu. Les jours sans
+    assez d'historique gardent l'intervalle brut (correction nulle).
+    """
+    d = df.copy()
+    d["day"] = d["ts"].dt.floor("D")
+    s = scores(np.log1p(d["pickups"]), np.log1p(d["q10"]), np.log1p(d["q90"]))
+    by_day = pd.Series(s, index=d.index).groupby(d["day"])
+    day_scores = {k: v.to_numpy() for k, v in by_day}
+    days = sorted(day_scores)
+    corr = {}
+    for day in days:
+        lo, hi = (
+            day - pd.Timedelta(days=delay_days + window_days),
+            day - pd.Timedelta(days=delay_days),
+        )
+        hist = [day_scores[k] for k in days if lo <= k < hi]
+        corr[day] = (
+            correction(np.concatenate(hist), alpha) if len(hist) >= window_days // 2 else 0.0
+        )
+    q = d["day"].map(corr)
+    d["lo_cal"] = np.expm1(np.log1p(d["q10"]) - q).clip(lower=0)
+    d["hi_cal"] = np.expm1(np.log1p(d["q90"]) + q)
+    d["correction"] = q
+    return d.drop(columns="day")
