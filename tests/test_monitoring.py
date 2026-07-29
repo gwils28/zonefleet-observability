@@ -94,3 +94,26 @@ def test_pca_reconstruction_sees_broken_correlation_but_not_shift_along_it():
     mv_broken = M.multivariate_drift(ref, broken, columns=cols)
     assert mv_broken["alert"].mean() == 1.0
     assert mv_along["alert"].mean() == 0.0
+
+
+def test_seasonal_baselines_on_a_shift_that_repeats_every_year():
+    rng = np.random.default_rng(0)
+    ts = pd.date_range("2019-01-01", "2021-01-01", freq="h", inclusive="left")
+    seasonal = 10 * np.sin(2 * np.pi * ts.dayofyear / 365)
+    df = pd.DataFrame({"ts": ts, "temperature_2m": seasonal + rng.normal(size=len(ts))})
+    hist, an = df[df["ts"].dt.year == 2019], df[df["ts"].dt.year == 2020]
+    autumn = hist[hist["ts"].dt.month >= 9]
+    winter = an[an["ts"].dt.month <= 2]
+    z = M.seasonal_zscore(hist, winter, ["temperature_2m"])
+    fixed = M.daily_psi(autumn, winter, ["temperature_2m"])
+    assert z["z"].abs().median() < 3 and fixed["psi"].median() > 0.25
+    # Limite documentée : le PSI journalier contre une fenêtre de 28 jours reste élevé,
+    # car une journée a une distribution bien plus étroite que la fenêtre.
+    s = M.seasonal_psi(hist, winter, ["temperature_2m"])
+    assert s["psi"].median() > 0.25
+
+
+def test_seasonal_psi_skips_days_without_history():
+    ts = pd.date_range("2020-01-01", periods=48, freq="h")
+    df = pd.DataFrame({"ts": ts, "x": 1.0})
+    assert M.seasonal_psi(df, df, ["x"]).empty
