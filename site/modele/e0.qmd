@@ -97,3 +97,22 @@ la référence ; évaluation : novembre-décembre, puis les analysis.
 Recommandation : calibrer sur une fenêtre glissante récente (les 4 dernières semaines
 de labels, disponibles à J + 1 chez ZoneFleet) plutôt que sur une référence fixe, et
 surveiller l'écart de couverture comme un indicateur réalisé.
+
+### Calibration glissante
+
+Suite naturelle (issue #51) : recalculer la correction **chaque jour** sur les 28 derniers
+jours de labels **publiés**, soit à J + 1 (journaux de l'opérateur), soit à J + 60
+(publication TLC). La fonction `conformal.rolling` ne lit jamais un label postérieur à
+`jour - délai` (testé).
+
+![Couverture journalière (moyenne 7 jours) de l'intervalle brut et de l'intervalle calibré en glissant, selon le délai des labels.](../figures/e0_conforme_glissant.png){#fig-conformal-rolling}
+
+- **Labels à J + 1** : la couverture plonge avec le choc (aucune calibration ne
+  l'anticipe), puis **revient à 80 % mi-avril**, environ un mois après l'état d'urgence ;
+  en 2025, elle reste collée à 80 % toute l'année, fêtes comprises.
+- **Labels à J + 60** : retour à 80 % seulement début juin, puis **sur-couverture**
+  (jusqu'à 98 %) : la fenêtre de calibration contient désormais les pires semaines,
+  l'intervalle devient inutilement large.
+- C'est le même message que [E5](../experiences/e5-reentrainement.qmd) pour le
+  réentraînement : **le délai des labels décide de la capacité d'adaptation**, bien plus
+  que la méthode.
