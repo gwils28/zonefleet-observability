@@ -108,9 +108,10 @@ jours de labels **publiés**, soit à J + 1 (journaux de l'opérateur), soit à 
 ![Couverture journalière (moyenne 7 jours) de l'intervalle brut et de l'intervalle calibré en glissant, selon le délai des labels.](../figures/e0_conforme_glissant.png){#fig-conformal-rolling}
 
 - **Labels à J + 1** : la couverture plonge avec le choc (aucune calibration ne
-  l'anticipe), puis **revient à 80 % mi-avril**, environ un mois après l'état d'urgence ;
+  l'anticipe), puis **revient à 80 % le 3 avril** (moyenne 7 jours), trois semaines après
+  l'état d'urgence ;
   en 2025, elle reste collée à 80 % toute l'année, fêtes comprises.
-- **Labels à J + 60** : retour à 80 % seulement début juin, puis **sur-couverture**
+- **Labels à J + 60** : retour à 80 % seulement le 24 mai, puis **sur-couverture**
   (jusqu'à 98 %) : la fenêtre de calibration contient désormais les pires semaines,
   l'intervalle devient inutilement large.
 - C'est le même message que [E5](../experiences/e5-reentrainement.qmd) pour le
