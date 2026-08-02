@@ -100,3 +100,15 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Résultat : la garantie CQR ne tient pas entre septembre-octobre et novembre-décembre
   (74 % au lieu de 80 %) ; elle tient en 2025 (79-81 %) ; elle s'effondre pendant le
   COVID (56 %). Les fiches et la page E0 le rapportent tel quel.
+
+## 2026-08-02 : E7, z-score saisonnier ajouté après coup
+
+- Déclaré (issue #53) : PSI journalier contre une base saisonnière (28 jours, un an plus
+  tôt). Un test synthétique, écrit avant l'exécution sur données réelles, a montré que le
+  PSI d'une journée contre une fenêtre de 28 jours est mal posé (distributions de
+  largeurs incomparables) ; sur données réelles, le PSI de température déclenche 99 %
+  des jours avec les deux bases.
+- Ajouté et étiqueté « a posteriori » : z-score de la moyenne journalière contre la
+  distribution des moyennes journalières de la base saisonnière (|z| > 3). Il ramène les
+  alertes de température à 0 % (2020) et 0,6 % (2025), et détecte le COVID dès le 13 mars
+  sur `lag_24`.
