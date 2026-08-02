@@ -353,6 +353,24 @@ def e0_conformal_table() -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+@table("e7_summary")
+def e7_summary() -> pd.DataFrame:
+    s = pd.read_csv(T / "e7_summary.csv")
+    case = {"covid": "COVID 2020", "congestion": "congestion 2025"}
+    return pd.DataFrame(
+        {
+            "Cas": s["split"].map(case),
+            "Signal": s["signal"],
+            "Feature": s["feature"],
+            "Jours en alerte avant le choc (%)": s["share_alert_before"].map(
+                lambda v: "-" if pd.isna(v) else fr(100 * v, 1)
+            ),
+            "Délai (j)": s["delay_days"].map(lambda v: "-" if pd.isna(v) else fr(v, 0)),
+            "Jours en alerte après (%)": s["share_alert_after"].map(lambda v: fr(100 * v, 1)),
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
