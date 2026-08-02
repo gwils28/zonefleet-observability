@@ -1,0 +1,19 @@
+signal,feature,share_alert_before,first_alert_after,delay_days,share_alert_after,split
+PSI base saisonnière,lag_168,0.0,2020-03-21,8.0,0.9273,covid
+PSI base saisonnière,lag_24,0.0,2020-03-15,2.0,0.9818,covid
+PSI base saisonnière,temperature_2m,0.9861,2020-03-13,0.0,1.0,covid
+PSI référence fixe,lag_168,0.0,2020-03-21,8.0,0.9273,covid
+PSI référence fixe,lag_24,0.0,2020-03-15,2.0,0.9818,covid
+PSI référence fixe,temperature_2m,0.9861,2020-03-13,0.0,1.0,covid
+z-score saisonnier,lag_168,0.0339,2020-03-17,4.0,0.9636,covid
+z-score saisonnier,lag_24,0.0678,2020-03-13,0.0,1.0,covid
+z-score saisonnier,temperature_2m,0.0,,,0.0,covid
+PSI base saisonnière,lag_168,0.0,2025-05-25,140.0,0.0113,congestion
+PSI base saisonnière,lag_24,0.0,2025-05-19,134.0,0.0113,congestion
+PSI base saisonnière,temperature_2m,0.75,2025-01-05,0.0,1.0,congestion
+PSI référence fixe,lag_168,0.0,2025-05-25,140.0,0.0056,congestion
+PSI référence fixe,lag_24,0.0,2025-05-19,134.0,0.0056,congestion
+PSI référence fixe,temperature_2m,0.75,2025-01-05,0.0,1.0,congestion
+z-score saisonnier,lag_168,,2025-02-22,48.0,0.0296,congestion
+z-score saisonnier,lag_24,,2025-02-16,42.0,0.0296,congestion
+z-score saisonnier,temperature_2m,,2025-06-25,171.0,0.0059,congestion
