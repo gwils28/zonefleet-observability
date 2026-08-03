@@ -50,3 +50,5 @@ e1c:         ## E1 bis : taille de chunk (jour ou semaine)
 	uv run python -m zonefleet.experiments.e1_chunks
 e0c:         ## E0 bis (extension) : calibration conforme des quantiles
 	uv run python -m zonefleet.experiments.e0_conformal
+e7:          ## E7 : dérive contre base saisonnière
+	uv run python -m zonefleet.experiments.e7_seasonal

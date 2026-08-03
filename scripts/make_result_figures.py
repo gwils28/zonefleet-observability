@@ -996,6 +996,47 @@ def e0_conformal_rolling() -> None:
     viz.save(fig, "e0_conforme_glissant")
 
 
+# --------------------------------------------------------------------------- E7
+@group("e7")
+def e7_signals() -> None:
+    from zonefleet.config import CONGESTION_START, COVID_EMERGENCY
+
+    s = pd.read_csv(T / "e7_signals.csv", parse_dates=["date"])
+    fig, axes = plt.subplots(2, 2, figsize=(12, 6.2), sharex="col")
+    for j, (split, shock, title) in enumerate(
+        [
+            ("covid", COVID_EMERGENCY, "2020 (COVID)"),
+            ("congestion", CONGESTION_START, "2025 (congestion)"),
+        ]
+    ):
+        for i, feat in enumerate(["temperature_2m", "lag_24"]):
+            ax = axes[i, j]
+            d = s[(s["split"] == split) & (s["feature"] == feat)]
+            fixed = d[d["signal"] == "PSI référence fixe"].set_index("date")["value"]
+            z = d[d["signal"] == "z-score saisonnier"].set_index("date")["value"].abs()
+            ax.plot(fixed.index, fixed / 0.25, color=viz.AQUA, label="PSI réf. fixe / 0,25")
+            ax.plot(z.index, z / 3, color=viz.VIOLET, label="|z| saisonnier / 3")
+            ax.axhline(1, color=viz.ALERT, ls="--", lw=1)
+            ax.axvline(shock, color=viz.INK2, lw=1)
+            ax.set_yscale("symlog", linthresh=1)
+            ax.set_ylim(bottom=0)
+            ax.set_title(f"{title} : {feat}", fontsize=10.5)
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    axes[0, 0].set_ylabel("rapport au seuil")
+    axes[1, 0].set_ylabel("rapport au seuil")
+    axes[0, 0].legend(loc="upper left", fontsize=8.5)
+    fig.suptitle(
+        "Au-dessus de 1 : alerte. La température ne dérive plus contre sa propre saison ; "
+        "le choc sur les lags reste visible",
+        x=0.01,
+        ha="left",
+        fontweight="bold",
+        fontsize=11,
+    )
+    fig.tight_layout()
+    viz.save(fig, "e7_signaux")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)

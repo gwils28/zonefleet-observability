@@ -1,0 +1,63 @@
+---
+title: "E7 : comparer chaque jour à sa propre saison"
+description: "La température dérive tous les jours contre une référence d'automne. Contre la même saison un an plus tôt, elle ne dérive plus, à condition de comparer des grandeurs comparables : le PSI d'une journée reste mal posé, le z-score de la moyenne journalière fonctionne."
+---
+
+::: {.callout-note appearance="minimal"}
+Script : `uv run python -m zonefleet.experiments.e7_seasonal` (≈ 7 s) · tables :
+`results/tables/e7_*.csv` · protocole déclaré dans l'issue #53 ; un signal ajouté après
+coup est signalé comme tel (notes du 2 août).
+:::
+
+## La question
+
+Toutes les expériences précédentes butent sur la même source de bruit : la **saison**.
+La référence de monitoring est l'automne de l'année d'entraînement ; une analysis
+d'hiver ou de printemps « dérive » sur la température tous les jours (E1, E2), et le
+PSI par zone se perd dans la saison (E6). L'idée naturelle : comparer chaque jour aux
+**mêmes semaines de l'année précédente** (28 jours centrés sur la même date, décalage de
+364 jours pour conserver le jour de semaine).
+
+## Deux façons de comparer à la saison
+
+| Signal | Compare | Statut |
+|---|---|---|
+| PSI contre la référence fixe | les 24 valeurs horaires du jour aux déciles de sept.-déc. | signal de E1/E2 |
+| PSI contre la base saisonnière | les 24 valeurs du jour aux déciles des 28 jours d'il y a un an | **déclaré** |
+| z-score saisonnier | la moyenne du jour à la distribution des 28 moyennes journalières d'il y a un an | **ajouté après coup** |
+
+Un test synthétique écrit avant l'exécution l'avait annoncé : une journée a une
+distribution bien plus étroite qu'une fenêtre de 28 jours qui couvre une pente
+saisonnière, si bien que le PSI journalier reste élevé **même contre la bonne saison**.
+Le z-score corrige ce défaut en comparant des moyennes journalières entre elles.
+
+## Résultats
+
+![Rapport de chaque signal à son seuil (PSI > 0,25 ; |z| > 3), en 2020 et en 2025, pour la température et `lag_24`. Au-dessus de 1, alerte.](../figures/e7_signaux.png){#fig-e7}
+
+{{< include ../_tables/e7_summary.md >}}
+
+- **Température** : le PSI déclenche presque tous les jours, **quelle que soit la base**
+  (99 % avant le COVID, 100 % en 2025). Le z-score saisonnier ne déclenche **jamais** en
+  2020 et une seule fois en 2025 (0,6 % des jours : les 24 et 25 juin, vague de chaleur). La
+  première source de fausses alertes du projet disparaît.
+- **Lags pendant le COVID** : le z-score saisonnier détecte le choc **le jour même** sur
+  `lag_24` (13 mars), contre 2 jours pour le PSI. La surprise envisagée (une base
+  saisonnière qui détecterait plus tard) ne se produit pas.
+- **Prix à payer** : 7 % de jours en alerte avant le choc sur `lag_24` en 2020, et une
+  oscillation hebdomadaire visible en 2025. La base de 28 jours mélange les jours de
+  semaine, alors que la moyenne d'un lundi n'est pas celle d'un samedi ; une base par
+  jour de semaine (4 valeurs) serait trop courte pour estimer un écart-type.
+
+## Ce que E7 établit
+
+1. **Comparer à la saison supprime la dérive saisonnière**, mais seulement avec une
+   statistique adaptée à la taille du chunk : le z-score de la moyenne journalière, pas
+   le PSI d'une journée.
+2. Pour la température et toute feature exogène saisonnière, le z-score saisonnier peut
+   **remplacer** le PSI contre la référence fixe dans le signal de dérive, sans perte sur
+   le COVID.
+3. Le prérequis est d'avoir **un an d'historique** de features : c'est une exigence de
+   donnée à prévoir dès le déploiement (ZoneFleet doit conserver ses features servies).
+4. Ce signal ne voit toujours pas le concept drift pur (il porte sur X) : il réduit le
+   bruit, il ne change pas l'angle mort.
