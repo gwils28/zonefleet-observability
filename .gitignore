@@ -33,3 +33,4 @@ mlflow.db
 results/mlflow/
 coverage.xml
 .coverage
+results/reports/
