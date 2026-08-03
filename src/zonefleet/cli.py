@@ -4,6 +4,7 @@ Exemples :
     zonefleet contract                  # valide les fichiers TLC contre le data contract
     zonefleet monitor --split covid     # signaux journaliers (CSV sur la sortie standard)
     zonefleet alert --split congestion  # sévérité du dernier jour : page, ticket, aucune
+    zonefleet report --date 2020-03-23 --split covid   # rapport du matin
     zonefleet run e3                    # lance une expérience du SPEC
 """
 
@@ -64,6 +65,36 @@ def cmd_alert(args: argparse.Namespace) -> int:
     return 1 if sev == PAGE else 0
 
 
+def daily_report(split: str, day: str | None = None) -> str:
+    """Rapport Markdown d'un jour (par défaut le dernier jour de l'analysis)."""
+    import pandas as pd
+
+    from zonefleet.alerting import daily_signals
+    from zonefleet.features import zone_table
+    from zonefleet.monitoring import monitor
+    from zonefleet.pipeline import predictions
+    from zonefleet.report import build
+    from zonefleet.rowscore import RowScorer
+
+    p = predictions(split)
+    ref, an = p[p.period == "reference"], p[p.period == "analysis"]
+    out = monitor(ref, an)
+    sig = daily_signals(out)
+    target = pd.Timestamp(day) if day else sig.index[-1]
+    today = an[an["ts"].dt.floor("D") == target]
+    rows = RowScorer().fit(ref).score_rows(today)
+    rows["zone"] = today["zone"].astype(int).to_numpy()
+    zl = rows.groupby("zone")["est"].mean().reset_index()
+    zl = zl.merge(zone_table()[["zone", "name"]], on="zone", how="left")
+    version = "1" if split == "covid" else "2"
+    return build(target, sig, zl, out["psi"], model_version=version)
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    print(daily_report(args.split, args.date))
+    return 0
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     importlib.import_module(EXPERIMENTS[args.experiment]).main()
     return 0
@@ -80,6 +111,10 @@ def build_parser() -> argparse.ArgumentParser:
         p = sub.add_parser(name, help=helptext)
         p.add_argument("--split", choices=["covid", "congestion"], default="congestion")
         p.set_defaults(fn=fn)
+    p = sub.add_parser("report", help="rapport quotidien de monitoring (Markdown)")
+    p.add_argument("--split", choices=["covid", "congestion"], default="congestion")
+    p.add_argument("--date", default=None, help="AAAA-MM-JJ (défaut : dernier jour)")
+    p.set_defaults(fn=cmd_report)
     p = sub.add_parser("run", help="lance une expérience")
     p.add_argument("experiment", choices=sorted(EXPERIMENTS))
     p.set_defaults(fn=cmd_run)
