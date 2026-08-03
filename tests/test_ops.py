@@ -75,7 +75,13 @@ def test_dagster_graph_loads():
     from zonefleet.ops.definitions import defs
 
     keys = {k.to_user_string() for k in defs.resolve_asset_graph().get_all_asset_keys()}
-    assert {"panel", "monitoring_signals", "alert_decision", "retrain_recommendation"} <= keys
+    assert {
+        "panel",
+        "monitoring_signals",
+        "alert_decision",
+        "retrain_recommendation",
+        "daily_report",
+    } <= keys
 
 
 def test_monitoring_assets_on_toy_world(toy_world, monkeypatch):
@@ -98,3 +104,9 @@ def test_monitoring_assets_on_toy_world(toy_world, monkeypatch):
     assert sev in {"page", "ticket", "aucune"}
     rec = D.retrain_recommendation(dg.build_asset_context(), monitoring_signals=sig)
     assert set(rec) == {"retrain", "reason"}
+    import zonefleet.config as Z
+
+    monkeypatch.setattr(Z, "RESULTS", toy_world.CACHE.parent)
+    text = D.daily_report(dg.build_asset_context(), config=cfg, monitoring_signals=sig)
+    assert text.startswith("# Monitoring ZoneFleet")
+    assert list((toy_world.CACHE.parent / "reports").glob("covid_*.md"))

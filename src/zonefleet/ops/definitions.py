@@ -153,6 +153,24 @@ def retrain_recommendation(
     return {"retrain": d.retrain, "reason": d.reason}
 
 
+@dg.asset(
+    group_name="monitoring", description="Rapport Markdown du dernier jour (results/reports/)."
+)
+def daily_report(
+    context: dg.AssetExecutionContext, config: MonitoringConfig, monitoring_signals: pd.DataFrame
+) -> str:
+    from zonefleet.config import RESULTS
+    from zonefleet.report import build
+
+    day = monitoring_signals.index[-1]
+    text = build(day, monitoring_signals, model_version="champion")
+    out = RESULTS / "reports" / f"{config.split}_{day.date()}.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(text)
+    context.add_output_metadata({"rapport": dg.MetadataValue.md(text), "fichier": str(out)})
+    return text
+
+
 monitoring_job = dg.define_asset_job("monitoring_quotidien", selection="*")
 
 defs = dg.Definitions(
@@ -166,6 +184,7 @@ defs = dg.Definitions(
         monitoring_signals,
         alert_decision,
         retrain_recommendation,
+        daily_report,
     ],
     asset_checks=[contract_respected, panel_is_valid],
     jobs=[monitoring_job],
