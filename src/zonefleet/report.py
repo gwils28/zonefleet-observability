@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import pandas as pd
 
+from zonefleet.alerting import persistent
+from zonefleet.config import LABEL_DELAY_DAYS
 from zonefleet.ops.decisions import PAGE, TICKET, alert_severity, retrain_decision
 
 ICON = {PAGE: "PAGE", TICKET: "TICKET", "aucune": "RAS"}
@@ -24,21 +26,29 @@ def build(
     zone_loss: pd.DataFrame | None = None,
     psi: pd.DataFrame | None = None,
     model_version: str = "?",
+    label_delay_days: int = LABEL_DELAY_DAYS,
 ) -> str:
     """Rapport du jour `day` (signaux jusqu'à ce jour inclus).
 
     `zone_loss` : colonnes zone, name, est (perte estimée du jour) ;
     `psi` : colonnes date, feature, psi.
     """
-    sig = signals[signals.index <= day]
+    sig = signals[signals.index <= day].copy()
     if sig.empty:
         raise ValueError(f"aucun signal jusqu'au {day.date()}")
+    # Horloge des labels : un rejeu contient des labels du futur ; on ne garde que ceux
+    # publiés à la date du rapport (jour cible + délai <= jour du rapport).
+    unpublished = sig.index + pd.Timedelta(days=label_delay_days) > day
+    sig.loc[unpublished, "realized"] = float("nan")
+    sig.loc[unpublished, "perf_real"] = False
     sev = alert_severity(sig)
     last = sig.iloc[-1]
-    confirmed = bool(
-        ((sig["drift_clean"] & sig["perf_est"]) | sig["perf_real"].fillna(False)).any()
-    )
-    rec = retrain_decision(confirmed, int(sig["realized"].notna().sum()) if confirmed else 0)
+    persisted_joint = persistent(sig["drift_clean"] & sig["perf_est"], 2)
+    joint = persisted_joint | persistent(sig["perf_real"].astype(bool), 2)
+    confirmed = bool(joint.any())
+    first = sig.index[joint]
+    label_days = int(sig.loc[first[0] :, "realized"].notna().sum()) if len(first) else 0
+    rec = retrain_decision(confirmed, label_days)
     lines = [
         f"# Monitoring ZoneFleet : {day.date()}",
         "",

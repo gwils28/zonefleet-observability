@@ -52,3 +52,14 @@ def test_page_report_lists_zones_and_drifting_features():
 def test_report_before_first_signal_fails():
     with pytest.raises(ValueError):
         build(pd.Timestamp("2024-01-01"), signals([0.3] * 5, [False] * 5))
+
+
+def test_unpublished_labels_are_hidden_on_the_decision_clock():
+    sig = signals(
+        [0.3, 0.3, 0.5, 0.6, 0.6], [False, True, True, True, True], real=[0.3, 0.3, 1.2, 1.4, 1.5]
+    )
+    md = build(pd.Timestamp("2025-03-05"), sig, label_delay_days=60)
+    assert "en attente" in md and "1,500" not in md
+    assert "Réentraînement : **non**" in md  # aucun label post-alerte publié
+    md1 = build(pd.Timestamp("2025-03-05"), sig, label_delay_days=0)
+    assert "disponible" in md1
