@@ -39,7 +39,7 @@ Le z-score corrige ce défaut en comparant des moyennes journalières entre elle
 
 - **Température** : le PSI déclenche presque tous les jours, **quelle que soit la base**
   (99 % avant le COVID, 100 % en 2025). Le z-score saisonnier ne déclenche **jamais** en
-  2020 et une seule fois en 2025 (0,6 % des jours, la vague de froid de juin). La
+  2020 et une seule fois en 2025 (0,6 % des jours : les 24 et 25 juin, vague de chaleur). La
   première source de fausses alertes du projet disparaît.
 - **Lags pendant le COVID** : le z-score saisonnier détecte le choc **le jour même** sur
   `lag_24` (13 mars), contre 2 jours pour le PSI. La surprise envisagée (une base
