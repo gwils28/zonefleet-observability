@@ -1,0 +1,22 @@
+name: site-check
+
+on:
+  pull_request:
+    paths: ["site/**", ".github/workflows/site-check.yml"]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - name: Rendu du site (sans exécution)
+        run: quarto render site 2>&1 | tee render.log
+      - name: Aucun lien interne cassé
+        run: |
+          if grep -q "Unable to resolve link target" render.log; then
+            grep "Unable to resolve link target" render.log
+            exit 1
+          fi
+      - name: Aucun tiret cadratin dans le site rendu
+        run: python3 scripts/hooks/check_no_em_dash.py $(find site -name "*.qmd" -o -name "*.md")
