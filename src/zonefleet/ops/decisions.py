@@ -20,7 +20,9 @@ def alert_severity(sig: pd.DataFrame, persistence: int = 2, ticket_days: int = 7
 
     - page : dérive nettoyée ET perte estimée au-dessus du seuil, `persistence` jours de suite,
       ou perte réalisée au-dessus du seuil (labels arrivés) ;
-    - ticket : dérive nettoyée seule pendant `ticket_days` jours (revue hebdomadaire) ;
+    - ticket : dérive nettoyée seule pendant `ticket_days` jours (revue hebdomadaire), ou
+      perte estimée seule pendant `persistence` jours (dégradation probable sans dérive des
+      lags : saison, fêtes, météo extrême ; E4 ter) ;
     - aucune sinon.
     """
     drift = sig["drift_clean"] if "drift_clean" in sig else sig["drift"]
@@ -28,7 +30,7 @@ def alert_severity(sig: pd.DataFrame, persistence: int = 2, ticket_days: int = 7
     realized = persistent(sig["perf_real"].fillna(False).astype(bool), persistence)
     if joint.iloc[-1] or realized.iloc[-1]:
         return PAGE
-    if persistent(drift, ticket_days).iloc[-1]:
+    if persistent(drift, ticket_days).iloc[-1] or persistent(sig["perf_est"], persistence).iloc[-1]:
         return TICKET
     return NONE
 
