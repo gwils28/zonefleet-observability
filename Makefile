@@ -53,3 +53,5 @@ e0c:         ## E0 bis (extension) : calibration conforme des quantiles
 	uv run python -m zonefleet.experiments.e0_conformal
 e7:          ## E7 : dérive contre base saisonnière
 	uv run python -m zonefleet.experiments.e7_seasonal
+e4c:         ## E4 ter (extension) : fausses alertes sur trois périodes calmes
+	uv run python -m zonefleet.experiments.e4_calm

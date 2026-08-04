@@ -99,13 +99,18 @@ PAGE    si  (psi_lag24 > 0,25 OU psi_lag168 > 0,25 OU pca_alert)
      ou  perte réalisée > seuil pendant 2 jours (labels arrivés : audit, réentraînement)
 
 TICKET  si  dérive nettoyée seule pendant 7 jours   -> revue hebdomadaire, pas d'astreinte
+     ou  perte estimée seule (sans dérive des lags) pendant 2 jours
+                                                 -> « dégradation probable » : saison, fêtes,
+                                                    météo extrême (E4 ter)
 
 RIEN    sinon
 ```
 
 Pourquoi garder le ticket : quand DLE se tait, la dérive reste le seul indice d'un
 concept drift naissant (elle a vu 83 % des chocs propagés en E4). Elle n'a simplement pas
-le droit de réveiller quelqu'un.
+le droit de réveiller quelqu'un. Symétriquement, DLE seul voit les dégradations
+saisonnières que la dérive des lags ignore : sur les automnes 2019 et 2024, chacun de ses
+jours d'alerte tombait sur une vraie dégradation ([E4 ter](experiences/e4-backtest.qmd#réplication-sur-trois-périodes-calmes-e4-ter)).
 
 Seuils : moyenne + k écarts-types des chunks de **référence hors échantillon**, recalculés
 à chaque promotion de modèle (Sculley : un seuil fixe dans un système dynamique est une

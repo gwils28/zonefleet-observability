@@ -145,3 +145,29 @@ Condition jointe nettoyée (P3b) :
   changer leur ordre ni les taux de fausses alertes.
 - Le classement de E4 tient sur toute la grille : P3b est la seule politique sans
   fausse alerte dès que la persistance atteint 2 jours.
+
+## Réplication sur trois périodes calmes (E4 ter)
+
+La principale limite du backtest est de mesurer les fausses alertes sur une seule période
+réelle. E4 ter (extension, issue #59) ajoute deux découpages sans choc connu, avec un
+modèle entraîné de janvier à avril et une référence de mai à août : analysis
+septembre-décembre 2019 et septembre-décembre 2024. Aucune injection : on observe les
+politiques telles quelles, au réglage retenu (k = 1, signal lissé 7 jours), et on les
+confronte à la dégradation **réelle** mesurée par les labels.
+
+{{< include ../_tables/e4_calm.md >}}
+
+- **La condition jointe nettoyée ne déclenche sur aucune des trois périodes** : le
+  « zéro fausse page » de E4 se réplique.
+- **Mais « calme » ne veut pas dire « sans dégradation »** : à l'automne, le modèle
+  entraîné au printemps se dégrade pendant les fêtes (erreur réalisée au-dessus du seuil
+  22 % et 17 % des jours en 2019 et 2024). DLE seul le voit : **chacun** de ses jours
+  d'alerte tombe sur une vraie dégradation (précision de 100 %), et il en couvre 38 à
+  41 %. La dérive nettoyée, elle, ne bouge pas : les lags ne se déplacent pas pendant
+  les fêtes, la condition jointe reste muette.
+- En 2025 au contraire, la précision de DLE seul tombe à 22 % (vagues de froid).
+
+Conséquence d'architecture, reprise dans le [system design](../system-design.qmd) : la
+condition jointe reste la règle de **page**, mais une alerte de DLE seul persistante ne
+doit pas être jetée ; elle ouvre un **ticket** « dégradation probable sans dérive des
+lags » (saison, fêtes, météo extrême), revu le jour ouvré suivant.

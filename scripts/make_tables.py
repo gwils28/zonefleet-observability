@@ -371,6 +371,29 @@ def e7_summary() -> pd.DataFrame:
     )
 
 
+@table("e4_calm")
+def e4_calm_table() -> pd.DataFrame:
+    d = pd.read_csv(T / "e4_calm.csv")
+    d = d[
+        (d["smooth"] == 7)
+        & d["policy"].isin(["P1_drift", "P1b_drift_clean", "P2_dle", "P3b_clean_and_dle"])
+    ]
+
+    def pct(v):
+        return "-" if pd.isna(v) else fr(100 * v, 0) + " %"
+
+    return pd.DataFrame(
+        {
+            "Période": d["period"],
+            "Politique": d["policy"].map(POLICY_E4),
+            "Allumages / 30 j": d["alert_events_per_30d"].map(lambda v: fr(v, 2)),
+            "Jours en alerte": d["share_days_in_alert"].map(pct),
+            "dont sur dégradation réelle": d["share_alert_days_on_real_degradation"].map(pct),
+            "Dégradation réelle couverte": d["share_degradation_days_covered"].map(pct),
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")

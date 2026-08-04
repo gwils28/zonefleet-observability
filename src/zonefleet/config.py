@@ -57,6 +57,24 @@ SPLITS = {
     ),
 }
 
+# Extension (E4 ter, docs/notes du 4 août) : périodes calmes supplémentaires pour mesurer
+# les fausses alertes ailleurs qu'en 2025. Hors des découpages du SPEC.
+CALM_SPLITS = {
+    "calme_2019": Split(
+        "calme_2019",
+        train=("2019-01-01", "2019-04-30"),
+        reference=("2019-05-01", "2019-08-31"),
+        analysis=("2019-09-01", "2019-12-31"),
+    ),
+    "calme_2024": Split(
+        "calme_2024",
+        train=("2024-01-01", "2024-04-30"),
+        reference=("2024-05-01", "2024-08-31"),
+        analysis=("2024-09-01", "2024-12-31"),
+    ),
+}
+ALL_SPLITS = {**SPLITS, **CALM_SPLITS}
+
 YEARS = (2019, 2020, 2024, 2025)
 SERVICES = ("yellow", "green")
 CONGESTION_START = pd.Timestamp("2025-01-05")

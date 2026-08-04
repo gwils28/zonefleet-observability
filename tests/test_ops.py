@@ -110,3 +110,7 @@ def test_monitoring_assets_on_toy_world(toy_world, monkeypatch):
     text = D.daily_report(dg.build_asset_context(), config=cfg, monitoring_signals=sig)
     assert text.startswith("# Monitoring ZoneFleet")
     assert list((toy_world.CACHE.parent / "reports").glob("covid_*.md"))
+
+
+def test_estimated_loss_alone_opens_a_ticket():
+    assert alert_severity(signals([0, 0, 0], [0, 1, 1])) == TICKET
