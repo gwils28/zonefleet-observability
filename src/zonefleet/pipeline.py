@@ -10,7 +10,8 @@ import json
 
 import pandas as pd
 
-from zonefleet.config import RESULTS, SPLITS
+from zonefleet.config import ALL_SPLITS as SPLITS
+from zonefleet.config import RESULTS
 from zonefleet.covariates import load_weather
 from zonefleet.data import load_panel
 from zonefleet.features import build_features, slice_period
