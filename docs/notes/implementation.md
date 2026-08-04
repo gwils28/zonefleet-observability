@@ -112,3 +112,13 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   distribution des moyennes journalières de la base saisonnière (|z| > 3). Il ramène les
   alertes de température à 0 % (2020) et 0,6 % (2025), et détecte le COVID dès le 13 mars
   sur `lag_24`.
+
+## 2026-08-04 : E4 ter, périodes calmes supplémentaires (extension)
+
+- Découpages ajoutés hors SPEC (`config.CALM_SPLITS`) : entraînement janv.-avril,
+  référence mai-août, analysis sept.-déc., en 2019 et 2024 ; les découpages du SPEC
+  (`SPLITS`) sont inchangés, `pipeline` utilise l'union.
+- Résultat : P3b ne déclenche sur aucune des trois périodes. Mais en automne, l'erreur
+  réalisée dépasse son seuil 22 à 26 % des jours (fêtes), et chaque alerte de DLE seul y
+  tombe sur une vraie dégradation. « Calme » signifie ici « sans choc externe ».
+- Conséquence intégrée au system design : DLE seul persistant ouvre un ticket.
