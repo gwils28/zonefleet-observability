@@ -14,7 +14,7 @@ from zonefleet.contract import schema_timeline, type_changes
 from zonefleet.data import aggregate_all, build_panel, cbd_share, check_panel, tlc_files, top_zones
 
 CBD_THRESHOLD = 0.8  # bimodalité nette : zones CBD > 0,93, autres < 0,6
-BLOCKS = [("2019-01-01", "2021-01-01"), ("2024-01-01", "2026-01-01")]
+BLOCKS = [("2019-01-01", "2022-01-01"), ("2024-01-01", "2026-01-01")]
 
 
 def schema_tables(files, tables) -> None:
