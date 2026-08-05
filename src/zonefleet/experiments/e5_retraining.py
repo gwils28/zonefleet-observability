@@ -89,7 +89,7 @@ def simulate(name: str, delay: int, df: pd.DataFrame, champion: QuantileForecast
     if name == "jamais":
         return run
     if name == "calendrier":
-        for month in pd.date_range("2020-02-01", "2020-12-01", freq="MS"):
+        for month in pd.date_range("2020-02-01", YEAR[1] - pd.Timedelta(days=1), freq="MS"):
             run.switches.append((month, fit(train_window(df, month, delay)), "mensuel"))
         return run
     if name == "réflexe":
@@ -136,7 +136,10 @@ def realized(run: Run, df: pd.DataFrame) -> pd.DataFrame:
     return daily.rename_axis("date").reset_index().assign(policy=run.name, delay=run.delay)
 
 
-def main() -> None:
+def main(end: str = "2021-01-01", suffix: str = "") -> None:
+    """Rejoue l'année 2020 (défaut) ou jusqu'à `end` ; `suffix` distingue les sorties."""
+    global YEAR
+    YEAR = (YEAR[0], pd.Timestamp(end))
     df = features()
     champion = frozen_model("covid")
     policies = ["jamais", "calendrier", "réflexe", "réflexe court", "gardé"]
@@ -152,14 +155,22 @@ def main() -> None:
             print(f"L={delay:>2} {name:14s} {len(run.switches) - 1} remplacement(s)")
     daily = pd.concat(daily, ignore_index=True)
     TABLES.mkdir(parents=True, exist_ok=True)
-    daily.round(5).to_csv(TABLES / "e5_daily.csv", index=False)
-    pd.DataFrame(switches).to_csv(TABLES / "e5_switches.csv", index=False)
+    daily.round(5).to_csv(TABLES / f"e5{suffix}_daily.csv", index=False)
+    pd.DataFrame(switches).to_csv(TABLES / f"e5{suffix}_switches.csv", index=False)
     periods = {
         "choc (13 mars-12 avril)": (SHOCK, pd.Timestamp("2020-04-13")),
         "printemps (13 avril-30 juin)": (pd.Timestamp("2020-04-13"), pd.Timestamp("2020-07-01")),
         "second semestre": (pd.Timestamp("2020-07-01"), YEAR[1]),
-        "13 mars-31 déc.": (SHOCK, YEAR[1]),
+        "13 mars-31 déc.": (SHOCK, pd.Timestamp("2021-01-01")),
     }
+    if YEAR[1] > pd.Timestamp("2021-01-01"):
+        periods.update(
+            {
+                "2021, 1er semestre": (pd.Timestamp("2021-01-01"), pd.Timestamp("2021-07-01")),
+                "2021, 2nd semestre": (pd.Timestamp("2021-07-01"), pd.Timestamp("2022-01-01")),
+                "2021": (pd.Timestamp("2021-01-01"), pd.Timestamp("2022-01-01")),
+            }
+        )
     rows = []
     for (pol, delay), d in daily.groupby(["policy", "delay"], sort=False):
         row = {"policy": pol, "delay": delay}
@@ -169,9 +180,15 @@ def main() -> None:
         row["retrains"] = sum(1 for s in switches if s["policy"] == pol and s["delay"] == delay)
         rows.append(row)
     summary = pd.DataFrame(rows)
-    summary.round(4).to_csv(TABLES / "e5_summary.csv", index=False)
+    summary.round(4).to_csv(TABLES / f"e5{suffix}_summary.csv", index=False)
     print(summary.round(3).to_string())
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--jusqua", default="2021-01-01", help="fin exclue de la simulation")
+    ap.add_argument("--suffixe", default="")
+    a = ap.parse_args()
+    main(a.jusqua, a.suffixe)
