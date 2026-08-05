@@ -1,0 +1,47 @@
+---
+title: "Méthode"
+description: "Comment le projet a été mené : protocole figé, expériences déclarées avant exécution, chiffres générés, garde-fous déterministes, et ce qui a été corrigé en route."
+---
+
+## Cinq règles
+
+1. **Le protocole est figé avant les résultats.** `SPEC.md` date du 2 juillet ; il n'a
+   pas été modifié depuis. Chaque écart est daté et justifié dans
+   [`docs/notes/implementation.md`](https://github.com/gwils28/zonefleet-observability/blob/main/docs/notes/implementation.md),
+   avec son impact.
+2. **Une expérience se déclare avant de s'exécuter.** Les issues E4 bis à E7 contiennent
+   la question, la mesure et « ce qui serait une surprise », écrits avant le premier
+   calcul. Quand un signal a été ajouté après coup (E6, E7), il est étiqueté comme tel
+   partout où il apparaît.
+3. **Aucun chiffre n'est tapé à la main.** Les tables du site sont générées par
+   `scripts/make_tables.py`, les figures par quatre scripts, les tuiles de l'accueil et
+   les rapports d'exemple aussi, toujours depuis `results/`.
+4. **Les garde-fous sont des mécanismes, pas des intentions.** Un hook refuse toute
+   écriture dans `data/raw/`, un autre le tiret cadratin ; la CI refuse un lint cassé,
+   un test rouge, un lien interne mort.
+5. **Les résultats imprévus sont rapportés tels quels.** La taxe de congestion ne
+   dégrade pas le modèle, la PCA ne voit pas le COVID, un calendrier mensuel bat la
+   politique de réentraînement gardée, la calibration conforme ne tient pas à travers
+   les fêtes.
+
+## Ce qui a été corrigé en route
+
+Une méthode se juge aussi à ce qu'elle rattrape. Quelques exemples, tous visibles dans
+l'historique des PR :
+
+| Problème | Comment il a été trouvé | Correction |
+|---|---|---|
+| Features de saison extrapolées hors de l'entraînement | MAE de référence anormalement haute | retrait, MAE 29,5 → 22,7 |
+| PSI journalier sur une moyenne glissante de 7 jours | 73 % de jours en alerte sans déplacement | artefact documenté, P1b |
+| Rappel de 100 % d'une alarme toujours allumée | incohérence délai -1 / fausses alertes | détection par front montant |
+| E3 mesurée en avant/après | effet non nul dans le scénario sans dérive | contrefactuel |
+| Double sélection de colonnes dans `by_zone` | nouveau test sur données jouets | correctif, table identique |
+| Rapport du matin lisant des labels « du futur » | relecture d'un exemple réel | horloge des labels dans le rapport |
+| Rangs de zones mal recopiés dans la page E6 | vérification contre la table | texte corrigé |
+
+## Outils
+
+Python 3.12 (uv), LightGBM, NannyML, statsforecast, duckdb, Dagster, MLflow, Quarto,
+pytest et ruff (pre-commit), GitHub Actions. Le site est rendu sans exécution : les
+figures, tables et notebooks sont produits localement et versionnés, ce qui rend la
+publication reproductible et rapide.

@@ -12,7 +12,9 @@ website:
   site-url: https://gwils28.github.io/zonefleet-observability/
   repo-url: https://github.com/gwils28/zonefleet-observability
   repo-actions: [source, issue]
+  favicon: favicon.svg
   page-navigation: true
+  open-graph: true
   reader-mode: true
   search: true
   navbar:
@@ -70,6 +72,7 @@ website:
           - href: exploitation/adr.qmd
       - text: À propos
         menu:
+          - href: methode.qmd
           - href: journal.qmd
             text: Journal de bord
           - href: references.qmd
