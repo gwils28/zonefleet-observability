@@ -122,3 +122,10 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   réalisée dépasse son seuil 22 à 26 % des jours (fêtes), et chaque alerte de DLE seul y
   tombe sur une vraie dégradation. « Calme » signifie ici « sans choc externe ».
 - Conséquence intégrée au system design : DLE seul persistant ouvre un ticket.
+
+## 2026-08-05 : extension du panel à 2021
+
+- Le SPEC (section 2) liste 2019-2020 et 2024-2025 ; 2021 est ajoutée pour E5 bis (la
+  reprise) et n'entre dans aucune expérience déjà publiée.
+- Vérifié : lignes 2019-2020 du panel identiques à l'écart près de 0, météo identique sur
+  la période commune, prédictions COVID identiques après rafraîchissement du cache.
