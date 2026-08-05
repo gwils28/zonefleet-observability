@@ -16,6 +16,9 @@ import pandas as pd
 
 from zonefleet import viz
 from zonefleet.config import RESULTS
+from zonefleet.labels import FAMILY_COLOR, POLICY_COLOR, POLICY_SHORT
+from zonefleet.labels import POLICY_SHORT as POLICY_FR
+from zonefleet.labels import RETRAIN_COLOR as POLICY_E5
 
 T = RESULTS / "tables"
 GROUPS: dict[str, list] = {}
@@ -142,14 +145,6 @@ def e0_traces() -> None:
 
 
 # --------------------------------------------------------------------------- E1/E2
-POLICY_FR = {
-    "P1_drift": "P1 dérive seule",
-    "P1b_drift_clean": "P1b dérive nettoyée",
-    "P2_dle": "P2 DLE seul",
-    "P3_drift_and_dle": "P3 dérive ET DLE",
-    "P3b_clean_and_dle": "P3b nettoyée ET DLE",
-    "P4_realized": "P4 labels (D + 60 j)",
-}
 
 
 def perf_panel(ax, perf: pd.DataFrame, metric: str, title: str, shock=None, phases=None) -> None:
@@ -401,12 +396,6 @@ def e2_timeline() -> None:
 
 
 # --------------------------------------------------------------------------- E3
-FAMILY_COLOR = {
-    "covariate nuisible": viz.BLUE,
-    "covariate bénin": viz.AQUA,
-    "concept pur": viz.MAGENTA,
-    "choc propagé": viz.YELLOW,
-}
 
 
 @group("e3")
@@ -509,20 +498,6 @@ def e3_transition() -> None:
 
 
 # --------------------------------------------------------------------------- E4
-POLICY_SHORT = {
-    "P1_drift": "P1 dérive",
-    "P1b_drift_clean": "P1b dérive nettoyée",
-    "P2_dle": "P2 DLE",
-    "P3_drift_and_dle": "P3 dérive ET DLE",
-    "P3b_clean_and_dle": "P3b dérive nettoyée ET DLE",
-    "P4_realized": "P4 labels (D + 60 j)",
-}
-POLICY_COLOR = {
-    "P1b_drift_clean": viz.AQUA,
-    "P2_dle": viz.BLUE,
-    "P3b_clean_and_dle": viz.VIOLET,
-    "P4_realized": viz.ORANGE,
-}
 
 
 @group("e4")
@@ -671,13 +646,6 @@ def e4_delays() -> None:
 
 
 # --------------------------------------------------------------------------- E5
-POLICY_E5 = {
-    "jamais": viz.NEUTRAL,
-    "calendrier": viz.BLUE,
-    "réflexe": viz.YELLOW,
-    "réflexe court": viz.MAGENTA,
-    "gardé": viz.VIOLET,
-}
 
 
 @group("e5")
