@@ -18,7 +18,7 @@ décalage** : c'est le L = 60 jours de nos [trois horloges](../concepts/trois-ho
 | Fichiers | 120 Parquet, 3,6 Go | `make data`, empreintes SHA-256 vérifiées (`configs/manifest_sha256.txt`) |
 | Granularité | zone de prise en charge x heure locale | maille du positionnement de flotte |
 
-![Courses journalières (moyenne glissante 7 jours). En avril 2020, le volume tombe à 3,9 % de celui de février. Début 2025, aucune chute visible après la tarification de congestion : le choc est local, pas global.](../figures/data_volumes_ville.png){#fig-volumes}
+![Courses journalières (moyenne glissante 7 jours). En avril 2020, le volume tombe à 3,9 % de celui de février ; fin 2021, il n'a retrouvé que 45 % de son niveau de 2019. Début 2025, aucune chute visible après la tarification de congestion : le choc est local, pas global.](../figures/data_volumes_ville.png){#fig-volumes}
 
 ::: {.callout-note}
 ## Deux ruptures de nature très différente
@@ -27,6 +27,10 @@ contre 229 000 en février (`results/tables/data_summary.csv`). La tarification 
 congestion est une **modification locale** : à l'échelle de la ville, février 2025
 (129 000 courses par jour) dépasse décembre 2024 (120 000). Si elle déplace la demande,
 c'est entre zones et entre heures, ce qu'[E2](../experiences/e2-congestion.qmd) examine.
+
+La **reprise de 2021** est lente et partielle : en décembre 2021, le volume quotidien
+(106 000 courses) n'atteint que 45 % de celui de décembre 2019. C'est une dérive de sens
+inverse, progressive, utilisée par [E5 bis](../experiences/e5-reentrainement.qmd).
 :::
 
 Le poids des taxis verts s'effondre entre les deux périodes : 7 % des courses en 2019,
