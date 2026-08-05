@@ -1,0 +1,7 @@
+---
+title: "Page introuvable"
+toc: false
+---
+
+Cette page a dérivé hors du site. Comme un concept drift, elle ne laisse aucune trace
+dans les entrées : il faut repartir de l'[accueil](index.qmd) ou utiliser la recherche.
