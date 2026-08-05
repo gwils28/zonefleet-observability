@@ -12,6 +12,9 @@ import pandas as pd
 
 from zonefleet.config import RESULTS, ROOT
 from zonefleet.features import zone_table
+from zonefleet.labels import POLICY_LONG as POLICY_E4
+from zonefleet.labels import POLICY_LONG as POLICY_FR
+from zonefleet.labels import SPLIT_LONG as SPLIT_FR
 
 T = RESULTS / "tables"
 OUT = ROOT / "site" / "_tables"
@@ -54,7 +57,6 @@ def zones() -> pd.DataFrame:
     )
 
 
-SPLIT_FR = {"covid": "E1 (2019-2020)", "congestion": "E2 (2024-2025)"}
 PERIOD_FR = {"reference": "référence", "analysis": "analysis"}
 MODEL_FR = {"lightgbm": "LightGBM (q50)", "seasonal_naive": "seasonal naive", "mstl": "MSTL"}
 
@@ -90,16 +92,6 @@ def e0_mstl() -> pd.DataFrame:
             "Seasonal naive": w["seasonal_naive"].map(lambda v: fr(v, 1)).to_numpy(),
         }
     )
-
-
-POLICY_FR = {
-    "P1_drift": "P1 dérive seule",
-    "P1b_drift_clean": "P1b dérive nettoyée",
-    "P2_dle": "P2 DLE seul",
-    "P3_drift_and_dle": "P3 dérive ET DLE",
-    "P3b_clean_and_dle": "P3b dérive nettoyée ET DLE",
-    "P4_realized": "P4 labels retardés",
-}
 
 
 def detection_frame(d: pd.DataFrame) -> pd.DataFrame:
@@ -184,16 +176,6 @@ def e3_summary() -> pd.DataFrame:
             "Jours en dérive (P1b)": s["share_drift_clean"].map(lambda v: fr(100 * v, 0) + " %"),
         }
     )
-
-
-POLICY_E4 = {
-    "P1_drift": "P1 dérive seule",
-    "P1b_drift_clean": "P1b dérive nettoyée",
-    "P2_dle": "P2 DLE seul",
-    "P3_drift_and_dle": "P3 dérive ET DLE",
-    "P3b_clean_and_dle": "P3b dérive nettoyée ET DLE",
-    "P4_realized": "P4 labels retardés",
-}
 
 
 @table("e4_main")
