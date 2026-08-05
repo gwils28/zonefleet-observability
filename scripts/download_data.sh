@@ -13,7 +13,7 @@ lookup="$RAW/ref/taxi_zone_lookup.csv"
 # Contours des zones (shapefile), pour les cartes de la documentation
 shp="$RAW/ref/taxi_zones.zip"
 [ -s "$shp" ] || curl -sSfL -o "$shp" "$BASE/misc/taxi_zones.zip"
-for y in 2019 2020 2024 2025; do
+for y in 2019 2020 2021 2024 2025; do
   for m in 01 02 03 04 05 06 07 08 09 10 11 12; do
     for s in yellow green; do
       f="$RAW/tlc/${s}_tripdata_${y}-${m}.parquet"

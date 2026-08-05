@@ -23,7 +23,7 @@ description versionnée de ce que le pipeline attend, vérifiée à chaque fichi
 | `panel` | au plus 3 000 courses par zone et par heure | contrôle de cohérence de l'agrégat |
 
 La validation ne lit que le **schéma** Parquet (`pyarrow.parquet.read_schema`), pas les
-données : 96 fichiers sont contrôlés en moins d'une seconde.
+données : 120 fichiers sont contrôlés en moins d'une seconde.
 
 ## Ce que le contrat a trouvé
 

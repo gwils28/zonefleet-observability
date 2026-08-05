@@ -22,8 +22,8 @@ un mensonge ?
 
 ## Le projet
 
-- **Données** : NYC TLC (taxis jaunes et verts) 2019-2020 et 2024-2025, 96 fichiers
-  validés par un *data contract*, agrégés en panel de 60 zones x heure (2,1 M lignes) ;
+- **Données** : NYC TLC (taxis jaunes et verts) 2019-2021 et 2024-2025, 120 fichiers
+  validés par un *data contract*, agrégés en panel de 60 zones x heure (2,6 M lignes) ;
   météo Open-Meteo ; calendrier US.
 - **Modèle surveillé** : LightGBM global à trois quantiles, lags ≥ 24 h, figé après
   entraînement ; bat le seasonal naive dans les 60 zones et MSTL (E0).
@@ -46,7 +46,7 @@ zonefleet alert --split congestion
 make dagster               # interface Dagster sur http://localhost:3000
 ```
 
-Les données brutes (3,1 Go) ne sont nécessaires que pour reconstruire le panel :
+Les données brutes (3,6 Go) ne sont nécessaires que pour reconstruire le panel :
 `make data` les télécharge et vérifie leurs empreintes SHA-256.
 
 ## Organisation

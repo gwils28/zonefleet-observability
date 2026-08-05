@@ -9,7 +9,7 @@ import pandas as pd
 from zonefleet.config import DATA_PROCESSED
 from zonefleet.covariates import fetch_weather, to_local_naive
 
-BLOCKS = [("2018-12-31", "2021-01-01"), ("2023-12-31", "2026-01-01")]
+BLOCKS = [("2018-12-31", "2022-01-01"), ("2023-12-31", "2026-01-01")]
 
 
 def main() -> None:

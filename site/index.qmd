@@ -10,7 +10,7 @@ l'arrivée des labels, et savoir **où cette mesure devient un mensonge** ?
 :::
 
 Ce site documente un projet complet sur données réelles : un forecaster de demande de
-taxis par zone et par heure (New York, 2019-2020 et 2024-2025), figé puis observé à
+taxis par zone et par heure (New York, 2019-2021 et 2024-2025), figé puis observé à
 travers deux chocs réels (le COVID, la tarification de congestion) et des centaines de
 dérives injectées. Le client, **ZoneFleet**, est fictif ; les chiffres ne le sont pas.
 
