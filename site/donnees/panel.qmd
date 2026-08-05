@@ -1,23 +1,23 @@
 ---
 title: "Le panel zone x heure"
-description: "De 96 fichiers de courses à 2,1 millions de lignes : sélection des zones, indicateur CBD dérivé des données, réparation des heures DST, transformation log1p."
+description: "De 120 fichiers de courses à 2,6 millions de lignes : sélection des zones, indicateur CBD dérivé des données, réparation des heures DST, transformation log1p."
 ---
 
 ## De la course au panel
 
 ```{mermaid}
 flowchart LR
-  A["96 Parquet TLC<br/>(jaunes, verts)"] --> B["data contract<br/>(schéma seul)"]
+  A["120 Parquet TLC<br/>(jaunes, verts)"] --> B["data contract<br/>(schéma seul)"]
   B -->|conforme| C["duckdb : COUNT(*)<br/>par zone x heure"]
   B -->|violation| X["fichier refusé"]
   C --> D["filtre : heure dans le mois du fichier,<br/>zones 1 à 263"]
   D --> E["60 zones les plus actives en 2019"]
   E --> F["grille complète, zéros explicites"]
   F --> G["réparation DST"]
-  G --> H["panel.parquet<br/>2 105 280 lignes"]
+  G --> H["panel.parquet<br/>2 630 880 lignes"]
 ```
 
-L'agrégation des 96 fichiers prend environ 5 secondes avec duckdb (lecture colonnaire
+L'agrégation des 120 fichiers prend environ 6 secondes avec duckdb (lecture colonnaire
 des seules colonnes utiles). Les courses dont l'horodatage sort du mois du fichier
 (horloges de taximètre déréglées, fréquentes dans TLC) sont écartées.
 
@@ -64,7 +64,7 @@ Les horodatages TLC sont en heure locale **naïve**. Deux fois par an, cela cré
 | Printemps (mars) | 02:00 n'existe pas | presque aucune course enregistrée | moyenne des heures voisines |
 | Automne (novembre) | 01:00 existe deux fois | volume doublé | volume divisé par deux |
 
-Huit heures par zone sont concernées sur les quatre années, marquées par la colonne
+Dix heures par zone sont concernées sur les cinq années, marquées par la colonne
 `dst_repaired`. La météo, récupérée en UTC, est ramenée sur la même convention (moyenne
 des deux heures d'automne, interpolation au printemps) pour que les jointures soient
 exactes. Les deux réparations sont testées (`test_spring_forward_hour_is_interpolated`,

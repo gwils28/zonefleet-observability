@@ -15,8 +15,8 @@ comportement d'un moniteur face au monde qui change.
 |---|---|
 | Unité | une zone TLC x une heure locale |
 | Zones | 60 (les plus actives de 2019, liste figée), dont 32 dans la zone de tarification de congestion |
-| Périodes | 2019-01-01 à 2020-12-31, 2024-01-01 à 2025-12-31 |
-| Lignes | 2 105 280 |
+| Périodes | 2019-01-01 à 2021-12-31, 2024-01-01 à 2025-12-31 |
+| Lignes | 2 630 880 |
 | Variables | `pickups` (jaunes + verts), `yellow`, `green`, `dst_repaired` |
 | Fichier | `data/processed/panel.parquet` (10 Mo, versionné) |
 

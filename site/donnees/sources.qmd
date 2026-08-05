@@ -14,8 +14,8 @@ décalage** : c'est le L = 60 jours de nos [trois horloges](../concepts/trois-ho
 | Choix | Valeur | Raison |
 |---|---|---|
 | Services | taxis jaunes et verts | volumes TLC historiques ; les VTC (FHVHV, ~0,5 Go par mois) sont hors périmètre |
-| Années | 2019-2020, 2024-2025 | deux ruptures réelles : le COVID (mars 2020) et la tarification de congestion (5 janvier 2025) |
-| Fichiers | 96 Parquet, 3,1 Go | `make data`, empreintes SHA-256 vérifiées (`configs/manifest_sha256.txt`) |
+| Années | 2019-2021, 2024-2025 | deux ruptures réelles, le COVID (mars 2020) et la tarification de congestion (5 janvier 2025), et la reprise de 2021 (ajoutée en août) |
+| Fichiers | 120 Parquet, 3,6 Go | `make data`, empreintes SHA-256 vérifiées (`configs/manifest_sha256.txt`) |
 | Granularité | zone de prise en charge x heure locale | maille du positionnement de flotte |
 
 ![Courses journalières (moyenne glissante 7 jours). En avril 2020, le volume tombe à 3,9 % de celui de février. Début 2025, aucune chute visible après la tarification de congestion : le choc est local, pas global.](../figures/data_volumes_ville.png){#fig-volumes}
