@@ -27,7 +27,7 @@ def city_volumes() -> None:
     d = pd.read_csv(T / "city_daily_pickups.csv", parse_dates=["day"]).set_index("day")
     fig, axes = plt.subplots(1, 2, figsize=(12, 3.8), sharey=True)
     for ax, (a, b), shock, lab in [
-        (axes[0], ("2019-01-01", "2020-12-31"), COVID_EMERGENCY, "état d'urgence\n13 mars 2020"),
+        (axes[0], ("2019-01-01", "2021-12-31"), COVID_EMERGENCY, "état d'urgence\n13 mars 2020"),
         (
             axes[1],
             ("2024-01-01", "2025-12-31"),
@@ -54,7 +54,7 @@ def city_volumes() -> None:
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
     axes[0].set_ylabel("milliers de courses / jour (moy. 7 j)")
     axes[0].legend(loc="center left", bbox_to_anchor=(0.55, 0.55))
-    axes[0].set_title("2019-2020 : le choc COVID")
+    axes[0].set_title("2019-2021 : le choc COVID et la reprise")
     axes[1].set_title("2024-2025 : la tarification de congestion")
     fig.tight_layout()
     viz.save(fig, "data_volumes_ville")
@@ -89,7 +89,7 @@ def schema_timeline() -> None:
     ticks = [i for i, m in enumerate(months) if m.endswith("-01")]
     ax.set_xticks(ticks, [months[i][:4] for i in ticks])
     ax.grid(False)
-    ax.set_title("Schéma des fichiers jaunes, mois par mois (48 mois)")
+    ax.set_title(f"Schéma des fichiers jaunes, mois par mois ({len(months)} mois)")
     from matplotlib.patches import Patch
 
     handles = [
@@ -238,6 +238,8 @@ def summary() -> None:
         "fev_2025_moyenne_courses": tot.loc["2025-02"].mean(),
         "part_vert_2019": d.loc["2019", "green"].sum() / tot.loc["2019"].sum(),
         "part_vert_2025": d.loc["2025", "green"].sum() / tot.loc["2025"].sum(),
+        "dec_2021_moyenne_courses": tot.loc["2021-12"].mean(),
+        "ratio_dec_2021_dec_2019": tot.loc["2021-12"].mean() / tot.loc["2019-12"].mean(),
         "panel_lignes": len(p),
         "panel_zones": p["zone"].nunique(),
         "panel_heures_reparees_dst": int(p["dst_repaired"].sum() / p["zone"].nunique()),
