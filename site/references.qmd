@@ -30,7 +30,7 @@ description: "Sources primaires citées dans le projet : articles, documentation
 ## Données
 
 - NYC Taxi & Limousine Commission, *TLC Trip Record Data* (taxis jaunes et verts,
-  2019-2020, 2024-2025) et *Taxi Zone Lookup Table* :
+  2019-2021, 2024-2025) et *Taxi Zone Lookup Table* :
   [nyc.gov](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
 - Open-Meteo, *Historical Weather API* (réanalyse ERA5) :
   [open-meteo.com](https://open-meteo.com/en/docs/historical-weather-api)

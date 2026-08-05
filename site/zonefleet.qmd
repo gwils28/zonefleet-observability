@@ -5,7 +5,7 @@ description: "Le cahier des charges ZoneFleet, ce que le projet a livré pour ch
 ---
 
 ::: {.callout-note appearance="minimal"}
-**ZoneFleet est un client fictif.** Les données, elles, sont réelles (NYC TLC 2019-2020 et
+**ZoneFleet est un client fictif.** Les données, elles, sont réelles (NYC TLC 2019-2021 et
 2024-2025) ; chaque chiffre de cette page renvoie à une table de `results/`.
 :::
 
@@ -43,7 +43,7 @@ flowchart LR
 
 | Exigence | Livré | Où |
 |---|---|---|
-| Agrégation courses → panel zone x heure, jointure des zones | 96 fichiers, 60 zones, 2,1 M lignes, ~5 s avec duckdb | [panel](donnees/panel.qmd), `data.py` |
+| Agrégation courses → panel zone x heure, jointure des zones | 120 fichiers, 60 zones, 2,6 M lignes, ~6 s avec duckdb | [panel](donnees/panel.qmd), `data.py` |
 | Calendrier, météo, événements | calendrier US et météo ERA5 ; **événements non intégrés** (pas de source historique propre), absorbés par la persistance des alertes | [sources](donnees/sources.qmd) |
 | Ruptures de schéma versionnées par un data contract | contrat YAML, ruptures connues et datées vs inconnues, changements de type journalisés | [data contract](donnees/data-contract.qmd) |
 | Demande intermittente, `log1p` | cible en log1p ; les 60 zones retenues sont peu intermittentes (≤ 6 % d'heures à zéro) | [panel](donnees/panel.qmd) |
