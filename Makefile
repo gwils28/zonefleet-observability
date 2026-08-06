@@ -58,3 +58,5 @@ e4c:         ## E4 ter (extension) : fausses alertes sur trois périodes calmes
 	uv run python -m zonefleet.experiments.e4_calm
 e5r:         ## E5 bis : politiques de réentraînement jusqu'à fin 2021 (≈ 25 min)
 	uv run python -m zonefleet.experiments.e5_retraining --jusqua 2022-01-01 --suffixe _reprise
+e4q:         ## E4 quater : dérive saisonnière dans la condition jointe (relit le cache de E4)
+	uv run python -m zonefleet.experiments.e4_seasonal
