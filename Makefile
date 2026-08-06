@@ -55,3 +55,5 @@ e7:          ## E7 : dérive contre base saisonnière
 	uv run python -m zonefleet.experiments.e7_seasonal
 e4c:         ## E4 ter (extension) : fausses alertes sur trois périodes calmes
 	uv run python -m zonefleet.experiments.e4_calm
+e5r:         ## E5 bis : politiques de réentraînement jusqu'à fin 2021 (≈ 25 min)
+	uv run python -m zonefleet.experiments.e5_retraining --jusqua 2022-01-01 --suffixe _reprise
