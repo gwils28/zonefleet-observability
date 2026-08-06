@@ -1,0 +1,17 @@
+smooth,policy,concept,covariate_harmful,level
+1,P1_drift,0.0,0.0,0.0
+1,P1b_drift_clean,0.1613,0.96,0.8333
+1,P1s_drift_seasonal,0.2903,0.98,0.8333
+1,P2_dle,0.2581,0.78,0.3333
+1,P3_drift_and_dle,0.2581,0.78,0.3333
+1,P3b_clean_and_dle,0.0,0.76,0.1667
+1,P3s_seasonal_and_dle,0.2581,0.78,0.1667
+1,P4_realized,0.5484,0.76,1.0
+7,P1_drift,0.0,0.0,0.0
+7,P1b_drift_clean,0.1613,0.96,0.8333
+7,P1s_drift_seasonal,0.2903,0.98,0.8333
+7,P2_dle,0.2581,0.8,0.1667
+7,P3_drift_and_dle,0.2581,0.8,0.1667
+7,P3b_clean_and_dle,0.0,0.86,0.1667
+7,P3s_seasonal_and_dle,0.2581,0.86,0.1667
+7,P4_realized,0.5161,0.76,1.0
