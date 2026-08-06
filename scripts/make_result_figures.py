@@ -1037,6 +1037,50 @@ def e7_signals() -> None:
     viz.save(fig, "e7_signaux")
 
 
+@group("e5")
+def e5_reprise() -> None:
+    d = pd.read_csv(T / "e5_reprise_daily.csv", parse_dates=["date"])
+    s = pd.read_csv(T / "e5_reprise_summary.csv")
+    fig, axes = plt.subplots(1, 2, figsize=(12, 3.9), gridspec_kw={"width_ratios": [2.2, 1]})
+    ax = axes[0]
+    for pol, c in POLICY_E5.items():
+        t = d[(d["delay"] == 1) & (d["policy"] == pol)].set_index("date")["mae_log"]
+        t = t[t.index >= "2020-07-01"]
+        ax.plot(
+            t.index,
+            t.rolling(14, min_periods=1).mean(),
+            color=c,
+            label=pol,
+            lw=2.4 if pol == "jamais" else 1.6,
+        )
+    ax.set_title("Juillet 2020-décembre 2021, labels à J + 1 (moyenne 14 j)", fontsize=11)
+    ax.set_ylabel("MAE log")
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
+    ax.legend(loc="upper right", ncols=3, fontsize=8.5)
+    ax = axes[1]
+    t = s[s["delay"] == 1].set_index("policy")
+    order = ["calendrier", "gardé", "réflexe", "réflexe court"]
+    ax.barh(order, t.loc[order, "retrains"], color=[POLICY_E5[p] for p in order])
+    for i, p in enumerate(order):
+        ax.annotate(
+            f"MAE 2021 : {t.loc[p, '2021']:.3f}".replace(".", ","),
+            (t.loc[p, "retrains"], i),
+            xytext=(4, 0),
+            textcoords="offset points",
+            va="center",
+            fontsize=8.5,
+            color=viz.INK2,
+        )
+    ax.set_xlim(0, 32)
+    ax.set_xlabel("remplacements de modèle (2020-2021)")
+    ax.invert_yaxis()
+    ax.grid(axis="x")
+    ax.grid(axis="y", visible=False)
+    ax.set_title("Coût en remplacements", fontsize=11)
+    fig.tight_layout()
+    viz.save(fig, "e5_reprise")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
