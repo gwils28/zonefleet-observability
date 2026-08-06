@@ -112,6 +112,14 @@ dépasser environ 64 % de rappel *honnête*.
 
 ![Délai de détection des scénarios nuisibles détectés, sur l'horloge de décision. Les signaux avancés détectent le jour de l'injection ou dans les jours qui suivent ; le lissage ajoute environ trois jours ; les labels arrivent après deux mois.](../figures/e4_delais.png){#fig-delays}
 
+## Choisir par le coût
+
+Aucune politique ne domine sur tous les critères. Le notebook
+[coût des alertes](../notebooks/couts-alerte.ipynb) donne un prix à chaque erreur
+(fausse page, dégradation manquée, jour de retard) et cherche l'optimum : la dérive
+nettoyée seule gagne tant qu'une fausse page coûte moins de 7,5 % d'une dégradation
+manquée, la condition jointe au-delà, et les labels jamais.
+
 ## Ce que E4 établit
 
 1. **Alerter sur la dérive seule est intenable** si l'on n'a pas nettoyé les features :

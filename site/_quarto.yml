@@ -58,6 +58,8 @@ website:
           - text: "---"
           - href: notebooks/tutoriel-dle.ipynb
             text: "Notebook : DLE pas à pas"
+          - href: notebooks/couts-alerte.ipynb
+            text: "Notebook : coût des alertes"
       - href: zonefleet.qmd
         text: Cas ZoneFleet
       - href: system-design.qmd
