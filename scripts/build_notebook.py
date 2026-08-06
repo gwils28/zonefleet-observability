@@ -226,6 +226,23 @@ ax.legend(loc="upper left", fontsize=8.5)
 plt.show()
 w.drop_duplicates("policy").round(3)""",
     ),
+    (
+        "md",
+        """## Lecture
+
+- Tant qu'une fausse page coûte moins d'environ **0,75** (soit 7,5 % d'une dégradation
+  manquée), la **dérive nettoyée seule** gagne : elle détecte le plus, quitte à alerter
+  plus souvent.
+- Au-delà, la **condition jointe nettoyée** devient optimale : elle ne fait jamais de
+  fausse page et garde un délai de quelques jours.
+- Les **labels** (P4) ne gagnent jamais : leur délai de deux mois coûte trop cher, même
+  avec un coût journalier de retard modeste.
+
+Le choix d'une politique d'astreinte n'est donc pas une question de « meilleure
+méthode » mais de **prix relatif des erreurs**, à fixer avec le métier. Pour ZoneFleet,
+où une nuit d'astreinte inutile coûte plus que quelques pourcents d'une semaine de flotte
+mal placée, la condition jointe est le bon choix.""",
+    ),
 ]
 
 
