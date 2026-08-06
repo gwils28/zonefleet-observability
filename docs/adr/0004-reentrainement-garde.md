@@ -15,3 +15,9 @@ validation, car un calendrier mensuel a battu la politique gardée en 2020 (L = 
 
 ## Conséquences
 - Pas de remplacement non motivé ; adaptation de fond conservée.
+
+## Mise à jour du 2026-08-06 (E5 bis)
+Prolongée à 2021, la simulation montre que la politique gardée rejoint le calendrier
+mensuel (MAE log 0,264 contre 0,261) avec 9 remplacements au lieu de 23. L'avantage du
+calendrier tenait au choc de 2020. La politique gardée devient la règle par défaut ; le
+réentraînement de fond trimestriel est conservé comme filet en cas de choc.

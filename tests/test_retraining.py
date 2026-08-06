@@ -32,3 +32,20 @@ def test_short_reflex_window_is_empty_with_slow_labels():
     w = E.train_window(df, E.FIRST_ALERT, 60, start=E.SHOCK)
     assert w.empty  # à L = 60 jours, aucun label postérieur au choc n'existe le 22 mars
     assert not E.train_window(df, E.FIRST_ALERT, 1, start=E.SHOCK).empty
+
+
+def test_summarize_uses_fixed_periods_and_counts_switches():
+    dates = pd.date_range("2020-01-01", "2021-12-31", freq="D")
+    daily = pd.DataFrame(
+        {
+            "date": dates,
+            "mae_log": np.where(dates.year == 2021, 0.2, 0.5),
+            "policy": "p",
+            "delay": 1,
+        }
+    )
+    sw = pd.DataFrame({"policy": ["p", "p", "q"], "delay": [1, 1, 1], "date": dates[:3]})
+    s = E.summarize(daily, sw).iloc[0]
+    assert s["second semestre"] == 0.5 and s["2021"] == 0.2 and s["retrains"] == 2
+    short = E.summarize(daily[daily["date"] < "2021-01-01"], sw)
+    assert "2021" not in short.columns

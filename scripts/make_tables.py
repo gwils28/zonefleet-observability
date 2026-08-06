@@ -376,6 +376,22 @@ def e4_calm_table() -> pd.DataFrame:
     )
 
 
+@table("e5_reprise")
+def e5_reprise_table() -> pd.DataFrame:
+    s = pd.read_csv(T / "e5_reprise_summary.csv")
+    return pd.DataFrame(
+        {
+            "Délai des labels": s["delay"].map(lambda d: f"L = {d} j"),
+            "Politique": s["policy"],
+            "13 mars-31 déc. 2020": s["13 mars-31 déc."].map(lambda v: fr(v, 3)),
+            "2021, 1er semestre": s["2021, 1er semestre"].map(lambda v: fr(v, 3)),
+            "2021, 2nd semestre": s["2021, 2nd semestre"].map(lambda v: fr(v, 3)),
+            "2021": s["2021"].map(lambda v: fr(v, 3)),
+            "Remplacements 2020-2021": s["retrains"],
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")

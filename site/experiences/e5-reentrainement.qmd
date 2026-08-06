@@ -111,3 +111,28 @@ journal de la demande non servie, exploration minimale.
    calendrier mensuel sur cette année exceptionnelle, avec deux fois moins de
    remplacements, chacun validé. Recommandation pour ZoneFleet : politique gardée **plus**
    un réentraînement de fond trimestriel, pour ne pas dépendre uniquement de l'alerte.
+
+## E5 bis : la reprise de 2021
+
+Le verdict « calendrier contre politique gardée » ne reposait que sur 2020, une année
+exceptionnelle. Après l'extension du panel à 2021 (issue #61), la même simulation est
+prolongée jusqu'au 31 décembre 2021 (issue #63, protocole déclaré avant exécution) :
+une année de reprise lente, de sens inverse, sans choc brutal.
+
+![À gauche, erreur relative du modèle en service de juillet 2020 à décembre 2021 (labels à J + 1). À droite, nombre de remplacements de modèle sur deux ans et erreur moyenne de 2021.](../figures/e5_reprise.png){#fig-reprise}
+
+{{< include ../_tables/e5_reprise.md >}}
+
+- **Sur 2021, la politique gardée rejoint le calendrier** : MAE log 0,264 contre 0,261
+  (L = 1), 0,269 contre 0,270 (L = 60). L'avantage du calendrier tenait au choc de 2020,
+  pas à une supériorité de fond.
+- **Pour 9 remplacements au lieu de 23** sur deux ans (7 au lieu de 23 à L = 60) :
+  chaque remplacement gardé est justifié par une validation sur des labels postérieurs.
+- **Le réflexe reste coincé** jusqu'à l'été 2021 (0,397 sur l'année) et le réflexe court
+  ne se remet jamais de son apprentissage sur les huit pires jours (0,611).
+- **Ne rien faire** devient tenable pendant la reprise (0,320) mais reste 20 % moins bon
+  que les deux politiques qui réentraînent.
+
+La recommandation se précise : **politique gardée par défaut**. Le réentraînement de fond
+trimestriel ajouté après E5 reste utile comme filet en cas de choc, mais un calendrier
+mensuel n'apporte rien en régime de reprise, sinon 14 remplacements de plus.
