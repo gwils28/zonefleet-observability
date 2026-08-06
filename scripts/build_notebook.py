@@ -1,7 +1,7 @@
 """Construit le notebook tutoriel « DLE pas à pas » (site/notebooks/tutoriel-dle.ipynb).
 
-Usage : uv run python scripts/build_notebook.py
-        uv run jupyter nbconvert --to notebook --execute --inplace site/notebooks/tutoriel-dle.ipynb
+Usage : uv run python scripts/build_notebook.py [nom.ipynb ...]
+        uv run jupyter nbconvert --to notebook --execute --inplace site/notebooks/<nom>.ipynb
 Le notebook est exécuté localement ; le site le rend avec ses sorties, sans le relancer.
 """
 
@@ -143,22 +143,119 @@ compare(an_con, "Concept drift pur : DLE ne voit rien")""",
 ]
 
 
-def main() -> None:
+COST_CELLS: list[tuple[str, str]] = [
+    (
+        "md",
+        """# Choisir une politique d'alerte par son coût
+
+E4 compare six politiques sur 240 scénarios. Aucune ne domine sur tous les critères :
+il faut **arbitrer** entre fausses pages, dégradations manquées et retard. Ce notebook
+rend l'arbitrage explicite : on donne un coût à chaque type d'erreur, et on cherche la
+politique et le seuil k qui minimisent le coût attendu par scénario.
+
+Données : `results/tables/e4_results.csv` (une ligne par scénario, politique, seuil k et
+lissage). Rien n'est recalculé.""",
+    ),
+    (
+        "code",
+        """import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from zonefleet import viz
+from zonefleet.config import RESULTS
+from zonefleet.labels import POLICY_COLOR, POLICY_SHORT
+
+viz.setup()
+r = pd.read_csv(RESULTS / "tables" / "e4_results.csv")
+r = r[r["policy"].isin(POLICY_COLOR)]
+print(r.groupby("policy").size().to_string())""",
+    ),
+    (
+        "md",
+        """## Le modèle de coût
+
+Par scénario :
+
+- **fausse page** : chaque allumage d'alerte sur un jour sans dérive coûte `c_fa`
+  (une nuit d'astreinte, de la confiance perdue dans le moniteur) ;
+- **dégradation manquée** : un scénario nuisible non détecté dans les 28 jours coûte
+  `c_miss` (des semaines de flotte mal positionnée) ;
+- **retard** : chaque jour entre l'injection et la décision coûte `c_day`.
+
+Les valeurs par défaut sont des ordres de grandeur à remplacer par ceux de ZoneFleet.""",
+    ),
+    (
+        "code",
+        """def expected_cost(r, c_fa=1.0, c_miss=10.0, c_day=0.3):
+    d = r.copy()
+    missed = d["harmful"] & ~d["detected"]
+    late = np.where(d["harmful"] & d["detected"], d["delay_days"].clip(lower=0), 0.0)
+    d["cost"] = c_fa * d["false_alert_events"] + c_miss * missed + c_day * late
+    return d.groupby(["policy", "smooth", "k"])["cost"].mean().reset_index()
+
+
+costs = expected_cost(r)
+best = costs.sort_values("cost").head(8)
+best.assign(policy=best["policy"].map(POLICY_SHORT)).round(3)""",
+    ),
+    (
+        "md",
+        """## Le choix dépend du prix d'une fausse page
+
+On fait varier le coût d'une fausse page de 0,1 à 20 (le coût d'une dégradation manquée
+reste à 10) et on regarde quelle politique gagne.""",
+    ),
+    (
+        "code",
+        """grid = np.geomspace(0.1, 20, 30)
+winners = []
+for c in grid:
+    cc = expected_cost(r, c_fa=c).sort_values("cost").iloc[0]
+    winners.append((c, cc["policy"], cc["smooth"], cc["k"], cc["cost"]))
+w = pd.DataFrame(winners, columns=["c_fa", "policy", "smooth", "k", "cost"])
+fig, ax = plt.subplots(figsize=(9, 3.4))
+for pol, col in POLICY_COLOR.items():
+    sub = w[w["policy"] == pol]
+    ax.scatter(sub["c_fa"], sub["cost"], color=col, s=30, label=POLICY_SHORT[pol])
+ax.set_xscale("log")
+ax.set_xlabel("coût d'une fausse page (coût d'une dégradation manquée = 10)")
+ax.set_ylabel("coût attendu minimal")
+ax.set_title("Politique optimale selon le prix d'une fausse page")
+ax.legend(loc="upper left", fontsize=8.5)
+plt.show()
+w.drop_duplicates("policy").round(3)""",
+    ),
+]
+
+
+def write(cells, name: str) -> None:
     nb = nbf.v4.new_notebook()
     nb["cells"] = [
         nbf.v4.new_markdown_cell(src) if kind == "md" else nbf.v4.new_code_cell(src)
-        for kind, src in CELLS
+        for kind, src in cells
     ]
     nb["metadata"]["kernelspec"] = {
         "name": "python3",
         "display_name": "Python 3",
         "language": "python",
     }
-    out = ROOT / "site" / "notebooks" / "tutoriel-dle.ipynb"
+    out = ROOT / "site" / "notebooks" / name
     out.parent.mkdir(parents=True, exist_ok=True)
     nbf.write(nb, out)
     print(out)
 
 
+NOTEBOOKS = {"tutoriel-dle.ipynb": CELLS, "couts-alerte.ipynb": COST_CELLS}
+
+
+def main(names: list[str]) -> None:
+    """Écrit les notebooks demandés (tous par défaut), sans sorties : les exécuter ensuite."""
+    for name in names or list(NOTEBOOKS):
+        write(NOTEBOOKS[name], name)
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+
+    main(sys.argv[1:])
