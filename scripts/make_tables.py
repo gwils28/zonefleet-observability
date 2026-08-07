@@ -392,6 +392,31 @@ def e5_reprise_table() -> pd.DataFrame:
     )
 
 
+@table("e4_seasonal")
+def e4_seasonal_table() -> pd.DataFrame:
+    s = pd.read_csv(T / "e4_seasonal.csv")
+    k = pd.read_csv(T / "e4_seasonal_by_kind.csv")
+    pols = ["P1b_drift_clean", "P1s_drift_seasonal", "P3b_clean_and_dle", "P3s_seasonal_and_dle"]
+    names = {
+        **POLICY_E4,
+        "P1s_drift_seasonal": "P1s dérive saisonnière",
+        "P3s_seasonal_and_dle": "P3s dérive saisonnière ET DLE",
+    }
+    s = s[(s["smooth"] == 7) & s["policy"].isin(pols)].set_index("policy").loc[pols]
+    k = k[k["smooth"] == 7].set_index("policy").loc[pols]
+    return pd.DataFrame(
+        {
+            "Politique (lissé 7 j)": [names[p] for p in pols],
+            "Rappel": (100 * s["recall"]).map(lambda v: fr(v, 0) + " %").to_numpy(),
+            "dont covariate nuisible": (100 * k["covariate_harmful"])
+            .map(lambda v: fr(v, 0) + " %")
+            .to_numpy(),
+            "dont concept pur": (100 * k["concept"]).map(lambda v: fr(v, 0) + " %").to_numpy(),
+            "Fausses alertes / 30 j": s["false_alerts_per_30d"].map(lambda v: fr(v, 2)).to_numpy(),
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
