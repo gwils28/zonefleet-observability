@@ -1049,6 +1049,45 @@ def e5_reprise() -> None:
     viz.save(fig, "e5_reprise")
 
 
+# --------------------------------------------------------------------------- E8
+@group("e8")
+def e8_quality() -> None:
+    q = pd.read_csv(T / "e8_quality_daily.csv", parse_dates=["date"])
+    th = pd.read_csv(T / "e8_thresholds.csv").iloc[0]
+    q = q[(q["date"] >= "2025-02-17") & (q["date"] < "2025-03-24")]
+    bugs = [
+        ("aucun", viz.NEUTRAL),
+        ("troncature", viz.BLUE),
+        ("duplication", viz.ORANGE),
+        ("decalage_1h", viz.VIOLET),
+        ("zone_muette", viz.MAGENTA),
+    ]
+    fig, axes = plt.subplots(1, 3, figsize=(12.5, 3.6))
+    for bug, c in bugs:
+        d = q[q["bug"] == bug]
+        lw = 2.6 if bug == "aucun" else 1.6
+        axes[0].plot(d["date"], d["volume_ratio"], color=c, lw=lw, label=bug.replace("_", " "))
+        axes[1].plot(d["date"], d["profile_corr"], color=c, lw=lw)
+        axes[2].plot(d["date"], d["zero_zones"], color=c, lw=lw)
+    axes[0].axhspan(th["volume_low"], th["volume_high"], color=viz.GRID, alpha=0.5, lw=0)
+    axes[1].axhline(th["profile_min"], color=viz.ALERT, ls="--", lw=1)
+    axes[0].set_title("Volume / médiane des 4 mêmes jours", fontsize=10.5)
+    axes[1].set_title("Corrélation du profil horaire", fontsize=10.5)
+    axes[2].set_title("Zones sans aucune course", fontsize=10.5)
+    for ax in axes:
+        ax.axvspan(
+            pd.Timestamp("2025-03-03"),
+            pd.Timestamp("2025-03-10"),
+            color=viz.ALERT,
+            alpha=0.06,
+            lw=0,
+        )
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
+    axes[0].legend(loc="lower left", fontsize=8)
+    fig.tight_layout()
+    viz.save(fig, "e8_qualite")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
