@@ -61,3 +61,30 @@ Le z-score corrige ce défaut en comparant des moyennes journalières entre elle
    donnée à prévoir dès le déploiement (ZoneFleet doit conserver ses features servies).
 4. Ce signal ne voit toujours pas le concept drift pur (il porte sur X) : il réduit le
    bruit, il ne change pas l'angle mort.
+
+## Dans la condition jointe (E4 quater)
+
+Puisque le z-score saisonnier détecte le COVID le jour même et ne déclenche plus sur la
+température, la question suivante (issue #70, déclarée avant exécution) était de
+l'utiliser **à la place du PSI des lags** dans la condition jointe, puis de repasser le
+backtest de 240 scénarios de [E4](e4-backtest.qmd).
+
+{{< include ../_tables/e4_seasonal.md >}}
+
+La surprise envisagée s'est produite :
+
+- **P3s fait des fausses alertes** (0,26 par mois) là où P3b n'en fait aucune.
+- Son gain apparent de rappel (60 % contre 51 %) vient **uniquement** du concept drift
+  (26 % contre 0 %), c'est-à-dire de détections fortuites au rythme de ses fausses
+  alertes ; sur les covariate shifts nuisibles, les deux politiques sont à égalité
+  (86 %).
+- Cause : la base de l'année précédente corrige la saison mais **importe tout ce qui a
+  changé d'une année sur l'autre** : la croissance de la demande entre 2024 et 2025
+  (+7 à +42 % selon l'heure, E2) et les écarts météo entre deux hivers (vague de froid
+  de février 2025 contre un février 2024 doux). Les lags sortent alors de leur plage
+  « saisonnière » sans que le modèle se dégrade.
+
+Conclusion : le z-score saisonnier est le bon outil pour les **features exogènes**
+(température), pas pour les lags d'une demande en croissance. La condition jointe
+d'astreinte reste **P3b** (PSI des lags contre la référence) ; la température en sort
+de toute façon, puisqu'elle n'entre pas dans la dérive nettoyée.
