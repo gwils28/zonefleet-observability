@@ -1,0 +1,6 @@
+bug,quality_first_flag,quality_flag_days,quality_flags,P1b_drift_clean_days,P1b_drift_clean_first,P2_dle_days,P2_dle_first,P3b_clean_and_dle_days,P3b_clean_and_dle_first,est_mean_bug_days,real_mean_bug_days
+aucun,2025-03-09,1,profile,0,,0,,0,,0.2786,0.2409
+troncature,2025-03-03,6,"volume, profile",1,2025-03-17,0,,0,,0.3055,0.3974
+duplication,2025-03-03,7,"volume, profile",12,2025-03-06,0,,0,,0.2652,0.5854
+decalage_1h,2025-03-04,2,profile,0,,0,,0,,0.2817,0.3483
+zone_muette,2025-03-03,7,"zero, profile",0,,0,,0,,0.2947,0.4257
