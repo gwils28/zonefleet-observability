@@ -108,6 +108,8 @@ class RowScorer:
         """Signaux journaliers à partir de scores par ligne (éventuellement rééchantillonnés)."""
         g = rows.groupby("date")
         out = g[["est", "recon", "real"]].mean()
+        for c in ("lag_24", "lag_168"):
+            out[f"mean_{c}"] = g[c].mean()  # pour la dérive saisonnière (E4 quater)
         for c in PSI_COLUMNS:
             out[f"psi_{c}"] = g[c].apply(lambda s, c=c: psi(self.ref_psi[c], s.to_numpy()))
         return out
