@@ -13,7 +13,7 @@ from zonefleet.alerting import persistent
 from zonefleet.config import LABEL_DELAY_DAYS
 from zonefleet.ops.decisions import PAGE, TICKET, alert_severity, retrain_decision
 
-ICON = {PAGE: "PAGE", TICKET: "TICKET", "aucune": "RAS"}
+ICON = {PAGE: "PAGE", TICKET: "TICKET", "aucune": "RAS", "donnees": "INCIDENT DONNÉES"}
 
 
 def _fmt(x: float, d: int = 3) -> str:
@@ -27,6 +27,7 @@ def build(
     psi: pd.DataFrame | None = None,
     model_version: str = "?",
     label_delay_days: int = LABEL_DELAY_DAYS,
+    quality: pd.Series | None = None,
 ) -> str:
     """Rapport du jour `day` (signaux jusqu'à ce jour inclus).
 
@@ -42,6 +43,9 @@ def build(
     sig.loc[unpublished, "realized"] = float("nan")
     sig.loc[unpublished, "perf_real"] = False
     sev = alert_severity(sig)
+    data_incident = quality is not None and bool(quality.get("flag_any", False))
+    if data_incident:
+        sev = "donnees"  # un bug amont prime : les signaux du modèle ne sont pas fiables (E8)
     last = sig.iloc[-1]
     persisted_joint = persistent(sig["drift_clean"] & sig["perf_est"], 2)
     joint = persisted_joint | persistent(sig["perf_real"].astype(bool), 2)
@@ -66,6 +70,21 @@ def build(
         f"{'disponible' if pd.notna(last['realized']) else 'en attente'} |",
         "",
     ]
+    if quality is not None:
+        lines += [
+            "## Qualité des données (avant le modèle)",
+            "",
+            f"- volume / médiane des 4 mêmes jours : {_fmt(quality['volume_ratio'], 2)}",
+            f"- corrélation du profil horaire : {_fmt(quality['profile_corr'], 3)}",
+            f"- zones sans aucune course : {int(quality['zero_zones'])}",
+            "",
+        ]
+        if data_incident:
+            lines += [
+                "> Incident données : traiter l'amont avant toute lecture des signaux du"
+                " modèle ; exclure ces jours de tout réentraînement.",
+                "",
+            ]
     if zone_loss is not None and len(zone_loss):
         top = zone_loss.sort_values("est", ascending=False).head(5)
         lines += ["## Zones en tête de perte estimée", "", "| Zone | Perte estimée |", "|---|---|"]
