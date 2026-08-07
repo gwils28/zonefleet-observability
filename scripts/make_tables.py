@@ -417,6 +417,27 @@ def e4_seasonal_table() -> pd.DataFrame:
     )
 
 
+@table("e8_summary")
+def e8_summary() -> pd.DataFrame:
+    e = pd.read_csv(T / "e8_summary.csv", parse_dates=["quality_first_flag"])
+
+    def first(v):
+        return "-" if pd.isna(v) else pd.Timestamp(v).strftime("%d/%m")
+
+    return pd.DataFrame(
+        {
+            "Bug (3-9 mars 2025)": e["bug"].str.replace("_", " "),
+            "Contrôles : 1er signal": e["quality_first_flag"].map(first),
+            "Contrôles déclenchés": e["quality_flags"].fillna("-"),
+            "Jours P1b": e["P1b_drift_clean_days"],
+            "Jours P2 (DLE)": e["P2_dle_days"],
+            "Jours P3b": e["P3b_clean_and_dle_days"],
+            "Perte estimée": e["est_mean_bug_days"].map(lambda v: fr(v, 3)),
+            "Perte réalisée": e["real_mean_bug_days"].map(lambda v: fr(v, 3)),
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
