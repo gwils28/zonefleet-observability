@@ -60,3 +60,5 @@ e5r:         ## E5 bis : politiques de réentraînement jusqu'à fin 2021 (≈ 2
 	uv run python -m zonefleet.experiments.e5_retraining --jusqua 2022-01-01 --suffixe _reprise
 e4q:         ## E4 quater : dérive saisonnière dans la condition jointe (relit le cache de E4)
 	uv run python -m zonefleet.experiments.e4_seasonal
+e8:          ## E8 : bugs de données amont, qualité contre moniteur de modèle
+	uv run python -m zonefleet.experiments.e8_quality

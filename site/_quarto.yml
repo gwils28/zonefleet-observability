@@ -55,6 +55,7 @@ website:
           - href: experiences/e5-reentrainement.qmd
           - href: experiences/e6-localisation.qmd
           - href: experiences/e7-saisonnier.qmd
+          - href: experiences/e8-qualite.qmd
           - text: "---"
           - href: notebooks/tutoriel-dle.ipynb
             text: "Notebook : DLE pas à pas"
