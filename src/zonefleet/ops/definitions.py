@@ -81,6 +81,26 @@ def panel_is_valid(panel: pd.DataFrame) -> dg.AssetCheckResult:
     )
 
 
+@dg.asset_check(asset=panel, description="Qualité du dernier jour (volume, profil, zones muettes).")
+def data_quality(panel: pd.DataFrame) -> dg.AssetCheckResult:
+    from zonefleet import quality as Q
+
+    last_year = panel[panel["ts"] >= panel["ts"].max() - pd.Timedelta(days=400)]
+    history = last_year[last_year["ts"] < last_year["ts"].max() - pd.Timedelta(days=30)]
+    checks = Q.daily_checks(last_year, Q.calibrate(Q.daily_checks(history)))
+    day = checks.iloc[-1]
+    return dg.AssetCheckResult(
+        passed=not bool(day["flag_any"]),
+        severity=dg.AssetCheckSeverity.ERROR,
+        metadata={
+            "jour": str(checks.index[-1].date()),
+            "volume_ratio": float(day["volume_ratio"]),
+            "profile_corr": float(day["profile_corr"]),
+            "zones_muettes": int(day["zero_zones"]),
+        },
+    )
+
+
 @dg.asset(group_name="donnees", description="Météo horaire locale (cache Open-Meteo).")
 def weather() -> pd.DataFrame:
     from zonefleet.covariates import load_weather
@@ -186,7 +206,7 @@ defs = dg.Definitions(
         retrain_recommendation,
         daily_report,
     ],
-    asset_checks=[contract_respected, panel_is_valid],
+    asset_checks=[contract_respected, panel_is_valid, data_quality],
     jobs=[monitoring_job],
     schedules=[
         dg.ScheduleDefinition(

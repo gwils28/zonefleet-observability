@@ -9,6 +9,12 @@
 | dérive nettoyée (PCA ou PSI lags) | non | - | normal |
 | perte réalisée (labels) | - | 0,521 | en attente |
 
+#### Qualité des données (avant le modèle)
+
+- volume / médiane des 4 mêmes jours : 1,01
+- corrélation du profil horaire : 0,983
+- zones sans aucune course : 0
+
 #### Zones en tête de perte estimée
 
 | Zone | Perte estimée |
