@@ -38,7 +38,7 @@ flowchart LR
 | Asset | Contenu | Contrôle |
 |---|---|---|
 | `tlc_schema_report` | rapport du data contract sur chaque fichier brut | `contract_respected` : aucune violation |
-| `panel` | panel zone x heure | `panel_is_valid` : doublons, volumes négatifs, plafond |
+| `panel` | panel zone x heure | `panel_is_valid` : doublons, volumes négatifs, plafond ; `data_quality` : volume, profil horaire et zones muettes du dernier jour (E8) |
 | `weather` | météo locale en cache | - |
 | `feature_matrix` | features à lags ≥ 24 h | - |
 | `champion_model` | modèle désigné par l'alias `champion` du registry (repli : modèle figé du SPEC) | - |
@@ -46,6 +46,7 @@ flowchart LR
 | `monitoring_signals` | signaux journaliers (dérive, DLE, réalisé) | - |
 | `alert_decision` | sévérité du dernier jour, en métadonnée | - |
 | `retrain_recommendation` | décision et raison (politique gardée de E5) | - |
+| `daily_report` | rapport du matin en Markdown (métadonnée et fichier) | - |
 
 Les décisions (`alert_severity`, `retrain_decision`) sont des **fonctions pures** du
 module `zonefleet.ops.decisions`, testées sans Dagster : l'orchestrateur appelle la
