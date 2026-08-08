@@ -114,3 +114,14 @@ def test_monitoring_assets_on_toy_world(toy_world, monkeypatch):
 
 def test_estimated_loss_alone_opens_a_ticket():
     assert alert_severity(signals([0, 0, 0], [0, 1, 1])) == TICKET
+
+
+def test_data_quality_check_on_toy_panel():
+    pytest.importorskip("dagster")
+    from tests.conftest import toy_panel
+    from zonefleet.ops.definitions import data_quality
+
+    p = toy_panel("2019-01-01", "2020-03-01", zones=(161, 162))
+    assert data_quality(p).passed
+    p.loc[p["ts"] >= "2020-02-29", "pickups"] *= 3
+    assert not data_quality(p).passed
