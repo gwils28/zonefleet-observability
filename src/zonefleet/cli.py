@@ -86,8 +86,19 @@ def daily_report(split: str, day: str | None = None) -> str:
     rows["zone"] = today["zone"].astype(int).to_numpy()
     zl = rows.groupby("zone")["est"].mean().reset_index()
     zl = zl.merge(zone_table()[["zone", "name"]], on="zone", how="left")
+    from zonefleet import quality as Q
+    from zonefleet.data import load_panel
+
+    panel = load_panel()
+    year = panel[
+        (panel["ts"] >= target - pd.Timedelta(days=400))
+        & (panel["ts"] < target + pd.Timedelta(days=1))
+    ]
+    history = year[year["ts"] < target - pd.Timedelta(days=30)]
+    checks = Q.daily_checks(year, Q.calibrate(Q.daily_checks(history)))
+    quality = checks.loc[target] if target in checks.index else None
     version = "1" if split == "covid" else "2"
-    return build(target, sig, zl, out["psi"], model_version=version)
+    return build(target, sig, zl, out["psi"], model_version=version, quality=quality)
 
 
 def cmd_report(args: argparse.Namespace) -> int:
