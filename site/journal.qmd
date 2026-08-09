@@ -58,6 +58,6 @@ Trois résultats contredisent l'intuition de départ ; ils sont rapportés tels 
 
 - Mesurer le taux de fausses alertes sur plusieurs périodes calmes (une seule ici).
 - Étendre aux VTC (FHVHV), plus sensibles au prix.
-- Remplacer la météo réalisée par une vraie prévision à 24 h.
+- ~~Remplacer la météo réalisée par une vraie prévision à 24 h~~ : fait, sans effet mesurable ([E9](experiences/e9-meteo.qmd)).
 - Conformaliser les quantiles (couverture réelle de 72 % pour 80 % visés).
 - Localiser la dérive par zone, à la manière du diagnostic hiérarchique de DriftGuard.

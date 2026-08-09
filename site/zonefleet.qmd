@@ -118,6 +118,6 @@ que la frontière de la performance estimée se lit ([E1](experiences/e1-covid.q
 - **VTC (FHVHV)** : plus sensibles au prix, ils pourraient réagir autrement à la taxe de
   congestion ; hors périmètre (volume de données).
 - **Événements** (concerts, matchs) : pas de source historique propre.
-- **Prévision météo réelle** : la météo réalisée a servi de prévision (hypothèse optimiste).
+- **Prévision météo réelle** : levée après coup ; la prévision de la veille ne change la MAE que de 0,1 % ([E9](experiences/e9-meteo.qmd)).
 - **Coût métier** : la traduction des points d'erreur en véhicules à vide et en courses
   perdues demande les données de flotte de ZoneFleet.
