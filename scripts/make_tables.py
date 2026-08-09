@@ -438,6 +438,21 @@ def e8_summary() -> pd.DataFrame:
     )
 
 
+@table("e9_forecast_error")
+def e9_forecast_error() -> pd.DataFrame:
+    e = pd.read_csv(T / "e9_forecast_error.csv").iloc[0]
+    return pd.DataFrame(
+        {
+            "Heures comparées": [fr(e["heures"], 0)],
+            "MAE température (°C)": [fr(e["mae_temperature"], 2)],
+            "Biais (prévu - réalisé, °C)": [fr(e["biais_temperature"], 2)],
+            "Corrélation": [fr(e["corr_temperature"], 3)],
+            "Heures de pluie prévues": [fr(100 * e["pluie_detectee"], 0) + " %"],
+            "Fausses pluies": [fr(100 * e["fausse_pluie"], 1) + " %"],
+        }
+    )
+
+
 @table("e9_variants")
 def e9_variants() -> pd.DataFrame:
     v = pd.read_csv(T / "e9_variants.csv")
