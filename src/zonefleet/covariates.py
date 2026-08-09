@@ -79,3 +79,33 @@ def calendar_features(ts: pd.Series) -> pd.DataFrame:
         },
         index=ts.index,
     )
+
+
+PREVIOUS_RUNS_URL = "https://previous-runs-api.open-meteo.com/v1/forecast"
+
+
+def fetch_weather_forecast(
+    start: str, end: str, lat_lon: tuple[float, float] = MANHATTAN
+) -> pd.DataFrame:
+    """Prévision émise la veille (variables `*_previous_day1`), en UTC, colonnes renommées
+    comme la météo réalisée pour être interchangeables dans les features."""
+    params = {
+        "latitude": lat_lon[0],
+        "longitude": lat_lon[1],
+        "start_date": start,
+        "end_date": end,
+        "hourly": ",".join(f"{v}_previous_day1" for v in WEATHER_VARS),
+        "timezone": "GMT",
+    }
+    r = requests.get(PREVIOUS_RUNS_URL, params=params, timeout=60)
+    r.raise_for_status()
+    h = r.json()["hourly"]
+    df = pd.DataFrame({"ts_utc": pd.to_datetime(h["time"], utc=True)})
+    for v in WEATHER_VARS:
+        df[v] = h[f"{v}_previous_day1"]
+    return df
+
+
+def load_weather_forecast(path: Path | None = None) -> pd.DataFrame:
+    """Prévision de la veille mise en cache (`data/processed/weather_forecast.csv`)."""
+    return pd.read_csv(path or DATA_PROCESSED / "weather_forecast.csv", parse_dates=["ts"])

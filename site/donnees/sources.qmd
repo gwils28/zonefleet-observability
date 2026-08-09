@@ -52,10 +52,11 @@ Cache versionné : `data/processed/weather.csv` (35 184 heures, aucune valeur ma
 ![La météo dérive par nature : une référence d'automne et une analysis d'hiver n'ont pas la même distribution de température. C'est une dérive attendue, sans impact si le modèle a vu des hivers.](../figures/data_meteo.png){#fig-weather}
 
 ::: {.callout-warning}
-## Hypothèse optimiste assumée
+## Hypothèse optimiste assumée, puis levée
 La météo **réalisée** tient lieu de prévision météo à 24 h. En production, on utiliserait
-une prévision (erreur de quelques degrés, timing des averses incertain). Cela dégraderait
-légèrement le modèle, sans changer la logique du monitoring.
+une prévision (erreur de quelques degrés, timing des averses incertain).
+[E9](../experiences/e9-meteo.qmd) l'a vérifié après coup avec la prévision réellement émise
+la veille : 1,5 °C d'erreur moyenne, mais une MAE du modèle qui ne bouge que de 0,1 %.
 :::
 
 ## Calendrier

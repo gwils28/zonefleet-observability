@@ -62,3 +62,5 @@ e4q:         ## E4 quater : dérive saisonnière dans la condition jointe (relit
 	uv run python -m zonefleet.experiments.e4_seasonal
 e8:          ## E8 : bugs de données amont, qualité contre moniteur de modèle
 	uv run python -m zonefleet.experiments.e8_quality
+e9:          ## E9 : vraie prévision météo de la veille
+	uv run python -m zonefleet.experiments.e9_weather

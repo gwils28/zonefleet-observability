@@ -438,6 +438,38 @@ def e8_summary() -> pd.DataFrame:
     )
 
 
+@table("e9_forecast_error")
+def e9_forecast_error() -> pd.DataFrame:
+    e = pd.read_csv(T / "e9_forecast_error.csv").iloc[0]
+    return pd.DataFrame(
+        {
+            "Heures comparées": [fr(e["heures"], 0)],
+            "MAE température (°C)": [fr(e["mae_temperature"], 2)],
+            "Biais (prévu - réalisé, °C)": [fr(e["biais_temperature"], 2)],
+            "Corrélation": [fr(e["corr_temperature"], 3)],
+            "Heures de pluie prévues": [fr(100 * e["pluie_detectee"], 0) + " %"],
+            "Fausses pluies": [fr(100 * e["fausse_pluie"], 1) + " %"],
+        }
+    )
+
+
+@table("e9_variants")
+def e9_variants() -> pd.DataFrame:
+    v = pd.read_csv(T / "e9_variants.csv")
+    return pd.DataFrame(
+        {
+            "Variante (entraînement / service)": v["variant"],
+            "Période": v["period"].map({"reference": "référence", "analysis": "analysis"}),
+            "MAE": v["mae"].map(lambda x: fr(x, 2)),
+            "Écart à (a)": v["delta_mae_pct"].map(
+                lambda x: ("+" if x >= 0 else "") + fr(x, 2) + " %"
+            ),
+            "MAE log": v["mae_log"].map(lambda x: fr(x, 3)),
+            "Perte estimée (DLE)": v["dle_est_mean"].map(lambda x: fr(x, 3)),
+        }
+    )
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")

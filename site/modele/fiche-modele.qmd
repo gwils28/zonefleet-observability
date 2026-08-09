@@ -38,8 +38,8 @@ indicateur CBD. Les features de saison sont exclues (extrapolation).
   changement brutal met une à deux semaines à être absorbé (E3).
 - **Hétéroscédasticité forte** : erreur relative 2,5 fois plus forte dans les situations
   de faible niveau (nuit, zones peu actives).
-- **Météo optimiste** : en production, une vraie prévision à J + 1 dégradera un peu les
-  performances.
+- **Météo** : entraîné sur la météo réalisée ; servi sur la vraie prévision de la veille,
+  sa MAE ne bouge que de 0,1 % ([E9](../experiences/e9-meteo.qmd)).
 
 ## Conditions de surveillance
 

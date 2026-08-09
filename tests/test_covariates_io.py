@@ -44,3 +44,17 @@ def test_load_weather_roundtrip(tmp_path):
     ).to_csv(p, index=False)
     w = C.load_weather(p)
     assert pd.api.types.is_datetime64_any_dtype(w["ts"])
+
+
+def test_fetch_weather_forecast_renames_previous_day_columns(monkeypatch):
+    payload = {
+        "hourly": {
+            "time": ["2024-02-01T00:00"],
+            "temperature_2m_previous_day1": [2.0],
+            "precipitation_previous_day1": [0.5],
+        }
+    }
+    monkeypatch.setattr(C.requests, "get", lambda url, params, timeout: FakeResponse(payload))
+    df = C.fetch_weather_forecast("2024-02-01", "2024-02-01")
+    assert list(df.columns) == ["ts_utc", "temperature_2m", "precipitation"]
+    assert df["temperature_2m"].iloc[0] == 2.0

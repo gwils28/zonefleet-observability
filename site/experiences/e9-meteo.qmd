@@ -1,0 +1,46 @@
+---
+title: "E9 : la vraie prévision météo de la veille"
+description: "Le projet supposait une météo parfaitement prévue. Avec la prévision réellement émise la veille, la température se trompe de 1,5 °C et la pluie n'est vue qu'une fois sur deux, mais le modèle ne perd rien de mesurable."
+---
+
+::: {.callout-note appearance="minimal"}
+Script : `uv run python -m zonefleet.experiments.e9_weather` (≈ 30 s) · tables :
+`results/tables/e9_*.csv` · protocole déclaré dans l'issue #76 · source :
+[Open-Meteo Previous Runs API](https://open-meteo.com/en/docs/previous-runs-api)
+(variables `*_previous_day1`).
+:::
+
+## La question
+
+Depuis la page [Sources](../donnees/sources.qmd), une hypothèse optimiste est assumée :
+la météo **réalisée** tient lieu de prévision à J + 1. En production, ZoneFleet ne
+dispose que de la prévision émise la veille. Que coûte la différence ?
+
+## La prévision de la veille
+
+{{< include ../_tables/e9_forecast_error.md >}}
+
+La prévision est bonne sur la température (corrélation 0,99) mais **biaisée vers le
+froid** d'environ 1 °C au point de Times Square, et elle ne prévoit que 41 % des heures
+de pluie (2 % de fausses pluies). L'archive commence le 19 janvier 2024.
+
+## Trois variantes
+
+{{< include ../_tables/e9_variants.md >}}
+
+- **(b) le modèle actuel, servi sur la prévision** : la MAE bouge de **0,1 %**. C'est le
+  chiffre qui compte pour la production : l'hypothèse optimiste ne biaise pas les
+  résultats du projet.
+- **(c) un modèle entraîné sur la prévision** : +1 % de MAE, attribuable en partie à un
+  entraînement plus court (il commence le 20 janvier).
+- La **perte estimée par DLE** est la même dans les trois variantes : le moniteur n'est
+  pas affecté non plus.
+
+## Ce que E9 établit
+
+1. La météo pèse très peu dans ce modèle (les lags portent l'essentiel, [E0](../modele/e0.qmd)),
+   si bien qu'une prévision imparfaite ne coûte rien de mesurable.
+2. L'hypothèse optimiste du projet est **levée** : aucune conclusion de E0 à E8 n'en
+   dépendait.
+3. Pour une flotte plus sensible à la météo (vélos, trottinettes), la conclusion pourrait
+   changer : la même expérience, avec les mêmes données, le dirait.
