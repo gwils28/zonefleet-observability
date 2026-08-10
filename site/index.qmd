@@ -52,6 +52,10 @@ l'angle mort, et **ne jamais réentraîner par réflexe**.
 - [E3](experiences/e3-frontiere.qmd) : la frontière où l'estimation ment
 - [E4](experiences/e4-backtest.qmd) : 240 dérives pour tester le moniteur
 - [E5](experiences/e5-reentrainement.qmd) : réentraîner, mais pas par réflexe
+- [E6](experiences/e6-localisation.qmd) : localiser la dérive par zone
+- [E7](experiences/e7-saisonnier.qmd) : comparer chaque jour à sa propre saison
+- [E8](experiences/e8-qualite.qmd) : quand ce sont les données qui mentent
+- [E9](experiences/e9-meteo.qmd) : la vraie prévision météo de la veille
 :::
 
 ::: {.g-col-12 .g-col-md-6}
@@ -59,14 +63,15 @@ l'angle mort, et **ne jamais réentraîner par réflexe**.
 - [System design](system-design.qmd) : l'architecture en dix lignes
 - [Cas client ZoneFleet](zonefleet.qmd) : cahier des charges et recommandations
 - [Dagster](mlops/dagster.qmd) et [MLflow](mlops/mlflow.qmd) : la mise en production
+- [Runbook](exploitation/runbook.qmd), [rapport du matin](exploitation/rapport.qmd), [ADR](exploitation/adr.qmd)
 :::
 
 ::: {.g-col-12 .g-col-md-6}
 ### Approfondir
 - Veille : [NannyML](veille/nannyml.qmd), [DriftGuard](veille/driftguard.qmd), [Sculley et al.](veille/sculley.qmd)
 - Données : [sources](donnees/sources.qmd), [data contract](donnees/data-contract.qmd), [panel](donnees/panel.qmd)
-- [Notebook : DLE pas à pas](notebooks/tutoriel-dle.ipynb)
-- [Journal de bord](journal.qmd) · [Références](references.qmd)
+- Notebooks : [DLE pas à pas](notebooks/tutoriel-dle.ipynb), [coût des alertes](notebooks/couts-alerte.ipynb)
+- [Méthode](methode.qmd) · [Journal de bord](journal.qmd) · [Références](references.qmd) · [Glossaire](glossaire.qmd) · [FAQ](faq.qmd)
 :::
 
 :::
@@ -78,7 +83,7 @@ git clone https://github.com/gwils28/zonefleet-observability && cd zonefleet-obs
 uv sync --all-extras
 make check            # lint + tests
 make e0 e1 e2 e3      # le panel agrégé est versionné : pas besoin des 3 Go de données brutes
-make e4 e5            # ≈ 20 min
+make e4 e5 e6 e7 e8 e9   # ≈ 25 min (E5 bis : make e5r, ≈ 25 min de plus)
 make figures site
 ```
 
