@@ -42,22 +42,33 @@ Le détail est dans `docs/notes/implementation.md`.
 | 16 juillet | E3 mesurée contre un contrefactuel sans dérive | l'avant/après confondait l'injection et la saison | taux de suivi interprétables |
 | 16 juillet | E4 : détection par front montant, lissage 7 jours | une alarme permanente affichait un faux rappel de 100 % | P1 correctement classée inutilisable |
 | 17 juillet | E5 rejouée à L = 1 et L = 60 jours | à L = 60, aucune politique ne peut réagir | comparaison informative ; résultat imprévu rapporté |
+| 23 juillet | E6 : PSI rapporté au contrefactuel, étiqueté a posteriori | le PSI brut par zone ne localise rien (saison) | leçon : base saisonnière |
+| 28 juillet | calibration conforme, extension hors SPEC | intervalles sous-couvrants (72 %) | garantie non tenue à travers les fêtes ; version glissante |
+| 2 août | E7 : z-score saisonnier, étiqueté a posteriori | PSI d'une journée contre 28 jours mal posé | température débarrassée de sa saison |
+| 4 août | E4 ter : périodes calmes supplémentaires, hors SPEC | une seule période calme mesurée | zéro page répliqué ; ticket « perte estimée seule » |
+| 5 août | panel étendu à 2021 | départager les politiques de réentraînement | résultats publiés identiques ; E5 bis |
 
 ## Résultats imprévus
 
-Trois résultats contredisent l'intuition de départ ; ils sont rapportés tels quels.
+Six résultats contredisent l'intuition de départ ; ils sont rapportés tels quels.
 
 1. **La tarification de congestion ne dégrade pas le modèle** ([E2](experiences/e2-congestion.qmd)),
    contrairement à l'hypothèse du cas client.
 2. **La reconstruction PCA ne voit pas le choc COVID** ([E1](experiences/e1-covid.qmd)) :
    un choc de niveau se déplace le long de la première composante.
 3. **Un réentraînement mensuel planifié bat la politique gardée** sur l'année 2020 quand
-   les labels sont rapides ([E5](experiences/e5-reentrainement.qmd)).
+   les labels sont rapides ([E5](experiences/e5-reentrainement.qmd)) ; l'écart disparaît
+   en 2021 (E5 bis).
+4. **La garantie de la calibration conforme ne tient pas** entre l'automne et les fêtes
+   ([E0 bis](modele/e0.qmd)).
+5. **Une base saisonnière dans la condition jointe fait des fausses alertes** : elle
+   importe la croissance d'une année sur l'autre (E4 quater, sur la page [E7](experiences/e7-saisonnier.qmd)).
+6. **La vraie prévision météo ne coûte rien** ([E9](experiences/e9-meteo.qmd)).
 
 ## Ce qui reste ouvert
 
-- Mesurer le taux de fausses alertes sur plusieurs périodes calmes (une seule ici).
+- ~~Mesurer les fausses alertes sur plusieurs périodes calmes~~ : fait (E4 ter, trois périodes).
 - Étendre aux VTC (FHVHV), plus sensibles au prix.
 - ~~Remplacer la météo réalisée par une vraie prévision à 24 h~~ : fait, sans effet mesurable ([E9](experiences/e9-meteo.qmd)).
-- Conformaliser les quantiles (couverture réelle de 72 % pour 80 % visés).
-- Localiser la dérive par zone, à la manière du diagnostic hiérarchique de DriftGuard.
+- ~~Conformaliser les quantiles~~ : fait (E0 bis), garantie non tenue hors régime calme.
+- ~~Localiser la dérive par zone~~ : fait ([E6](experiences/e6-localisation.qmd)).
