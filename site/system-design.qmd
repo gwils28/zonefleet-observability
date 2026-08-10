@@ -6,13 +6,16 @@ description: "Décision d'architecture en 10 lignes, puis le raisonnement comple
 ## La décision en dix lignes
 
 ::: {.callout-tip appearance="simple"}
-1. **Pendant la fenêtre aveugle** (H + L jours), surveiller trois familles de signaux,
-   toutes calculables à l'émission : dérive des entrées, dérive des prédictions,
-   performance **estimée** (DLE, échelle relative).
+1. **D'abord les données** : contrat de schéma et contrôles de qualité journaliers ; un
+   échec est un incident données qui suspend la lecture des signaux du modèle (E8).
+   Puis, **pendant la fenêtre aveugle** (H + L jours), trois familles de signaux, toutes
+   calculables à l'émission : dérive des entrées, dérive des prédictions, performance
+   **estimée** (DLE, échelle relative).
 2. **Hiérarchie** : la performance estimée décide, la dérive qualifie, la dérive des
    prédictions sert de garde-fou de cohérence (Sculley, *prediction bias*).
-3. **Page** seulement sur la condition jointe *dérive ET perte estimée*, persistante
-   2 jours ; la dérive seule ouvre un **ticket** hebdomadaire, jamais une astreinte.
+3. **Page** seulement sur la condition jointe *dérive nettoyée ET perte estimée*,
+   persistante 2 jours ; la dérive seule ou la perte estimée seule ouvrent un **ticket**,
+   jamais une astreinte (E4, E4 ter).
 4. Les seuils viennent de la **référence** (hors échantillon), recalculés à chaque
    promotion, sur un signal **lissé 7 jours** pour l'alerte et brut pour le diagnostic.
 5. La **performance réalisée** (labels à t + L) ne sert pas à alerter vite : elle audite
@@ -23,7 +26,8 @@ description: "Décision d'architecture en 10 lignes, puis le raisonnement comple
 7. **Réentraînement gardé** : dérive confirmée ET ≥ 28 jours de labels post-alerte, puis
    champion/challenger sur une fenêtre postérieure, promotion si gain ≥ 5 %.
 8. **Jamais de réentraînement réflexe** : à L = 60 jours, il apprend sur l'ancien monde ;
-   sur 9 jours de labels, il apprend du bruit.
+   sur 8 jours de labels, il apprend du bruit ; en régime de reprise, la politique gardée
+   égale un calendrier mensuel avec 2,5 fois moins de remplacements (E5 bis).
 9. **Anti-boucle de rétroaction** : zones témoins à positionnement indépendant du
    modèle, journal de la demande non servie, refus d'apprendre sur une fenêtre pilotée
    à 100 % par le modèle.
@@ -184,3 +188,14 @@ sous-servie, dont la demande observée baisse : la demande est **censurée par l
 - Ses taux de fausses alertes sont mesurés sur une seule période calme réelle (2025) ;
   il faudra les recalibrer sur un an de production.
 - Les seuils dépendent du modèle : chaque promotion impose de recalculer la référence.
+
+## 7. Ce que les expériences complémentaires ont changé
+
+| Expérience | Ce qu'elle a modifié dans cette architecture |
+|---|---|
+| [E4 ter](experiences/e4-backtest.qmd#réplication-sur-trois-périodes-calmes-e4-ter) | zéro fausse page répliqué sur trois périodes calmes ; ajout du ticket « perte estimée seule », qui voit les dégradations saisonnières |
+| [E6](experiences/e6-localisation.qmd) | après une page, lire la **carte de perte estimée par zone**, pas la carte de dérive |
+| [E7](experiences/e7-saisonnier.qmd) | z-score saisonnier pour les **features exogènes** (température) ; pas pour les lags d'une demande en croissance (E4 quater) |
+| [E8](experiences/e8-qualite.qmd) | couche **qualité des données** en premier, sévérité « incident données » |
+| [E9](experiences/e9-meteo.qmd) | la vraie prévision météo ne change rien : pas besoin d'un monitoring dédié de la météo prévue |
+| [E0 bis](modele/e0.qmd) | intervalles calibrés en glissant sur les labels récents ; écart de couverture comme indicateur réalisé |
