@@ -5,5 +5,6 @@
 <div class="kpi"><div class="value">0,00</div><div class="label">taux de suivi de DLE sous concept drift pur</div></div>
 <div class="kpi"><div class="value">51 %</div><div class="label">rappel de la condition jointe, avec 0 fausse alerte sur 240 scénarios</div></div>
 <div class="kpi"><div class="value">177 / 177</div><div class="label">jours d'alerte de la dérive seule après la taxe de congestion, pour 0 dégradation</div></div>
+<div class="kpi"><div class="value">4 / 4</div><div class="label">bugs de données vus dès J1-J2 par les contrôles de qualité ; la condition jointe reste muette sur 4</div></div>
 </div>
 ```

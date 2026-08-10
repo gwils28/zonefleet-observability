@@ -4,9 +4,31 @@ Format inspiré de *Keep a Changelog*. Les dates sont celles de fusion dans `mai
 
 ## [Non publié]
 
+## [0.9.0] - 2026-08-10
 ### Ajouté
-- Hook pre-commit (ruff, fichiers, YAML, typographie), couverture de tests en CI.
-- Modèles d'issue et de PR, guide de contribution.
+- E8 : bugs de données amont ; module `quality`, asset check `data_quality`, sévérité
+  « incident données » dans le rapport du matin.
+- E9 : vraie prévision météo de la veille (Open-Meteo Previous Runs) ; hypothèse
+  optimiste levée.
+- E4 quater : dérive saisonnière dans la condition jointe (fausses alertes, non retenue).
+- ADR 0007 (qualité avant modèle) et 0008 (calibration glissante).
+
+## [0.8.0] - 2026-08-06
+### Ajouté
+- E7 : dérive contre base saisonnière (z-score de la moyenne journalière).
+- E4 ter : fausses alertes sur trois périodes calmes ; ticket « perte estimée seule ».
+- Panel étendu à 2021 ; E5 bis sur la reprise.
+- Rapport quotidien de monitoring (CLI, asset Dagster), notebook des coûts d'alerte,
+  libellés partagés, CI de rendu du site, favicon, 404, page Méthode.
+
+## [0.7.0] - 2026-07-29
+### Ajouté
+- E1 bis (taille de chunk), E6 (localisation par zone), calibration conforme fixe et
+  glissante (extension hors SPEC), graphiques interactifs.
+- Hook pre-commit, couverture de tests (57 % puis 76 %), modèles d'issue et de PR,
+  guide de contribution.
+### Corrigé
+- `e0_model.by_zone` (double sélection de colonnes), tables publiées inchangées.
 
 ## [0.6.0] - 2026-07-22
 ### Ajouté

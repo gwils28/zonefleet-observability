@@ -99,6 +99,10 @@ que la frontière de la performance estimée se lit ([E1](experiences/e1-covid.q
 
 ## Recommandations à ZoneFleet
 
+0. **Contrôler la qualité des données avant tout** : volume, profil horaire et zones
+   muettes chaque matin, calendrier connu exclu. Un fichier tronqué ou dupliqué est
+   invisible pour le moniteur de modèle mais corrompt labels et réentraînements
+   ([E8](experiences/e8-qualite.qmd)).
 1. **Brancher le monitoring réalisé sur vos journaux de courses**, pas sur la
    publication TLC : la fenêtre aveugle passe de 61 jours à 2. C'est le premier
    investissement, devant tout le reste.
@@ -107,11 +111,17 @@ que la frontière de la performance estimée se lit ([E1](experiences/e1-covid.q
    nuisibles détectées en 3 jours médians, le reste revenant aux labels.
 3. **Dérive seule en ticket hebdomadaire**, pour ne pas perdre l'indice d'un concept
    drift naissant.
-4. **Réentraînement gardé + fond trimestriel**, toujours via champion/challenger.
+4. **Réentraînement gardé**, toujours via champion/challenger ; il égale un calendrier
+   mensuel en régime de reprise avec 2,5 fois moins de remplacements
+   ([E5 bis](experiences/e5-reentrainement.qmd#e5-bis-la-reprise-de-2021)), un fond
+   trimestriel servant de filet en cas de choc.
 5. **Zones témoins et journal de la demande non servie** avant tout réentraînement sur
    des données pilotées par le modèle.
-6. **Recalibrer les seuils après un an de production** : les taux de fausses alertes
-   mesurés ici reposent sur une seule période calme.
+6. **Recalibrer les seuils après un an de production** : le zéro fausse page s'est
+   répliqué sur trois périodes calmes ([E4 ter](experiences/e4-backtest.qmd#réplication-sur-trois-périodes-calmes-e4-ter)),
+   mais pas sur des données de flotte réelles.
+7. **Après une page, ouvrir la carte de perte estimée par zone** ([E6](experiences/e6-localisation.qmd)) ;
+   calibrer les intervalles en glissant sur les 28 derniers jours de labels ([E0 bis](modele/e0.qmd)).
 
 ## Ce que le projet n'a pas couvert
 

@@ -7,6 +7,11 @@ description: "Les termes du projet, définis une fois."
 : Paquet de lignes sur lequel un signal de monitoring est calculé ; ici un jour
   (60 zones x 24 heures = 1 440 lignes).
 
+**Calibration conforme (CQR)**
+: Élargissement d'un intervalle de prévision par le quantile empirique des scores
+  max(q_bas - y, y - q_haut) sur un échantillon de calibration ; garantie de couverture
+  sous échangeabilité seulement ([E0 bis](modele/e0.qmd)).
+
 **Concept drift**
 : Changement de la relation entre entrées et cible, P(y | X). **Pur** si les entrées
   P(X) ne bougent pas : invisible sans labels ([E3](experiences/e3-frontiere.qmd)).
@@ -21,6 +26,10 @@ description: "Les termes du projet, définis une fois."
 
 **Covariate shift**
 : Changement de la distribution des entrées P(X), la relation P(y | X) restant stable.
+
+**Contrôles de qualité**
+: Indicateurs journaliers du panel (volume, profil horaire, zones muettes) comparés aux
+  mêmes jours de semaine précédents, calendrier connu exclu ([E8](experiences/e8-qualite.qmd)).
 
 **Data contract**
 : Description versionnée de ce que le pipeline attend des fichiers bruts : colonnes,
@@ -64,6 +73,14 @@ description: "Les termes du projet, définis une fois."
 **Seasonal naive**
 : Prévision « même heure la semaine précédente » (lag 168 h).
 
+**Incident données**
+: Sévérité du rapport du matin quand un contrôle de qualité échoue ; elle prime sur
+  toute alerte du modèle.
+
 **Taux de suivi**
 : Hausse de l'erreur estimée divisée par la hausse de l'erreur réalisée ; 1 = DLE suit,
   0 = DLE aveugle (E3).
+
+**Z-score saisonnier**
+: Écart de la moyenne journalière d'une feature à la distribution des moyennes
+  journalières des mêmes semaines de l'année précédente ([E7](experiences/e7-saisonnier.qmd)).
