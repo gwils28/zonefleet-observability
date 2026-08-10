@@ -480,6 +480,10 @@ def kpis_html() -> str:
     p3b = e4[(e4["policy"] == "P3b_clean_and_dle") & (e4["k"] == 1.0) & (e4["smooth"] == 7)].iloc[0]
     e2 = pd.read_csv(T / "e2_detection_by_group.csv")
     p1_days = int(e2[e2["policy"] == "P1_drift"]["alert_days_after"].max())
+    e8 = pd.read_csv(T / "e8_summary.csv")
+    bugs = e8[e8["bug"] != "aucun"]
+    caught = int(bugs["quality_first_flag"].notna().sum())
+    silent = int((bugs["P3b_clean_and_dle_days"] == 0).sum())
     tiles = [
         (
             f"{fr(det.loc['P2_dle', 'delay_days'], 0)} j",
@@ -495,6 +499,11 @@ def kpis_html() -> str:
         (
             f"{p1_days} / {p1_days}",
             "jours d'alerte de la dérive seule après la taxe de congestion, pour 0 dégradation",
+        ),
+        (
+            f"{caught} / {len(bugs)}",
+            "bugs de données vus dès J1-J2 par les contrôles de qualité ; "
+            f"la condition jointe reste muette sur {silent}",
         ),
     ]
     body = "\n".join(
