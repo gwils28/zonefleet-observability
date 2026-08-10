@@ -46,3 +46,23 @@ confiance est sous-estimé. Un an de production permettrait de les recalibrer.
 En partie : la perte estimée par zone classe correctement les zones touchées (corrélation
 de rang 0,74 sur le COVID) et localise parfaitement un choc limité au CBD. Le PSI par
 zone contre une référence fixe, lui, se perd dans la saison ([E6](experiences/e6-localisation.qmd)).
+
+### « Et si ce sont les données qui sont fausses ? »
+Le moniteur de modèle ne le voit presque pas : un fichier tronqué ou dupliqué laisse les
+entrées plausibles. Des contrôles de qualité simples (volume, profil horaire, zones
+muettes, comparés aux mêmes jours de semaine) attrapent les quatre bugs testés dès le
+premier jour ([E8](experiences/e8-qualite.qmd)).
+
+### « L'hypothèse d'une météo parfaitement prévue fausse-t-elle les résultats ? »
+Non : servi sur la prévision réellement émise la veille, le modèle ne perd que 0,1 % de
+MAE ([E9](experiences/e9-meteo.qmd)).
+
+### « Pourquoi ne pas comparer chaque jour à la même période de l'an dernier ? »
+C'est la bonne idée pour la température (plus aucune fausse alerte saisonnière), mais
+pas pour les lags d'une demande qui croît : la comparaison importe la croissance d'une
+année sur l'autre et fait des fausses alertes ([E7](experiences/e7-saisonnier.qmd)).
+
+### « Les intervalles de prévision sont-ils fiables ? »
+Pas tels quels : 72 % de couverture pour 80 % visés. Une calibration conforme glissante
+sur les 28 derniers jours de labels les ramène à 80 %, à condition d'avoir des labels
+rapides ([E0 bis](modele/e0.qmd)).
