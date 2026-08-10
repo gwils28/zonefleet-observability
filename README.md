@@ -18,7 +18,12 @@ un mensonge ?
 | Sur un choc réel ? | COVID : détection sans labels en **9 jours** contre 62 avec ; mais DLE sous-estime l'ampleur d'un facteur 2,7 pendant la transition | E1 |
 | Alerter sur la dérive des entrées ? | dérive seule : alarme **permanente** (100 % des jours) ; après la taxe de congestion, 177 jours d'alerte pour un modèle qui ne s'est pas dégradé | E2, E4 |
 | Quelle politique d'alerte ? | **dérive nettoyée ET DLE**, lissée 7 jours : 51 % de rappel, **0 fausse alerte** sur 240 scénarios, 3 jours de délai médian | E4 |
-| Réentraîner dès l'alerte ? | **non** : sur l'année COVID, le réflexe fait pire que l'inaction ; la politique gardée évite les accidents | E5 |
+| Réentraîner dès l'alerte ? | **non** : sur l'année COVID, le réflexe fait pire que l'inaction ; sur la reprise de 2021, la politique gardée égale un calendrier mensuel avec 9 remplacements au lieu de 23 | E5, E5 bis |
+| Les fausses alertes tiennent-elles ailleurs ? | oui : 0 page de la condition jointe sur trois périodes calmes ; DLE seul y voit les dégradations des fêtes | E4 ter |
+| Où regarder après une page ? | la perte estimée par zone classe les zones touchées (corrélation de rang 0,74 sur le COVID) ; le PSI par zone se perd dans la saison | E6 |
+| Et la saisonnalité ? | un z-score saisonnier supprime la dérive de la température ; pour les lags, il importe la croissance d'une année sur l'autre | E7, E4 quater |
+| Et si ce sont les données qui mentent ? | des contrôles de qualité voient 4 bugs injectés dès le 1er jour ; le moniteur de modèle, non | E8 |
+| La météo « parfaite » biaise-t-elle tout ? | non : servie sur la vraie prévision de la veille, la MAE bouge de 0,1 % | E9 |
 
 ## Le projet
 
@@ -30,9 +35,11 @@ un mensonge ?
 - **Monitoring** : dérive univariée (KS, Wasserstein, PSI), multivariée (reconstruction
   PCA), dérive des prédictions, performance estimée (NannyML DLE) et réalisée.
 - **Expériences** : E1 COVID, E2 tarification de congestion, E3 dérives pures
-  construites, E4 backtest du moniteur (240 scénarios), E5 politiques de réentraînement.
+  construites, E4 backtest du moniteur (240 scénarios, sensibilité, trois périodes
+  calmes), E5 politiques de réentraînement (2020-2021), E6 localisation par zone, E7 base
+  saisonnière, E8 bugs de données, E9 vraie prévision météo ; calibration conforme.
 - **Mise en production de démonstration** : graphe d'assets Dagster avec contrôles
-  qualité, registry MLflow (champion/challenger), CLI `zonefleet`.
+  qualité, registry MLflow (champion/challenger), rapport du matin, CLI `zonefleet`.
 
 ## Démarrer
 
