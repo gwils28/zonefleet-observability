@@ -56,6 +56,8 @@ def register(
     """Enregistre une nouvelle version ; renvoie son numéro."""
     from mlflow import MlflowClient
 
+    if model.trained_on is None:
+        raise ValueError("modèle non entraîné : rien à enregistrer")
     mlflow = _mlflow(directory)
     client = MlflowClient()
     d = directory or TRACKING_DIR
