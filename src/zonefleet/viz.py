@@ -12,6 +12,7 @@ from pathlib import Path
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from cycler import cycler
 
 from zonefleet.config import FIGURES
 
@@ -53,7 +54,7 @@ def setup() -> None:
             "lines.linewidth": 2.0,
             "legend.frameon": False,
             "legend.fontsize": 9.5,
-            "axes.prop_cycle": mpl.cycler(color=SERIES),
+            "axes.prop_cycle": cycler(color=SERIES),
         }
     )
 
