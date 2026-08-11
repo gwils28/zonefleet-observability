@@ -96,7 +96,7 @@ def daily_report(split: str, day: str | None = None) -> str:
     ]
     history = year[year["ts"] < target - pd.Timedelta(days=30)]
     checks = Q.daily_checks(year, Q.calibrate(Q.daily_checks(history)))
-    quality = checks.loc[target] if target in checks.index else None
+    quality = pd.Series(checks.loc[target]) if target in checks.index else None
     version = "1" if split == "covid" else "2"
     return build(target, sig, zl, out["psi"], model_version=version, quality=quality)
 

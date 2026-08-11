@@ -25,12 +25,13 @@ PROFILE_MIN = 0.97
 WEEKS = 4
 
 
-def known_calendar_days(days: pd.DatetimeIndex) -> pd.Series:
+def known_calendar_days(index: pd.Index) -> pd.Series:
     """Jours fériés US, la veille et le lendemain, et la semaine du 24 décembre au 1er janvier.
 
     Ces jours ont un volume et un profil atypiques connus d'avance : un contrôle de
     qualité qui les signale produit des fausses alertes certaines.
     """
+    days = pd.DatetimeIndex(index)
     hol = us_holidays(sorted(set(days.year) | {y - 1 for y in days.year}))
     near = {h + pd.Timedelta(days=k) for h in hol for k in (-1, 0, 1)}
     year_end = (days.month == 12) & (days.day >= 24) | (days.month == 1) & (days.day == 1)
