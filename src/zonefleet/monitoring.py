@@ -21,6 +21,7 @@ os.environ.setdefault("NML_DISABLE_USAGE_LOGGING", "1")
 import nannyml as nml  # noqa: E402
 import numpy as np
 import pandas as pd
+from numpy.typing import ArrayLike
 
 from zonefleet.features import CALENDAR, LAG_COLS, ROLL_COLS, WEATHER
 
@@ -183,7 +184,7 @@ def multivariate_drift(
     )
 
 
-def psi(reference: np.ndarray, current: np.ndarray, bins: int = 10, eps: float = 1e-4) -> float:
+def psi(reference: ArrayLike, current: ArrayLike, bins: int = 10, eps: float = 1e-4) -> float:
     """Population Stability Index, bacs définis par les quantiles de la référence.
 
     Repères usuels : < 0,1 stable ; 0,1 à 0,25 dérive modérée ; > 0,25 dérive forte.
@@ -282,7 +283,7 @@ def seasonal_zscore(
     an_daily = analysis.groupby(analysis[TS].dt.floor(CHUNK))[columns].mean()
     rows = []
     for day, vals in an_daily.iterrows():
-        center = day - pd.Timedelta(days=lag_days)
+        center = pd.Timestamp(str(day)) - pd.Timedelta(days=lag_days)
         base = hist_daily[
             (hist_daily.index >= center - pd.Timedelta(days=half_window_days))
             & (hist_daily.index < center + pd.Timedelta(days=half_window_days))
