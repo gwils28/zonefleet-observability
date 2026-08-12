@@ -129,3 +129,11 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   reprise) et n'entre dans aucune expérience déjà publiée.
 - Vérifié : lignes 2019-2020 du panel identiques à l'écart près de 0, météo identique sur
   la période commune, prédictions COVID identiques après rafraîchissement du cache.
+
+## 2026-08-11 : typage statique progressif
+
+- mypy sur `src/zonefleet` : modules métier sans erreur (métriques et PSI acceptent tout
+  `ArrayLike`, réparation DST réécrite, registry qui refuse un modèle non entraîné).
+- Pilotes d'expérience exclus provisoirement (`ignore_errors`) : 39 erreurs, presque toutes
+  dues à la rigueur des stubs pandas sur des `groupby` et des `DataFrame | Series`.
+- Vérifié : panel reconstruit identique, 113 tests verts.
