@@ -9,17 +9,18 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+from numpy.typing import ArrayLike
 
 
-def mae(y: np.ndarray, p: np.ndarray) -> float:
+def mae(y: ArrayLike, p: ArrayLike) -> float:
     return float(np.mean(np.abs(np.asarray(y) - np.asarray(p))))
 
 
-def rmse(y: np.ndarray, p: np.ndarray) -> float:
+def rmse(y: ArrayLike, p: ArrayLike) -> float:
     return float(np.sqrt(np.mean((np.asarray(y) - np.asarray(p)) ** 2)))
 
 
-def smape(y: np.ndarray, p: np.ndarray) -> float:
+def smape(y: ArrayLike, p: ArrayLike) -> float:
     """sMAPE en %, terme nul quand prévision et réalisé valent 0 (demande intermittente)."""
     y, p = np.asarray(y, float), np.asarray(p, float)
     den = np.abs(y) + np.abs(p)
@@ -27,17 +28,17 @@ def smape(y: np.ndarray, p: np.ndarray) -> float:
     return float(100 * ratio.mean())
 
 
-def mase(y: np.ndarray, p: np.ndarray, scale: float) -> float:
+def mase(y: ArrayLike, p: ArrayLike, scale: float) -> float:
     return mae(y, p) / scale
 
 
-def pinball(y: np.ndarray, q: np.ndarray, alpha: float) -> float:
+def pinball(y: ArrayLike, q: ArrayLike, alpha: float) -> float:
     """Perte quantile moyenne au niveau alpha."""
     d = np.asarray(y, float) - np.asarray(q, float)
     return float(np.mean(np.maximum(alpha * d, (alpha - 1) * d)))
 
 
-def coverage(y: np.ndarray, lo: np.ndarray, hi: np.ndarray) -> float:
+def coverage(y: ArrayLike, lo: ArrayLike, hi: ArrayLike) -> float:
     """Part des réalisations dans [lo, hi]."""
     y = np.asarray(y)
     return float(np.mean((y >= np.asarray(lo)) & (y <= np.asarray(hi))))
@@ -50,10 +51,10 @@ def seasonal_scale(pickups: pd.Series, zone: pd.Series, season: int = 168) -> fl
 
 
 def summarize(
-    y: np.ndarray,
-    q10: np.ndarray,
-    q50: np.ndarray,
-    q90: np.ndarray,
+    y: ArrayLike,
+    q10: ArrayLike,
+    q50: ArrayLike,
+    q90: ArrayLike,
     scale: float,
 ) -> dict[str, float]:
     """Toutes les métriques du SPEC pour une prévision quantile."""

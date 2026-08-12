@@ -39,7 +39,7 @@ def build(
         raise ValueError(f"aucun signal jusqu'au {day.date()}")
     # Horloge des labels : un rejeu contient des labels du futur ; on ne garde que ceux
     # publiés à la date du rapport (jour cible + délai <= jour du rapport).
-    unpublished = sig.index + pd.Timedelta(days=label_delay_days) > day
+    unpublished = pd.DatetimeIndex(sig.index) + pd.Timedelta(days=label_delay_days) > day
     sig.loc[unpublished, "realized"] = float("nan")
     sig.loc[unpublished, "perf_real"] = False
     sev = alert_severity(sig)

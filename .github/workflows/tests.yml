@@ -17,5 +17,7 @@ jobs:
         run: uv sync --frozen --all-extras
       - name: Lint
         run: uv run --frozen ruff check .
+      - name: Typage
+        run: uv run --frozen mypy
       - name: Tests
         run: uv run --frozen pytest --cov=zonefleet --cov-report=term-missing:skip-covered --cov-report=xml

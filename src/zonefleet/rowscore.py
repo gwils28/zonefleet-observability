@@ -111,7 +111,12 @@ class RowScorer:
         for c in ("lag_24", "lag_168"):
             out[f"mean_{c}"] = g[c].mean()  # pour la dérive saisonnière (E4 quater)
         for c in PSI_COLUMNS:
-            out[f"psi_{c}"] = g[c].apply(lambda s, c=c: psi(self.ref_psi[c], s.to_numpy()))
+            ref = self.ref_psi[c]
+
+            def day_psi(s: pd.Series, ref: np.ndarray = ref) -> float:
+                return psi(ref, s.to_numpy())
+
+            out[f"psi_{c}"] = g[c].apply(day_psi)
         return out
 
     def daily(self, df: pd.DataFrame) -> pd.DataFrame:

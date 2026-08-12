@@ -143,8 +143,9 @@ def build_panel(long: pd.DataFrame, zones: list[int], start: str, end: str) -> p
             col.loc[h] = 0.5 * (col.loc[h - one] + nxt)
         for h in fall:
             col.loc[h] = col.loc[h] / 2.0
-        panel[s] = col.stack().reorder_levels(["zone", "ts"]).sort_index()
-    panel.loc[(slice(None), spring.append(fall)), "dst_repaired"] = True
+        panel[s] = col.stack().swaplevel().sort_index()  # (ts, zone) -> (zone, ts)
+    repaired = spring.append(fall)
+    panel.loc[panel.index.get_level_values("ts").isin(repaired), "dst_repaired"] = True
     panel = panel.reset_index()
     panel["pickups"] = panel["yellow"] + panel["green"]
     return panel[["zone", "ts", "pickups", "yellow", "green", "dst_repaired"]]

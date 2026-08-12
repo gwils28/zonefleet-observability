@@ -23,7 +23,7 @@ WEATHER_VARS = ("temperature_2m", "precipitation")
 
 def fetch_weather(start: str, end: str, lat_lon: tuple[float, float] = MANHATTAN) -> pd.DataFrame:
     """Météo horaire ERA5 en UTC entre deux dates incluses (AAAA-MM-JJ)."""
-    params = {
+    params: dict[str, str | float] = {
         "latitude": lat_lon[0],
         "longitude": lat_lon[1],
         "start_date": start,
@@ -89,7 +89,7 @@ def fetch_weather_forecast(
 ) -> pd.DataFrame:
     """Prévision émise la veille (variables `*_previous_day1`), en UTC, colonnes renommées
     comme la météo réalisée pour être interchangeables dans les features."""
-    params = {
+    params: dict[str, str | float] = {
         "latitude": lat_lon[0],
         "longitude": lat_lon[1],
         "start_date": start,
