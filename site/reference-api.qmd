@@ -1,0 +1,371 @@
+---
+title: "Référence de l'API"
+description: "Fonctions et classes publiques du package zonefleet, générées depuis les docstrings."
+---
+
+Page générée par `scripts/make_api_docs.py` : elle suit le code, elle ne se rédige pas à la main.
+
+## Données
+
+### `zonefleet.config`
+
+Constantes du protocole (SPEC.md) et chemins du projet.
+
+`Split(name: str, train: tuple[str, str], reference: tuple[str, str], analysis: tuple[str, str]) -> None`
+: *classe*. Découpage temporel d'une expérience (bornes incluses, au jour près).
+
+### `zonefleet.contract`
+
+Data contract des fichiers TLC : validation de schéma et journal des ruptures.
+
+`ContractReport(file: str, service: str, month: str, violations: list[str] = <factory>, known_breaks: list[str] = <factory>, unknown_breaks: list[str] = <factory>, types: dict[str, str] = <factory>) -> None`
+: *classe*. Résultat de la validation d'un fichier.
+
+`load_contract(path: Path | None = None) -> dict`
+: *fonction*. Charge le contract YAML (par défaut `configs/data_contract.yaml`).
+
+`parse_name(path: Path) -> tuple[str, str]`
+: *fonction*. Extrait (service, mois AAAA-MM) du nom de fichier TLC.
+
+`schema_timeline(paths: list[Path], contract: dict | None = None) -> list[ContractReport]`
+: *fonction*. Valide une liste de fichiers et renvoie les rapports triés par service puis mois.
+
+`type_changes(reports: list[ContractReport]) -> list[str]`
+: *fonction*. Détecte les changements de famille de type d'une colonne d'un mois au suivant.
+
+`type_family(t: pa.DataType) -> str`
+: *fonction*. Ramène un type Arrow à une famille stable (integer, float, timestamp, string, null).
+
+`validate_file(path: Path, contract: dict | None = None) -> ContractReport`
+: *fonction*. Valide un fichier Parquet TLC (lecture du schéma seulement, sans charger les données).
+
+`validate_schema(schema: pa.Schema, service: str, month: str, contract: dict) -> ContractReport`
+: *fonction*. Valide un schéma Arrow contre le contract.
+
+### `zonefleet.data`
+
+Agrégation des courses TLC en panel zone x heure.
+
+`aggregate_all(files: list[Path]) -> pd.DataFrame`
+: *fonction*. Agrège tous les fichiers en une table longue (zone, ts, service, pickups).
+
+`aggregate_file(path: Path, con: duckdb.DuckDBPyConnection | None = None) -> pd.DataFrame`
+: *fonction*. Compte les prises en charge par zone et par heure pour un fichier mensuel.
+
+`build_panel(long: pd.DataFrame, zones: list[int], start: str, end: str) -> pd.DataFrame`
+: *fonction*. Panel complet zone x heure (zéros explicites) avec réparation des heures DST.
+
+`cbd_share(files: list[Path]) -> pd.DataFrame`
+: *fonction*. Part des courses avec `cbd_congestion_fee > 0` par zone de prise en charge.
+
+`check_panel(panel: pd.DataFrame, max_per_hour: int | None = None) -> list[str]`
+: *fonction*. Contrôles de cohérence du panel (règle `panel` du data contract).
+
+`dst_hours(index: pd.DatetimeIndex) -> tuple[pd.DatetimeIndex, pd.DatetimeIndex]`
+: *fonction*. Heures locales naïves inexistantes (printemps) et ambiguës (automne) de l'index.
+
+`load_panel(path: Path | None = None) -> pd.DataFrame`
+: *fonction*. Charge le panel agrégé (`data/processed/panel.parquet`).
+
+`log1p_demand(x: pd.Series | np.ndarray) -> np.ndarray`
+: *fonction*. Transformation de la demande (intermittente sur les zones peu actives).
+
+`tlc_files(years: tuple[int, ...] | None = None) -> list[Path]`
+: *fonction*. Fichiers Parquet TLC présents dans `data/raw/tlc`, filtrés par année.
+
+`top_zones(long: pd.DataFrame, year: int = 2019, n: int = 60) -> list[int]`
+: *fonction*. Les n zones au plus grand volume (jaune + vert) sur l'année de référence.
+
+### `zonefleet.covariates`
+
+Covariables exogènes : météo horaire (Open-Meteo) et calendrier US.
+
+`calendar_features(ts: pd.Series) -> pd.DataFrame`
+: *fonction*. Features calendaires d'une série d'horodatages horaires locaux.
+
+`fetch_weather(start: str, end: str, lat_lon: tuple[float, float] = (40.758, -73.985)) -> pd.DataFrame`
+: *fonction*. Météo horaire ERA5 en UTC entre deux dates incluses (AAAA-MM-JJ).
+
+`fetch_weather_forecast(start: str, end: str, lat_lon: tuple[float, float] = (40.758, -73.985)) -> pd.DataFrame`
+: *fonction*. Prévision émise la veille (variables `*_previous_day1`), en UTC, colonnes renommées comme la météo réalisée pour être interchangeables dans les features.
+
+`load_weather(path: Path | None = None) -> pd.DataFrame`
+: *fonction*. Météo locale mise en cache (`data/processed/weather.csv`).
+
+`load_weather_forecast(path: Path | None = None) -> pd.DataFrame`
+: *fonction*. Prévision de la veille mise en cache (`data/processed/weather_forecast.csv`).
+
+`to_local_naive(df: pd.DataFrame) -> pd.DataFrame`
+: *fonction*. Passe de l'UTC à l'heure locale naïve, sur la même convention que le panel TLC.
+
+`us_holidays(years: list[int]) -> set[pd.Timestamp]`
+: *fonction*. Jours fériés fédéraux US (et observés) pour les années données.
+
+### `zonefleet.quality`
+
+Contrôles de qualité journaliers du panel, avant tout monitoring de modèle.
+
+`calibrate(checks: pd.DataFrame, q: float = 0.005) -> dict[str, float]`
+: *fonction*. Seuils empiriques (quantiles q et 1 - q) sur des jours ordinaires de référence.
+
+`daily_checks(panel: pd.DataFrame, thresholds: dict[str, float] | None = None) -> pd.DataFrame`
+: *fonction*. Une ligne par jour : indicateurs et drapeaux de qualité (jours calendaires connus exclus).
+
+`inject_bug(panel: pd.DataFrame, kind: str, start: pd.Timestamp, days: int = 7, zones: tuple[int, ...] = (161, 162, 230), seed: int = 0) -> pd.DataFrame`
+: *fonction*. Injecte un bug de données dans le panel sur [start, start + days).
+
+`known_calendar_days(index: pd.Index) -> pd.Series`
+: *fonction*. Jours fériés US, la veille et le lendemain, et la semaine du 24 décembre au 1er janvier.
+
+## Modèle
+
+### `zonefleet.features`
+
+Matrice de features du forecaster, sans fuite temporelle.
+
+`add_lag_features(panel: pd.DataFrame, value: str = y) -> pd.DataFrame`
+: *fonction*. Ajoute lags et moyennes glissantes de `value` par zone et par bloc contigu.
+
+`build_features(panel: pd.DataFrame, weather: pd.DataFrame, zones: pd.DataFrame | None = None) -> pd.DataFrame`
+: *fonction*. Assemble la matrice complète : cible, lags, calendrier, météo, zone.
+
+`contiguous_block(ts: pd.Series) -> pd.Series`
+: *fonction*. Identifiant de bloc temporel contigu (le panel saute de 2020 à 2024).
+
+`slice_period(df: pd.DataFrame, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame`
+: *fonction*. Lignes dont la cible t est dans [start, end).
+
+`zone_table() -> pd.DataFrame`
+: *fonction*. Métadonnées des 60 zones (`configs/zones.yaml`).
+
+### `zonefleet.model`
+
+Le modèle surveillé : LightGBM global à trois quantiles, puis figé.
+
+`QuantileForecaster(quantiles: tuple[float, ...] = (0.1, 0.5, 0.9), params: dict = <factory>, seed: int = 0, models: dict[float, lgb.LGBMRegressor] = <factory>, trained_on: tuple[str, str] | None = None) -> None`
+: *classe*. Trois LightGBM quantiles sur log1p(demande) ; prévisions renvoyées en courses.
+
+`seasonal_naive(df: pd.DataFrame) -> np.ndarray`
+: *fonction*. Baseline : même heure la semaine précédente (lag 168 h), en courses.
+
+### `zonefleet.baselines`
+
+Baselines : seasonal naive (dans model.py) et MSTL glissant (statsforecast).
+
+`mstl_rolling(panel: pd.DataFrame, zones: list[int], start: str, end: str) -> pd.DataFrame`
+: *fonction*. Prévisions MSTL journalières pour des zones, cibles dans [start, end).
+
+### `zonefleet.metrics`
+
+Métriques de prévision réalisée (échelle des courses).
+
+`coverage(y: ArrayLike, lo: ArrayLike, hi: ArrayLike) -> float`
+: *fonction*. Part des réalisations dans [lo, hi].
+
+`mae(y: ArrayLike, p: ArrayLike) -> float`
+: *fonction*.
+
+`mase(y: ArrayLike, p: ArrayLike, scale: float) -> float`
+: *fonction*.
+
+`pinball(y: ArrayLike, q: ArrayLike, alpha: float) -> float`
+: *fonction*. Perte quantile moyenne au niveau alpha.
+
+`rmse(y: ArrayLike, p: ArrayLike) -> float`
+: *fonction*.
+
+`seasonal_scale(pickups: pd.Series, zone: pd.Series, season: int = 168) -> float`
+: *fonction*. MAE du seasonal naive par zone (panel trié par zone puis heure), toutes zones confondues.
+
+`smape(y: ArrayLike, p: ArrayLike) -> float`
+: *fonction*. sMAPE en %, terme nul quand prévision et réalisé valent 0 (demande intermittente).
+
+`summarize(y: ArrayLike, q10: ArrayLike, q50: ArrayLike, q90: ArrayLike, scale: float) -> dict[str, float]`
+: *fonction*. Toutes les métriques du SPEC pour une prévision quantile.
+
+### `zonefleet.conformal`
+
+Calibration conforme des quantiles (CQR, Romano, Patterson et Candès, 2019).
+
+`apply(df: pd.DataFrame, corr: dict, by: str | None = None) -> pd.DataFrame`
+: *fonction*. Intervalle calibré (colonnes lo_cal, hi_cal, en courses).
+
+`correction(s: np.ndarray, alpha: float = 0.2) -> float`
+: *fonction*. Quantile conforme des scores (avec la correction de taille finie).
+
+`coverage_width(df: pd.DataFrame, lo: str, hi: str) -> tuple[float, float]`
+: *fonction*.
+
+`fit(cal: pd.DataFrame, alpha: float = 0.2, by: str | None = None) -> dict`
+: *fonction*. Corrections globales ou par groupe (Mondrian), en échelle log1p.
+
+`rolling(df: pd.DataFrame, window_days: int = 28, delay_days: int = 1, alpha: float = 0.2) -> pd.DataFrame`
+: *fonction*. Intervalle calibré jour par jour sur les `window_days` derniers jours de labels connus.
+
+`scores(y: np.ndarray, lo: np.ndarray, hi: np.ndarray) -> np.ndarray`
+: *fonction*. Scores de conformité CQR.
+
+## Monitoring
+
+### `zonefleet.monitoring`
+
+Briques de monitoring : dérive des entrées et des prédictions, performance estimée sans labels (NannyML DLE) et performance réalisée.
+
+`daily_psi(reference: pd.DataFrame, analysis: pd.DataFrame, columns: list[str], bins: int = 10) -> pd.DataFrame`
+: *fonction*. PSI journalier de chaque colonne contre la référence entière.
+
+`estimate_performance(reference: pd.DataFrame, analysis: pd.DataFrame, scale: str = count, metrics: tuple[str, ...] = (mae, rmse), chunk_period: str = D, seed: int = 0) -> pd.DataFrame`
+: *fonction*. Performance estimée par DLE sur l'analysis, **sans lire** `y_true` de l'analysis.
+
+`flatten(df: pd.DataFrame) -> pd.DataFrame`
+: *fonction*. Aplatit les colonnes multi-index NannyML en `niveau1__niveau2`.
+
+`monitor(reference: pd.DataFrame, analysis: pd.DataFrame, seed: int = 0) -> dict[str, pd.DataFrame]`
+: *fonction*. Exécute toutes les briques et renvoie un tableau par signal.
+
+`multivariate_drift(reference: pd.DataFrame, analysis: pd.DataFrame, columns: list[str] | None = None, chunk_period: str = D, n_components: float = 0.65) -> pd.DataFrame`
+: *fonction*. Erreur de reconstruction PCA par chunk (NannyML DataReconstructionDriftCalculator).
+
+`prediction_drift(reference: pd.DataFrame, analysis: pd.DataFrame) -> pd.DataFrame`
+: *fonction*. Dérive de la distribution des prévisions (médiane, échelle log) : KS et Wasserstein.
+
+`prepare(df: pd.DataFrame, scale: str = count) -> pd.DataFrame`
+: *fonction*. Colonnes cible/prédiction selon l'échelle (`y_true`, `y_pred`).
+
+`psi(reference: ArrayLike, current: ArrayLike, bins: int = 10, eps: float = 0.0001) -> float`
+: *fonction*. Population Stability Index, bacs définis par les quantiles de la référence.
+
+`realized_performance(df: pd.DataFrame, scale: str = count, freq: str = D) -> pd.DataFrame`
+: *fonction*. MAE et RMSE réalisées par chunk, une fois les labels révélés.
+
+`seasonal_psi(history: pd.DataFrame, analysis: pd.DataFrame, columns: list[str], half_window_days: int = 14, lag_days: int = 364, bins: int = 10) -> pd.DataFrame`
+: *fonction*. PSI journalier contre une base saisonnière : les 2 x `half_window_days` jours centrés sur la même date `lag_days` plus tôt (364 = même jour de semaine un an avant).
+
+`seasonal_zscore(history: pd.DataFrame, analysis: pd.DataFrame, columns: list[str], half_window_days: int = 14, lag_days: int = 364) -> pd.DataFrame`
+: *fonction*. Écart standardisé de la moyenne du jour à la base saisonnière des moyennes journalières.
+
+`univariate_drift(reference: pd.DataFrame, analysis: pd.DataFrame, columns: list[str] | None = None, methods: tuple[str, ...] = (kolmogorov_smirnov, wasserstein), chunk_period: str = D) -> pd.DataFrame`
+: *fonction*. Dérive univariée (KS, Wasserstein) par colonne et par chunk.
+
+### `zonefleet.rowscore`
+
+Scores par ligne réutilisant les modèles ajustés par NannyML (E4 à grande échelle).
+
+`RowScorer(seed: int = 0, n_components: float = 0.65)`
+: *classe*. Ajuste DLE (MAE, échelle log) et la PCA sur une référence, puis score des lignes.
+
+### `zonefleet.alerting`
+
+Politiques d'alerte et horloge de décision.
+
+`daily_signals(signals: dict[str, pd.DataFrame], metric: str = mae_log) -> pd.DataFrame`
+: *fonction*. Assemble les signaux booléens journaliers à partir de la sortie de `monitor`.
+
+`decision_time(target_day: pd.Timestamp, policy: str) -> pd.Timestamp`
+: *fonction*. Date à laquelle l'alerte d'un jour cible peut effectivement être levée.
+
+`false_alert_days(flags: pd.DataFrame, before: pd.Timestamp) -> pd.Series`
+: *fonction*. Nombre de jours en alerte avant le début du choc (fausses alertes).
+
+`first_alert(flags: pd.DataFrame, after: pd.Timestamp) -> pd.DataFrame`
+: *fonction*. Première alerte de chaque politique à partir d'un jour cible, et son délai.
+
+`persistent(flag: pd.Series, k: int) -> pd.Series`
+: *fonction*. Vrai le jour où `flag` est vrai depuis au moins k jours consécutifs.
+
+`policy_flags(sig: pd.DataFrame, persistence: int = 2) -> pd.DataFrame`
+: *fonction*. Alertes (par jour cible) de chaque politique, après persistance.
+
+### `zonefleet.scenarios`
+
+Injection de dérives contrôlées dans une période d'analysis (E3, E4).
+
+`Scenario(kind: str, severity: float, onset: pd.Timestamp, column: str = lag_168, direction: int = -1, subset: str = all, name: str = ) -> None`
+: *classe*. Description d'une dérive injectée.
+
+`concept_drift(analysis: pd.DataFrame, onset: pd.Timestamp, factor: float, subset: str = all) -> pd.DataFrame`
+: *fonction*. Multiplie la demande réalisée après `onset`, X et prédictions gelés.
+
+`covariate_shift(analysis: pd.DataFrame, onset: pd.Timestamp, kappa: float, column: str = lag_168, direction: int = -1, ref_stats: tuple[float, float] | None = None, seed: int = 0) -> pd.DataFrame`
+: *fonction*. Rééchantillonne chaque jour après `onset` avec des poids exp(direction * kappa * z).
+
+`inject(scenario: Scenario, analysis: pd.DataFrame, ref_stats: dict[str, tuple[float, float]] | None = None, level_inputs: dict | None = None, seed: int = 0) -> pd.DataFrame`
+: *fonction*. Applique un scénario à une analysis au format `pipeline.predictions`.
+
+`level_shock(panel: pd.DataFrame, weather: pd.DataFrame, model: QuantileForecaster, start: pd.Timestamp, end: pd.Timestamp, onset: pd.Timestamp, factor: float, subset: str = all, zones: pd.DataFrame | None = None) -> pd.DataFrame`
+: *fonction*. Choc de niveau propagé : demande x factor à partir d'onset, features recalculées.
+
+`subset_mask(df: pd.DataFrame, subset: str) -> pd.Series`
+: *fonction*. Lignes concernées par une dérive locale.
+
+## Exploitation
+
+### `zonefleet.report`
+
+Rapport quotidien de monitoring, en Markdown.
+
+`build(day: pd.Timestamp, signals: pd.DataFrame, zone_loss: pd.DataFrame | None = None, psi: pd.DataFrame | None = None, model_version: str = ?, label_delay_days: int = 60, quality: pd.Series | None = None) -> str`
+: *fonction*. Rapport du jour `day` (signaux jusqu'à ce jour inclus).
+
+### `zonefleet.ops.decisions`
+
+Décisions opérationnelles, en fonctions pures (testées sans Dagster).
+
+`RetrainDecision(retrain: bool, reason: str) -> None`
+: *classe*. RetrainDecision(retrain: 'bool', reason: 'str')
+
+`alert_severity(sig: pd.DataFrame, persistence: int = 2, ticket_days: int = 7) -> str`
+: *fonction*. Sévérité du dernier jour de `sig` (signaux journaliers de `alerting.daily_signals`).
+
+`retrain_decision(drift_confirmed: bool, post_alert_label_days: int, min_label_days: int = 28, feedback_guard_ok: bool = True) -> RetrainDecision`
+: *fonction*. Politique gardée : dérive confirmée ET assez de labels ET pas de boucle de rétroaction.
+
+### `zonefleet.ops.registry`
+
+Registry MLflow local : versions du forecaster, alias champion / challenger.
+
+`load(alias: str = champion, directory: Path | None = None) -> QuantileForecaster`
+: *fonction*. Charge le modèle désigné par un alias.
+
+`panel_fingerprint(path: Path | None = None) -> str`
+: *fonction*. Empreinte SHA-256 (16 premiers caractères) du panel ayant servi à l'entraînement.
+
+`promote_if_better(champion_error: float, challenger_error: float, challenger_version: str, margin: float = 0.05, directory: Path | None = None) -> bool`
+: *fonction*. Promeut le challenger si son erreur est inférieure d'au moins `margin` (relatif).
+
+`register(model: QuantileForecaster, metrics: dict[str, float], tags: dict[str, str] | None = None, directory: Path | None = None) -> str`
+: *fonction*. Enregistre une nouvelle version ; renvoie son numéro.
+
+`set_alias(alias: str, version: str, directory: Path | None = None) -> None`
+: *fonction*.
+
+`tracking_uri(directory: Path | None = None) -> str`
+: *fonction*.
+
+### `zonefleet.cli`
+
+Interface en ligne de commande.
+
+`build_parser() -> argparse.ArgumentParser`
+: *fonction*.
+
+`cmd_alert(args: argparse.Namespace) -> int`
+: *fonction*.
+
+`cmd_contract(_: argparse.Namespace) -> int`
+: *fonction*.
+
+`cmd_monitor(args: argparse.Namespace) -> int`
+: *fonction*.
+
+`cmd_report(args: argparse.Namespace) -> int`
+: *fonction*.
+
+`cmd_run(args: argparse.Namespace) -> int`
+: *fonction*.
+
+`daily_report(split: str, day: str | None = None) -> str`
+: *fonction*. Rapport Markdown d'un jour (par défaut le dernier jour de l'analysis).
+
+`main(argv: list[str] | None = None) -> int`
+: *fonction*.

@@ -83,6 +83,7 @@ website:
             text: Références
           - href: glossaire.qmd
           - href: faq.qmd
+          - href: reference-api.qmd
     right:
       - icon: github
         href: https://github.com/gwils28/zonefleet-observability

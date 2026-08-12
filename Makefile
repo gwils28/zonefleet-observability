@@ -43,6 +43,7 @@ figures:     ## Figures et tables du site (depuis results/)
 	uv run python scripts/make_tables.py
 	uv run python scripts/make_interactive.py
 	uv run python scripts/make_reports.py
+	uv run python scripts/make_api_docs.py
 site:        ## Rendu du site Quarto (site/_site)
 	quarto render site
 all: check experiments figures notebook site
