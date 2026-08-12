@@ -12,7 +12,9 @@ test:        ## Suite de tests rapide
 	uv run pytest
 lint:
 	uv run ruff check .
-check: lint test
+typecheck:   ## Vérification du typage (mypy)
+	uv run mypy
+check: lint typecheck test
 e0:          ## E0 : qualité du modèle surveillé (≈ 6 min, MSTL inclus)
 	uv run python -m zonefleet.experiments.e0_model
 e1:          ## E1 : choc COVID, DLE estimé vs réalisé
