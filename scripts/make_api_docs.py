@@ -85,7 +85,8 @@ def main() -> None:
         lines += [f"## {section}", ""]
         for m in mods:
             lines += module_section(m)
-    (ROOT / "site" / "reference-api.qmd").write_text("\n".join(lines) + "\n")
+    text = "\n".join(line.rstrip() for line in lines).rstrip() + "\n"
+    (ROOT / "site" / "reference-api.qmd").write_text(text)
     print(sum(1 for line in lines if line.startswith("`")), "entrées")
 
 
