@@ -57,6 +57,7 @@ website:
           - href: experiences/e7-saisonnier.qmd
           - href: experiences/e8-qualite.qmd
           - href: experiences/e9-meteo.qmd
+          - href: experiences/e10-zones.qmd
           - text: "---"
           - href: notebooks/tutoriel-dle.ipynb
             text: "Notebook : DLE pas à pas"
