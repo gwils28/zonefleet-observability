@@ -74,6 +74,7 @@ website:
           - href: exploitation/runbook.qmd
           - href: exploitation/rapport.qmd
           - href: exploitation/adr.qmd
+          - href: exploitation/deploiement.qmd
       - text: À propos
         menu:
           - href: methode.qmd
