@@ -80,8 +80,6 @@ check_untyped_defs = false
 [[tool.mypy.overrides]]
 # Pilotes d'expérience : typage progressif, exclus pour l'instant (docs/notes du 11 août).
 module = [
-    "zonefleet.experiments.e4_seasonal",
-    "zonefleet.experiments.e4_sensitivity",
     "zonefleet.experiments.e9_weather",
     "zonefleet.experiments.e10_zones",
 ]
