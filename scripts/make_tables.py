@@ -470,6 +470,32 @@ def e9_variants() -> pd.DataFrame:
     )
 
 
+@table("e10_summary")
+def e10_summary() -> pd.DataFrame:
+    s = pd.read_csv(T / "e10_summary.csv").set_index("policy")
+    b = pd.read_csv(T / "e10_by_subset.csv").set_index("policy")
+    n = pd.read_csv(T / "e10_subset_counts.csv").set_index("subset")["n"]
+    names = {
+        "ville": "condition jointe à la ville (E4)",
+        "par_groupe": "condition jointe par groupe",
+    }
+    out = pd.DataFrame({"Politique": [names[p] for p in ["ville", "par_groupe"]]})
+    out["Rappel"] = [fr(100 * s.loc[p, "recall"], 0) + " %" for p in ["ville", "par_groupe"]]
+    out["Fausses alertes / 30 j"] = [
+        fr(s.loc[p, "false_alerts_per_30d"], 2) for p in ["ville", "par_groupe"]
+    ]
+    for sub, lab in [
+        ("all", "ville entière"),
+        ("cbd", "CBD"),
+        ("night", "nuit"),
+        ("evening", "soir"),
+    ]:
+        out[f"{lab} (n = {n.get(sub, 0)})"] = [
+            fr(100 * b.loc[p, sub], 0) + " %" for p in ["ville", "par_groupe"]
+        ]
+    return out
+
+
 def kpis_html() -> str:
     """Tuiles de chiffres clés de l'accueil, calculées depuis results/."""
     det = pd.read_csv(T / "e1_detection.csv").set_index("policy")
