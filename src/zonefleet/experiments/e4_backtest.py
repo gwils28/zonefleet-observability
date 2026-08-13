@@ -69,7 +69,7 @@ def draw_scenarios(n: int, seed: int = 2026) -> pd.DataFrame:
                 "kind": kind,
                 "severity": round(float(sev), 3),
                 "subset": subset,
-                "onset": days[rng.integers(len(days))],
+                "onset": days[int(rng.integers(len(days)))],
             }
         )
     return pd.DataFrame(rows)
@@ -129,7 +129,7 @@ def thresholds(ref_daily: pd.DataFrame, k: float) -> dict[str, float]:
 def policy_flags(
     daily: pd.DataFrame, thr: dict[str, float], persistence: int = PERSISTENCE
 ) -> pd.DataFrame:
-    psi_all = daily[[c for c in daily if c.startswith("psi_")]].max(axis=1)
+    psi_all = daily[[c for c in daily.columns if str(c).startswith("psi_")]].max(axis=1)
     psi_clean = daily[["psi_lag_24", "psi_lag_168"]].max(axis=1)
     pca = daily["recon"] > thr["recon"]
     drift, clean = pca | (psi_all > PSI_ALERT), pca | (psi_clean > PSI_ALERT)
