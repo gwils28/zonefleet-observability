@@ -26,6 +26,7 @@ from zonefleet.experiments.e4_backtest import (
     harm_of,
     policy_flags,
     rising,
+    scenario_frame,
     smooth,
     summarize,
     thresholds,
@@ -50,7 +51,7 @@ def seasonal_z(daily: pd.DataFrame, base: pd.DataFrame, half: int = 14) -> pd.Da
     for c in COLS:
         z = []
         for day, v in daily[f"mean_{c}"].items():
-            center = day - pd.Timedelta(days=364)
+            center = pd.Timestamp(str(day)) - pd.Timedelta(days=364)
             b = base.loc[
                 (base.index >= center - pd.Timedelta(days=half))
                 & (base.index < center + pd.Timedelta(days=half)),
@@ -107,20 +108,20 @@ def main() -> None:
     scen = pd.read_csv(TABLES / "e4_scenarios.csv", parse_dates=["onset"])
     pred = predictions("congestion")
     ref_daily = RowScorer().fit(pred[pred.period == "reference"]).reference_daily
-    base_raw = daily.xs(scen.loc[scen["kind"] == "none", "id"].iloc[0])
+    base_raw = scenario_frame(daily, scen.loc[scen["kind"] == "none", "id"].iloc[0])
     base = seasonal_base()
-    res = []
+    records: list[dict] = []
     for w in (1, 7):
         thr = thresholds(smooth(ref_daily, w), 1.0)
         for sc in scen.itertuples():
-            raw = daily.xs(sc.id)
+            raw = scenario_frame(daily, sc.id)
             z = seasonal_z(raw, base)
             d = smooth(raw, w)
-            res += [
+            records += [
                 dict(r, smooth=w, k=1.0)
                 for r in evaluate(sc, d, harm_of(sc, raw, base_raw), flags_with_seasonal(d, z, thr))
             ]
-    res = pd.DataFrame(res)
+    res = pd.DataFrame(records)
     res.to_csv(TABLES / "e4_seasonal_results.csv", index=False)
     summ = summarize(res, n_boot=1000)
     summ.round(4).to_csv(TABLES / "e4_seasonal.csv", index=False)
