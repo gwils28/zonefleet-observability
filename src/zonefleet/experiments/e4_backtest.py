@@ -75,6 +75,11 @@ def draw_scenarios(n: int, seed: int = 2026) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def scenario_frame(daily: pd.DataFrame, scenario_id) -> pd.DataFrame:
+    """Signaux journaliers d'un scénario depuis le cache multi-index (id, date)."""
+    return pd.DataFrame(daily.xs(scenario_id))
+
+
 def resample_rows(rows: pd.DataFrame, onset, kappa, direction, stats, seed) -> pd.DataFrame:
     """Covariate shift sur la table des scores par ligne (même logique que scenarios.py)."""
     rng = np.random.default_rng(seed)
