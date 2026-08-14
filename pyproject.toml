@@ -76,10 +76,3 @@ ignore_missing_imports = true
 warn_unused_ignores = true
 no_implicit_optional = true
 check_untyped_defs = false
-
-[[tool.mypy.overrides]]
-# Pilotes d'expérience : typage progressif, exclus pour l'instant (docs/notes du 11 août).
-module = [
-    "zonefleet.experiments.e10_zones",
-]
-ignore_errors = true
