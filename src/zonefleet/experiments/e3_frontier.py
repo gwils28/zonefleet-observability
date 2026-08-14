@@ -99,7 +99,8 @@ def main() -> None:
         "end": end,
         "zones": zone_table(),
     }
-    shares, daily = [], []
+    shares: list[dict] = []
+    parts: list[pd.DataFrame] = []
     cols = [
         "estimated",
         "realized",
@@ -115,8 +116,8 @@ def main() -> None:
         flags = policy_flags(sig)
         post = flags[flags.index >= ONSET]
         shares.append({"scenario": sc.label, **{f"share_{c}": post[c].mean() for c in post}})
-        daily.append(sig[cols].assign(scenario=sc.label, family=family(sc), severity=sc.severity))
-    daily = pd.concat(daily)
+        parts.append(sig[cols].assign(scenario=sc.label, family=family(sc), severity=sc.severity))
+    daily = pd.concat(parts)
     summary = summarize(daily, pd.DataFrame(shares))
     TABLES.mkdir(parents=True, exist_ok=True)
     summary.round(4).to_csv(TABLES / "e3_summary.csv", index=False)

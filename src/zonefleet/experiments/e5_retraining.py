@@ -177,17 +177,18 @@ def main(end: str = "2021-01-01", suffix: str = "") -> None:
     df = features()
     champion = frozen_model("covid")
     policies = ["jamais", "calendrier", "réflexe", "réflexe court", "gardé"]
-    daily, switches = [], []
+    parts: list[pd.DataFrame] = []
+    switches: list[dict] = []
     for delay in DELAYS:
         for name in policies:
             run = simulate(name, delay, df, champion)
-            daily.append(realized(run, df))
+            parts.append(realized(run, df))
             switches += [
                 {"policy": name, "delay": delay, "date": d, "note": note}
                 for d, _, note in run.switches[1:]
             ]
             print(f"L={delay:>2} {name:14s} {len(run.switches) - 1} remplacement(s)")
-    daily = pd.concat(daily, ignore_index=True)
+    daily = pd.concat(parts, ignore_index=True)
     TABLES.mkdir(parents=True, exist_ok=True)
     daily.round(5).to_csv(TABLES / f"e5{suffix}_daily.csv", index=False)
     pd.DataFrame(switches).to_csv(TABLES / f"e5{suffix}_switches.csv", index=False)

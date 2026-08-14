@@ -25,6 +25,7 @@ from zonefleet.experiments.e4_backtest import (
     evaluate,
     harm_of,
     policy_flags,
+    scenario_frame,
     smooth,
     summarize,
     thresholds,
@@ -47,20 +48,20 @@ def main() -> None:
     pred = predictions("congestion")
     ref_daily = RowScorer().fit(pred[pred.period == "reference"]).reference_daily
     thr = thresholds(smooth(ref_daily, SMOOTH_W), K)
-    base = daily.xs(scen.loc[scen["kind"] == "none", "id"].iloc[0])
+    base = scenario_frame(daily, scen.loc[scen["kind"] == "none", "id"].iloc[0])
     rows = []
     for param, value, kw in VARIANTS:
-        persistence = kw.get("persistence", PERSISTENCE)
-        window = kw.get("window", WINDOW_DAYS)
-        harm_threshold = kw.get("harm_threshold", HARM)
-        res = []
+        persistence = int(kw.get("persistence", PERSISTENCE))
+        window = int(kw.get("window", WINDOW_DAYS))
+        harm_threshold = float(kw.get("harm_threshold", HARM))
+        records: list[dict] = []
         for sc in scen.itertuples():
-            raw = daily.xs(sc.id)
+            raw = scenario_frame(daily, sc.id)
             harm = harm_of(sc, raw, base, window)
             d = smooth(raw, SMOOTH_W)
             flags = policy_flags(d, thr, persistence)
-            res += evaluate(sc, d, harm, flags, window, harm_threshold)
-        res = pd.DataFrame(res).assign(smooth=SMOOTH_W, k=K)
+            records += evaluate(sc, d, harm, flags, window, harm_threshold)
+        res = pd.DataFrame(records).assign(smooth=SMOOTH_W, k=K)
         summ = summarize(res, n_boot=500)
         rows.append(summ.assign(parameter=param, value=value))
         print(f"{param:12s} {value:<5} fait")

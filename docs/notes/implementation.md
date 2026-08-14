@@ -137,3 +137,9 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Pilotes d'expérience exclus provisoirement (`ignore_errors`) : 39 erreurs, presque toutes
   dues à la rigueur des stubs pandas sur des `groupby` et des `DataFrame | Series`.
 - Vérifié : panel reconstruit identique, 113 tests verts.
+
+## 2026-08-14 : typage complet
+
+- Exclusion mypy des pilotes d'expérience retirée : 80 erreurs corrigées (scénarios typés
+  dans E10, accès typé au cache de E4, listes distinctes des tables, écarts calculés par
+  alignement). Sorties de E4 bis, E4 quater, E9 et E10 vérifiées identiques.

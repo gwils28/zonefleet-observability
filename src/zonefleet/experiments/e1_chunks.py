@@ -31,8 +31,8 @@ def chunk_end(start: pd.Timestamp, freq: str) -> pd.Timestamp:
 
 def run_chunk(ref: pd.DataFrame, an: pd.DataFrame, label: str, freq: str) -> pd.DataFrame:
     est = estimate_performance(ref, an, "log", metrics=("mae",), chunk_period=freq)
-    real = realized_performance(an, "log", freq="D")
-    real = real[real["metric"] == "mae_log"].set_index("date")["realized"]
+    perf = realized_performance(an, "log", freq="D")
+    real = perf[perf["metric"] == "mae_log"].set_index("date")["realized"]
     if freq == "W":
         # même découpage que NannyML : semaines calendaires, rattachées à leur premier jour
         rows = []

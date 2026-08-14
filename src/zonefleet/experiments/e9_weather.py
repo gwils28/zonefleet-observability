@@ -92,8 +92,8 @@ def main() -> None:
         + metrics(c, "c : prévision / prévision")
     )
     out = pd.DataFrame(rows)
-    base = out[out["variant"].str.startswith("a")].set_index("period")
-    out["delta_mae_pct"] = [100 * (r.mae / base.loc[r.period, "mae"] - 1) for r in out.itertuples()]
+    base_mae = out[out["variant"].str.startswith("a")].set_index("period")["mae"]
+    out["delta_mae_pct"] = 100 * (out["mae"] / out["period"].map(base_mae) - 1)
     out.round(4).to_csv(TABLES / "e9_variants.csv", index=False)
     print(pd.read_csv(TABLES / "e9_forecast_error.csv").round(3).to_string())
     print(out.round(3).to_string())

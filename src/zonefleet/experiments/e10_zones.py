@@ -11,6 +11,7 @@ ligne sont agrégés par groupe ; chaque groupe a ses seuils de référence ; la
 from __future__ import annotations
 
 import warnings
+from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
@@ -29,6 +30,30 @@ from zonefleet.scenarios import level_shock, subset_mask
 GROUPS = {"cbd": 1, "hors_cbd": 0}
 
 
+class Scen(NamedTuple):
+    """Scénario de E4, champs typés."""
+
+    id: int
+    kind: str
+    severity: float
+    subset: str
+    onset: pd.Timestamp
+
+
+def load_scenarios() -> list[Scen]:
+    df = pd.read_csv(TABLES / "e4_scenarios.csv", parse_dates=["onset"])
+    return [
+        Scen(
+            int(r["id"]),
+            str(r["kind"]),
+            float(r["severity"]),
+            str(r["subset"]),
+            pd.Timestamp(r["onset"]),
+        )
+        for _, r in df.iterrows()
+    ]
+
+
 def rows_with_group(scorer: RowScorer, df: pd.DataFrame) -> pd.DataFrame:
     r = scorer.score_rows(df)
     r["cbd"] = df["cbd"].to_numpy()
@@ -45,7 +70,11 @@ def group_daily(rows: pd.DataFrame, ref_rows: pd.DataFrame) -> dict[str, pd.Data
         d = gb[["est", "recon", "real"]].mean()
         for c in ("lag_24", "lag_168"):
             ref_vals = ref[c].to_numpy()
-            d[f"psi_{c}"] = gb[c].apply(lambda s, rv=ref_vals: psi(rv, s.to_numpy()))
+
+            def day_psi(s: pd.Series, rv: np.ndarray = ref_vals) -> float:
+                return psi(rv, s.to_numpy())
+
+            d[f"psi_{c}"] = gb[c].apply(day_psi)
         res[g] = d
     return res
 
@@ -84,7 +113,7 @@ def main() -> None:
         frozen_model("congestion"),
         zone_table(),
     )
-    scen = pd.read_csv(TABLES / "e4_scenarios.csv", parse_dates=["onset"])
+    scen = load_scenarios()
     harm = (
         pd.read_csv(TABLES / "e4_results.csv")
         .query("smooth == 1 and k == 1.0")
@@ -92,7 +121,7 @@ def main() -> None:
         .set_index("id")["harmful"]
     )
     out = []
-    for sc in scen.itertuples():
+    for sc in scen:
         if sc.kind == "none":
             rows = base_rows
         elif sc.kind.startswith("covariate"):
@@ -116,7 +145,7 @@ def main() -> None:
         flags["par_groupe"] = flags["cbd"] | flags["hors_cbd"]
         idx = daily["ville"].index
         win = (idx >= sc.onset) & (idx < sc.onset + pd.Timedelta(days=WINDOW_DAYS))
-        null = (idx >= PRE_START) & ((idx < sc.onset) | (sc.kind == "none"))
+        null = (idx >= PRE_START) & ((idx < sc.onset) | bool(sc.kind == "none"))
         for pol in ("ville", "par_groupe"):
             f = flags[pol].reindex(idx).fillna(False)
             ev = rising(f)
@@ -139,21 +168,16 @@ def main() -> None:
     res = pd.DataFrame(out)
     res.to_csv(TABLES / "e10_results.csv", index=False)
     h = res[res["harmful"]]
-    summary = (
-        res.groupby("policy")
-        .apply(
-            lambda d: pd.Series(
-                {
-                    "recall": d.loc[d["harmful"], "detected"].mean(),
-                    "median_delay": d.loc[d["harmful"] & d["detected"], "delay_days"].median(),
-                    "false_alerts_per_30d": 30
-                    * d["false_alert_events"].sum()
-                    / d["null_days"].sum(),
-                }
-            ),
-            include_groups=False,
-        )
-        .reset_index()
+    summary = pd.DataFrame(
+        [
+            {
+                "policy": pol,
+                "recall": d.loc[d["harmful"], "detected"].mean(),
+                "median_delay": d.loc[d["harmful"] & d["detected"], "delay_days"].median(),
+                "false_alerts_per_30d": 30 * d["false_alert_events"].sum() / d["null_days"].sum(),
+            }
+            for pol, d in res.groupby("policy")
+        ]
     )
     by_subset = h.groupby(["policy", "subset"])["detected"].mean().unstack().reset_index()
     n_subset = h.drop_duplicates("id")["subset"].value_counts().rename("n").reset_index()
