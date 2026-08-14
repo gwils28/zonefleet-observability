@@ -55,7 +55,7 @@ packages = ["src/zonefleet"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-extend-exclude = [".claude"]
+extend-exclude = [".claude", "site/notebooks"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
