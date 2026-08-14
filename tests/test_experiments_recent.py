@@ -75,3 +75,56 @@ def test_make_tables_french_number_format():
     assert fr(1234.5, 1) == "1 234,5"
     assert fr(float("nan")) == "-"
     assert fr("texte") == "texte"
+
+
+def test_e10_group_signals_and_joint_condition():
+    from zonefleet.experiments import e10_zones as E
+
+    rng = np.random.default_rng(0)
+    dates = np.repeat(pd.date_range("2025-01-01", periods=30, freq="D"), 20)
+    rows = pd.DataFrame(
+        {
+            "date": dates,
+            "est": 0.3,
+            "recon": 1.0,
+            "real": 0.3,
+            "lag_24": rng.normal(size=600),
+            "lag_168": rng.normal(size=600),
+            "cbd": np.tile([0, 1], 300),
+        }
+    )
+    daily = E.group_daily(rows, rows)
+    assert set(daily) == {"ville", "cbd", "hors_cbd"}
+    thr = E.thresholds(daily["ville"])
+    d = daily["cbd"].copy()
+    d.loc[d.index[-5:], "est"] = 0.9
+    d.loc[d.index[-5:], "psi_lag_24"] = 0.5
+    j = E.joint(d, {**thr, "est": 0.5})
+    assert j.iloc[-1] and not j.iloc[:-5].any()
+
+
+def test_e4_seasonal_z_is_large_for_a_level_jump():
+    from zonefleet.experiments.e4_seasonal import seasonal_z
+
+    base_idx = pd.date_range("2024-01-01", "2024-03-31", freq="D")
+    base = pd.DataFrame(
+        {
+            "lag_24": np.random.default_rng(1).normal(5, 0.1, len(base_idx)),
+            "lag_168": 5.0 + np.random.default_rng(2).normal(0, 0.1, len(base_idx)),
+        },
+        index=base_idx,
+    )
+    days = pd.date_range("2025-02-01", periods=10, freq="D")
+    daily = pd.DataFrame({"mean_lag_24": 5.0, "mean_lag_168": 3.0}, index=days)
+    z = seasonal_z(daily, base)
+    assert (z["z_lag_168"] > 3).all() and (z["z_lag_24"] < 3).all()
+
+
+def test_e1_chunks_run_on_toy_world(toy_world):
+    from zonefleet.experiments.e1_chunks import run_chunk, summarize
+
+    p = toy_world.predictions("covid")
+    ref, an = p[p.period == "reference"], p[p.period == "analysis"]
+    d = run_chunk(ref, an, "semaine", "W")
+    assert set(d["chunk"]) == {"semaine"} and (d["ci_rel_width"] > 0).all()
+    assert summarize(d)["n_chunks"] == len(d)
