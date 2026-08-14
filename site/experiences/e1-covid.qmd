@@ -99,6 +99,12 @@ Trois enseignements :
   transformer une alarme permanente en détecteur précoce. P3b (P1b ET DLE) décide le
   22 mars, comme P2 : sur ce choc, c'est DLE qui fixe le délai de la condition jointe.
 
+::: {.callout-tip}
+## Rejouer la page du 22 mars
+Le notebook [anatomie d'une alerte](../notebooks/anatomie-alerte.ipynb) reprend ces
+journées une à une : quel signal s'allume, quand, et ce que le rapport du matin aurait dit.
+:::
+
 ## Ce que E1 établit
 
 1. Sur un choc réel, **la performance estimée sans labels détecte en 9 jours ce que les

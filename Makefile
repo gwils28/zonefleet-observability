@@ -35,6 +35,7 @@ notebook:    ## Régénère et exécute le notebook tutoriel
 	uv run python scripts/build_notebook.py
 	uv run jupyter nbconvert --to notebook --execute --inplace site/notebooks/tutoriel-dle.ipynb
 	uv run jupyter nbconvert --to notebook --execute --inplace site/notebooks/couts-alerte.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace site/notebooks/anatomie-alerte.ipynb
 experiments: e0 e1 e2 e3 e4 e5  ## Toutes les expériences du SPEC
 figures:     ## Figures et tables du site (depuis results/)
 	uv run python scripts/make_concept_figures.py

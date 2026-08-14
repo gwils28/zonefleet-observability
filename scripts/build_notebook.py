@@ -246,6 +246,87 @@ mal placée, la condition jointe est le bon choix.""",
 ]
 
 
+ALERT_CELLS: list[tuple[str, str]] = [
+    (
+        "md",
+        """# Anatomie d'une alerte : le 22 mars 2020
+
+Le 13 mars 2020, New York déclare l'état d'urgence. Ce notebook rejoue, jour par jour, ce
+que le moniteur ZoneFleet aurait vu, sans aucun label, jusqu'à la première page ; puis ce
+que les labels révèlent deux mois plus tard.
+
+Prérequis : le cache des prévisions (`make e0`).""",
+    ),
+    (
+        "code",
+        """import os
+os.environ["NML_DISABLE_USAGE_LOGGING"] = "1"
+
+import pandas as pd
+
+from zonefleet.alerting import daily_signals, policy_flags
+from zonefleet.monitoring import monitor
+from zonefleet.pipeline import predictions
+
+p = predictions("covid")
+ref, an = p[p.period == "reference"], p[p.period == "analysis"]
+out = monitor(ref, an)
+sig = daily_signals(out)
+flags = policy_flags(sig)
+window = sig.loc["2020-03-09":"2020-03-25"]
+cols = ["psi_clean_max", "pca_alert", "drift_clean", "estimated", "threshold", "perf_est"]
+window[cols].round(3)""",
+    ),
+    (
+        "md",
+        """## Ce qu'on lit dans ce tableau
+
+- Le **PSI des lags** dépasse 0,25 dès le 14 mars : la dérive nettoyée s'allume
+  (la demande d'hier ne ressemble plus à celle de l'automne).
+- La **PCA** ne voit presque rien (une seule journée, le 23) : les lags chutent ensemble,
+  le long de la première composante.
+- La **perte estimée** monte lentement et ne franchit son seuil que le 19, puis durablement
+  à partir du 22 : il faut que les lags aient absorbé le choc pour que DLE le voie.""",
+    ),
+    (
+        "code",
+        """cols = ["P1b_drift_clean", "P2_dle", "P3b_clean_and_dle"]
+flags.loc["2020-03-09":"2020-03-25", cols]""",
+    ),
+    (
+        "md",
+        """La condition jointe nettoyée (P3b) s'allume le **23 mars** (jour cible) : la décision
+est possible la veille, le **22 mars**, neuf jours après l'état d'urgence. La dérive
+nettoyée seule (P1b) aurait alerté dès le 14 mars, mais elle alerte aussi sur des dérives
+bénignes (E4) : elle ouvre un ticket, pas une page.""",
+    ),
+    (
+        "code",
+        """from zonefleet.cli import daily_report
+
+print(daily_report("covid", "2020-03-23"))""",
+    ),
+    ("md", """## Deux mois plus tard : ce que disent les labels"""),
+    (
+        "code",
+        """late = sig.loc["2020-03-09":"2020-04-15", ["estimated", "realized"]]
+ax = late.plot(figsize=(9, 3.2), color=["#2a78d6", "#eb6834"])
+ax.axvline(pd.Timestamp("2020-03-13"), color="#52514e", lw=1)
+ax.set_ylabel("MAE log")
+ax.set_title("Estimée le jour même, réalisée connue deux mois plus tard")
+late.loc["2020-03-22":"2020-03-28"].round(3)""",
+    ),
+    (
+        "md",
+        """L'erreur réelle de ces journées est de 1,4 à 1,7, soit près de trois à quatre fois
+l'estimation :
+la page était juste sur le **fait** (le modèle se dégrade) et fausse sur l'**ampleur**.
+C'est exactement la frontière mesurée dans E3 : pendant la transition, le choc ressemble à
+un concept drift, que la perte estimée ne peut voir qu'en partie.""",
+    ),
+]
+
+
 def write(cells, name: str) -> None:
     nb = nbf.v4.new_notebook()
     nb["cells"] = [
@@ -263,7 +344,11 @@ def write(cells, name: str) -> None:
     print(out)
 
 
-NOTEBOOKS = {"tutoriel-dle.ipynb": CELLS, "couts-alerte.ipynb": COST_CELLS}
+NOTEBOOKS = {
+    "tutoriel-dle.ipynb": CELLS,
+    "couts-alerte.ipynb": COST_CELLS,
+    "anatomie-alerte.ipynb": ALERT_CELLS,
+}
 
 
 def main(names: list[str]) -> None:
