@@ -71,6 +71,8 @@ Les intervalles bootstrap rééchantillonnent les scénarios. Or les jours « sa
 proviennent tous de la **même période réelle** (janvier-juin 2025) : ils ne sont pas
 indépendants d'un scénario à l'autre. L'incertitude sur le taux de fausses alertes est
 donc **sous-estimée** ; il faudrait d'autres années calmes pour la mesurer vraiment.
+C'est l'objet de la [réplication sur trois périodes calmes](#réplication-sur-trois-périodes-calmes-e4-ter)
+plus bas.
 :::
 
 ## Le compromis selon le seuil
