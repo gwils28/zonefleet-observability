@@ -114,6 +114,8 @@ journées une à une : quel signal s'allume, quand, et ce que le rapport du mati
    ([E2](e2-congestion.qmd)) et dans le backtest ([E4](e4-backtest.qmd)).
 3. Une politique de production ne peut pas se reposer sur DLE seul pour l'**ampleur** :
    le chiffre estimé est un minorant pendant les ruptures.
+4. La **dérive nettoyée** (lags seulement) détecte le choc en un jour sans fausse alerte
+   préalable : elle ouvre un ticket le 14 mars, la condition jointe page le 22.
 
 ## Variante : chunks d'une semaine (E1 bis)
 
