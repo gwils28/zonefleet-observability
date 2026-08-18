@@ -87,6 +87,14 @@ C'est la **mécanique exacte du décrochage** observé en E1 :
    revient à son niveau habituel, mais DLE, qui a appris que « faible niveau » rime avec
    « forte erreur », la surestime légèrement.
 
+::: {.callout-tip}
+## La même frontière, zone par zone
+[E6](e6-localisation.qmd) retrouve cette frontière à la maille de la zone (perte estimée :
+AUC 1,0 pour localiser un choc propagé, 0,5 pour un concept drift), et
+[E10](e10-zones.qmd) montre que les dérives locales nuisibles sont presque toutes des
+concept drifts.
+:::
+
 ## Ce que E3 établit
 
 1. L'hypothèse du SPEC est **confirmée** : la performance estimée sans labels capture le
