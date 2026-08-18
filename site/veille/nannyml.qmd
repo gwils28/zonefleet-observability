@@ -169,3 +169,9 @@ régime qui déplacent le modèle vers des zones où il se trompait déjà davan
 (concept drift). La compétence n'est pas de l'utiliser, c'est de savoir **quand ne pas
 le croire**.
 :::
+
+Ce que le projet a mesuré, pour aller plus loin : taux de suivi de 0,85 à 0,99 sous
+covariate shift et de 0 sous concept drift pur ([E3](../experiences/e3-frontiere.qmd)),
+précision de 100 % sur les dégradations saisonnières d'automne mais de 22 % en hiver 2025
+([E4 ter](../experiences/e4-backtest.qmd#réplication-sur-trois-périodes-calmes-e4-ter)),
+cécité face aux bugs de données ([E8](../experiences/e8-qualite.qmd)).
