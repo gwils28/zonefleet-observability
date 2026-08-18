@@ -31,7 +31,7 @@ flowchart LR
 | Lags de demande | `lag_24`, `lag_48`, `lag_72`, `lag_168`, `lag_336` (sur log1p) | oui, par construction |
 | Moyennes glissantes | `roll_mean_24`, `roll_mean_168`, terminées à t - 24 h | oui |
 | Calendrier | `hour`, `dow`, `is_weekend`, `is_holiday` | oui |
-| Météo | `temperature_2m`, `precipitation` | hypothèse : prévision parfaite |
+| Météo | `temperature_2m`, `precipitation` | entraîné sur le réalisé ; la vraie prévision de la veille ne change la MAE que de 0,1 % ([E9](../experiences/e9-meteo.qmd)) |
 | Zone | `zone` (catégorielle), `cbd` | oui |
 
 Les lags sont calculés **par zone et par bloc contigu** (le panel saute de 2020 à 2024) :

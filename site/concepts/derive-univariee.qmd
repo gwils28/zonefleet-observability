@@ -30,7 +30,10 @@ d'usage : **< 0,1** stable, **0,1 à 0,25** dérive modérée, **> 0,25** dériv
    d'une semaine de décembre n'a rien à voir avec celle d'une semaine de septembre ;
    la température de janvier non plus. Une dérive de calendrier ou de météo est
    **attendue**, rarement nuisible : c'est la première source de fausses alertes
-   mesurée dans [E1](../experiences/e1-covid.qmd).
+   mesurée dans [E1](../experiences/e1-covid.qmd). Pour une feature exogène saisonnière,
+   comparer la moyenne du jour aux mêmes semaines de l'année précédente (z-score
+   saisonnier) supprime ce bruit ; le PSI d'une journée contre une fenêtre longue, lui,
+   reste mal posé ([E7](../experiences/e7-saisonnier.qmd)).
 3. **Wasserstein parle la langue de la feature.** Un W1 de 0,4 sur `lag_168` (en log1p)
    veut dire « la demande d'il y a une semaine s'est déplacée d'environ 40 % en moyenne »,
    interprétable sans tableau de seuils.

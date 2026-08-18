@@ -63,6 +63,8 @@ référence (72 %), pas à la valeur nominale (80 %).
    c'est la condition 3 de DLE, satisfaite.
 3. Sa dépendance au lag hebdomadaire fixe l'**inertie** attendue après un choc : environ
    une semaine.
+4. Sa météo pèse peu : servi sur la vraie prévision de la veille, il ne perd que 0,1 % de
+   MAE ([E9](../experiences/e9-meteo.qmd)).
 
 ## Extension : calibration conforme des quantiles (E0 bis)
 

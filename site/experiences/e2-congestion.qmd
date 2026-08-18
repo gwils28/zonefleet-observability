@@ -86,6 +86,13 @@ de DLE (pas de régions rares ou inédites) vue dans l'autre sens : hors du conn
 l'estimation peut se tromper vers le haut comme vers le bas. Aucune alerte n'en résulte
 (le seuil est à peine touché, la persistance filtre).
 
+::: {.callout-tip}
+## Suite : la saison comme référence
+La première source de fausses alertes d'E2, la température, disparaît quand on compare
+chaque jour à la même saison de l'année précédente avec un z-score de la moyenne
+journalière ([E7](e7-saisonnier.qmd)).
+:::
+
 ## Ce que E2 établit
 
 1. Une **rupture structurelle réelle et datée** ne dégrade pas forcément un modèle :

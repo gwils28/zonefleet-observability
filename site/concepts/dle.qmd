@@ -45,6 +45,12 @@ nouvelles positions.
 | P(y \| X) change, X stable | ĝ inchangée, lue aux mêmes endroits | **aveugle** |
 | Bruit homoscédastique (erreur identique partout) | ĝ quasi constante | estimation plate, toute variation est du bruit |
 
+## Lire DLE par zone
+
+La perte estimée par ligne s'agrège aussi par zone : elle sert alors de **diagnostic**.
+Sur le COVID, elle classe les zones touchées presque comme l'erreur réalisée
+(corrélation de rang 0,74), même quand elle sous-estime l'ampleur ([E6](../experiences/e6-localisation.qmd)).
+
 ## Deux échelles, deux lectures
 
 Le projet estime la performance sur deux échelles :

@@ -116,3 +116,5 @@ changer de sens le 5 janvier 2025.
 | Pipeline jungles, glue code | orchestration | assets Dagster typés |
 | Configuration debt | découpages, seuils | `config.py` unique, SPEC figé |
 | Monitoring and testing | le moniteur lui-même | backtest E4 du moniteur |
+| Up-stream producers | fichiers TLC tronqués, dupliqués, décalés | contrôles de qualité avant le moniteur (E8) |
+| Fixed thresholds (saison) | référence d'automne contre analysis d'hiver | z-score saisonnier pour les features exogènes (E7) |

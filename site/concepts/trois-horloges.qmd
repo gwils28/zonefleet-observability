@@ -47,7 +47,9 @@ Un signal sur le jour cible D n'est pas disponible au même moment selon sa natu
 | Performance **réalisée** du jour D | D + 60 jours | il faut le label publié |
 
 Ce projet mesure donc chaque délai de détection **sur l'horloge de décision** (fonction
-`alerting.decision_time`). Une alerte sur la performance réalisée qui pointe le bon jour
+`alerting.decision_time`). La même discipline s'applique aux outils d'exploitation : le
+[rapport du matin](../exploitation/rapport.qmd) masque, dans un rejeu historique, toute
+perte réalisée dont la publication est postérieure à sa date. Une alerte sur la performance réalisée qui pointe le bon jour
 cible arrive deux mois trop tard pour repositionner une flotte : elle n'a de valeur que
 pour l'audit et le réentraînement.
 

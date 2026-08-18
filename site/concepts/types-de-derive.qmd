@@ -51,7 +51,9 @@ Dans un modèle à lags, la frontière est **mouvante**, et c'est ce qui rend le
    vaut 1,3 fois le dimanche ») peut elle-même avoir changé : concept drift résiduel.
 
 Cette séquence est visible dans les données réelles de [E1](../experiences/e1-covid.qmd)
-et isolée proprement, type par type, dans [E3](../experiences/e3-frontiere.qmd).
+et isolée proprement, type par type, dans [E3](../experiences/e3-frontiere.qmd). Elle vaut
+aussi à petite échelle : parmi les dérives nuisibles limitées à quelques zones, presque
+toutes sont des concept drifts, invisibles à la ville comme à la zone ([E10](../experiences/e10-zones.qmd)).
 
 ## Construire des dérives pures pour les tester
 

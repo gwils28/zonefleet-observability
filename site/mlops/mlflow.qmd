@@ -41,6 +41,13 @@ stateDiagram-v2
   recalculés sur la référence du nouveau champion : un seuil hérité d'un autre modèle est
   un « fixed threshold in a dynamic system » au sens de Sculley.
 
+## Ce que E5 bis a confirmé
+
+Sur deux ans (2020-2021), la politique gardée remplace le champion 9 fois, contre 23 pour
+un calendrier mensuel, pour une erreur équivalente en 2021 (MAE log 0,264 contre 0,261) :
+chaque mouvement d'alias est justifié par une validation postérieure
+([E5 bis](../experiences/e5-reentrainement.qmd#e5-bis-la-reprise-de-2021)).
+
 ## Dans le code
 
 ```python

@@ -38,7 +38,8 @@ que l'entrée bouge **et** que l'erreur estimée monte.
 |---|---|---|---|---|
 | Changement de saison, modèle robuste | alerte | - | - | dérive sans impact : P3 se tait, à raison |
 | Covariate shift vers des zones difficiles | alerte | alerte | **alerte** | le cas d'école de la condition jointe |
-| Bruit du nanny model, entrées stables | - | alerte | - | P3 filtre une fausse alerte de DLE |
+| Bruit du nanny model, entrées stables | - | alerte | - | P3 filtre une fausse alerte de DLE (DLE seul ouvre un ticket) |
+| Dégradation saisonnière (fêtes), lags stables | - | alerte | - | DLE seul a raison : ticket « dégradation probable » (E4 ter) |
 | Concept drift pur | - | - | - | **tous muets** ; seul P4 verra, 60 jours plus tard |
 
 ## Persistance
@@ -73,4 +74,13 @@ ALERT RealizedDegradation
 ```
 
 La dérive seule n'est pas jetée : elle descend d'un niveau de sévérité (ticket), parce
-qu'elle reste le seul indice d'un concept drift naissant quand DLE se tait.
+qu'elle reste le seul indice d'un concept drift naissant quand DLE se tait. La perte
+estimée seule non plus : sur les automnes 2019 et 2024, chacune de ses alertes tombait
+sur une vraie dégradation saisonnière ([E4 ter](../experiences/e4-backtest.qmd#réplication-sur-trois-périodes-calmes-e4-ter)).
+
+Deux compléments mesurés depuis :
+
+- **Évaluer la condition par groupe de zones** (CBD, hors CBD) et alerter si l'un des
+  groupes alerte : +4 points de rappel, toujours sans fausse alerte ([E10](../experiences/e10-zones.qmd)).
+- **Faire passer la qualité des données avant tout** : un bug amont prime sur les
+  alertes du modèle (sévérité « incident données », [E8](../experiences/e8-qualite.qmd)).

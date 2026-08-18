@@ -38,6 +38,7 @@ def layout(fig: go.Figure, title: str, xtitle: str, ytitle: str, height: int = 4
 def write(fig: go.Figure, name: str, first: bool = True) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     html = fig.to_html(
+        div_id=f"zf-{name.replace('_', '-')}",
         full_html=False,
         include_plotlyjs="cdn" if first else False,
         config={"displaylogo": False, "responsive": True},
