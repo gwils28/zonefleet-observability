@@ -54,6 +54,13 @@ Une rupture déclarée dans `known_breaks` n'est acceptée **qu'après sa date**
 fichier est mal nommé, soit l'amont a republié des données. Le test
 `test_known_break_is_logged_only_after_its_date` le vérifie.
 
+## Le contrat ne suffit pas
+
+Le contrat vérifie la **forme** des fichiers. Un fichier conforme peut être tronqué,
+dupliqué ou décalé d'une heure : c'est le rôle des contrôles de qualité journaliers
+(volume, profil horaire, zones muettes) ajoutés après [E8](../experiences/e8-qualite.qmd),
+qui attrapent ces bugs dès le premier jour.
+
 ## Dans le code
 
 ```python
