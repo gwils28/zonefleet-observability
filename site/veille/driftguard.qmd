@@ -114,3 +114,6 @@ C'est le cadre repris tel quel dans [E4, backtest du moniteur](../experiences/e4
    qu'ils parlent **avant** les labels : dérive des entrées, dérive des prédictions,
    performance estimée. → [alerting](../concepts/politiques-alerte.qmd)
 3. **Réentraîner peu et ciblé**, avec un critère de coût. → [E5](../experiences/e5-reentrainement.qmd)
+4. **Diagnostiquer par niveau de la hiérarchie** : l'équivalent de son module SHAP est
+   ici la perte estimée par zone, qui classe correctement les zones touchées par le COVID
+   sans aucun label. → [E6](../experiences/e6-localisation.qmd)
