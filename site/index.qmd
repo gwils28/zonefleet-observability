@@ -26,10 +26,12 @@ brutal commence par un concept drift, le temps que les lags l'absorbent.
 
 ![Pour chaque dérive injectée : hausse d'erreur réalisée (abscisse) contre hausse estimée sans labels (ordonnée). Sur la diagonale, l'estimation dit vrai ; sur l'axe horizontal, elle ment.](figures/e3_frontiere.png){#fig-home}
 
-D'où l'architecture recommandée : **alerter sur la condition jointe** « dérive des
-entrées ET hausse de la perte estimée » (zéro fausse alerte mesurée), garder la dérive
-seule pour un ticket hebdomadaire, **raccourcir le délai des labels** pour couvrir
-l'angle mort, et **ne jamais réentraîner par réflexe**.
+D'où l'architecture recommandée : **contrôler la qualité des données d'abord** (un bug
+amont est invisible pour le moniteur de modèle), **alerter sur la condition jointe**
+« dérive des entrées ET hausse de la perte estimée » (zéro fausse alerte sur quatre
+périodes réelles et 240 scénarios), garder la dérive seule et la perte estimée seule pour
+des tickets, **raccourcir le délai des labels** pour couvrir l'angle mort, et **ne jamais
+réentraîner par réflexe**.
 
 ## Parcourir le site
 
