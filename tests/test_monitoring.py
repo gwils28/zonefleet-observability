@@ -117,3 +117,24 @@ def test_seasonal_psi_skips_days_without_history():
     ts = pd.date_range("2020-01-01", periods=48, freq="h")
     df = pd.DataFrame({"ts": ts, "x": 1.0})
     assert M.seasonal_psi(df, df, ["x"]).empty
+
+
+def test_psi_by_day_matches_reference_implementation():
+    rng = np.random.default_rng(3)
+    ref = rng.normal(size=5000)
+    days = np.repeat(pd.date_range("2025-01-01", periods=20, freq="D"), 300)
+    vals = rng.normal(loc=np.repeat(np.linspace(0, 1, 20), 300), size=len(days))
+    fast = M.psi_by_day(ref, vals, days)
+    slow = pd.Series(vals).groupby(days).apply(lambda s: M.psi(ref, s.to_numpy()))
+    np.testing.assert_allclose(fast.to_numpy(), slow.to_numpy(), rtol=1e-12, atol=1e-12)
+
+
+def test_psi_by_day_with_ties_on_bin_edges():
+    """Les lags sont des log1p d'entiers : beaucoup de valeurs tombent sur les bornes."""
+    rng = np.random.default_rng(4)
+    ref = np.log1p(rng.poisson(5, 4000))
+    days = np.repeat(pd.date_range("2025-01-01", periods=10, freq="D"), 200)
+    vals = np.log1p(rng.poisson(np.repeat(np.linspace(4, 8, 10), 200)))
+    fast = M.psi_by_day(ref, vals, days)
+    slow = pd.Series(vals).groupby(days).apply(lambda s: M.psi(ref, s.to_numpy()))
+    np.testing.assert_allclose(fast.to_numpy(), slow.to_numpy(), rtol=1e-12, atol=1e-12)
