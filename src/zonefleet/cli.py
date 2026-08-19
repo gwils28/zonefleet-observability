@@ -111,8 +111,20 @@ def cmd_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def version() -> str:
+    """Version installée du package (métadonnées), « inconnue » en mode source brut."""
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _v
+
+    try:
+        return _v("zonefleet")
+    except PackageNotFoundError:
+        return "inconnue"
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog="zonefleet", description=__doc__.splitlines()[0])
+    ap.add_argument("--version", action="version", version=f"zonefleet {version()}")
     sub = ap.add_subparsers(dest="command", required=True)
     sub.add_parser("contract", help="valide les fichiers TLC").set_defaults(fn=cmd_contract)
     for name, fn, helptext in [
