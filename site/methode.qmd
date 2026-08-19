@@ -39,6 +39,13 @@ l'historique des PR :
 | Rapport du matin lisant des labels « du futur » | relecture d'un exemple réel | horloge des labels dans le rapport |
 | Rangs de zones mal recopiés dans la page E6 | vérification contre la table | texte corrigé |
 
+## Reproduire ailleurs
+
+L'image Docker du dépôt (`docker build -t zonefleet .`) fige l'environnement par
+`uv.lock`. Vérifié dans un conteneur vierge : `make check` passe (134 tests, lint,
+typage) et `make e1`, sans aucun cache, reproduit à l'identique les dates de décision et
+les délais publiés pour les six politiques.
+
 ## Outils
 
 Python 3.12 (uv), LightGBM, NannyML, statsforecast, duckdb, Dagster, MLflow, Quarto,
