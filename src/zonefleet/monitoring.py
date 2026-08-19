@@ -202,11 +202,22 @@ def daily_psi(
     reference: pd.DataFrame, analysis: pd.DataFrame, columns: list[str], bins: int = 10
 ) -> pd.DataFrame:
     """PSI journalier de chaque colonne contre la référence entière."""
-    rows = []
-    for day, d in analysis.groupby(analysis[TS].dt.floor(CHUNK)):
-        for col in columns:
-            rows.append({"date": day, "feature": col, "psi": psi(reference[col], d[col], bins)})
-    return pd.DataFrame(rows)
+    days = analysis[TS].dt.floor(CHUNK).to_numpy()
+    parts = [
+        psi_by_day(reference[col], analysis[col], days, bins)
+        .rename("psi")
+        .reset_index()
+        .assign(feature=col)
+        for col in columns
+    ]
+    out = pd.concat(parts, ignore_index=True)[["date", "feature", "psi"]]
+    order = out["feature"].map({c: i for i, c in enumerate(columns)})
+    return (
+        out.assign(_o=order)
+        .sort_values(["date", "_o"], kind="stable")
+        .drop(columns="_o")
+        .reset_index(drop=True)
+    )
 
 
 def prediction_drift(reference: pd.DataFrame, analysis: pd.DataFrame) -> pd.DataFrame:

@@ -22,7 +22,7 @@ import nannyml as nml  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
-from zonefleet.monitoring import DLE_FEATURES, DRIFT_FEATURES, TS, prepare, psi  # noqa: E402
+from zonefleet.monitoring import DLE_FEATURES, DRIFT_FEATURES, TS, prepare, psi_by_day  # noqa: E402
 
 logging.getLogger("nannyml").setLevel(logging.WARNING)
 
@@ -110,13 +110,11 @@ class RowScorer:
         out = g[["est", "recon", "real"]].mean()
         for c in ("lag_24", "lag_168"):
             out[f"mean_{c}"] = g[c].mean()  # pour la dérive saisonnière (E4 quater)
+        days = rows["date"].to_numpy()
         for c in PSI_COLUMNS:
-            ref = self.ref_psi[c]
-
-            def day_psi(s: pd.Series, ref: np.ndarray = ref) -> float:
-                return psi(ref, s.to_numpy())
-
-            out[f"psi_{c}"] = g[c].apply(day_psi)
+            out[f"psi_{c}"] = (
+                psi_by_day(self.ref_psi[c], rows[c], days).reindex(out.index).to_numpy()
+            )
         return out
 
     def daily(self, df: pd.DataFrame) -> pd.DataFrame:
