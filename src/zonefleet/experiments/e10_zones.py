@@ -22,7 +22,7 @@ from zonefleet.covariates import load_weather
 from zonefleet.data import load_panel
 from zonefleet.experiments.e4_backtest import PRE_START, WINDOW_DAYS, resample_rows, rising
 from zonefleet.features import zone_table
-from zonefleet.monitoring import psi
+from zonefleet.monitoring import psi_by_day
 from zonefleet.pipeline import TABLES, frozen_model, predictions
 from zonefleet.rowscore import RowScorer
 from zonefleet.scenarios import level_shock, subset_mask
@@ -68,13 +68,9 @@ def group_daily(rows: pd.DataFrame, ref_rows: pd.DataFrame) -> dict[str, pd.Data
         ref = ref_rows if g == "ville" else ref_rows[ref_rows["cbd"] == GROUPS[g]]
         gb = r.groupby("date")
         d = gb[["est", "recon", "real"]].mean()
+        days = r["date"].to_numpy()
         for c in ("lag_24", "lag_168"):
-            ref_vals = ref[c].to_numpy()
-
-            def day_psi(s: pd.Series, rv: np.ndarray = ref_vals) -> float:
-                return psi(rv, s.to_numpy())
-
-            d[f"psi_{c}"] = gb[c].apply(day_psi)
+            d[f"psi_{c}"] = psi_by_day(ref[c], r[c], days).reindex(d.index).to_numpy()
         res[g] = d
     return res
 

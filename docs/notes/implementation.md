@@ -143,3 +143,11 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Exclusion mypy des pilotes d'expérience retirée : 80 erreurs corrigées (scénarios typés
   dans E10, accès typé au cache de E4, listes distinctes des tables, écarts calculés par
   alignement). Sorties de E4 bis, E4 quater, E9 et E10 vérifiées identiques.
+
+## 2026-08-19 : PSI journalier vectorisé
+
+- `monitoring.psi_by_day` : bacs de la référence calculés une fois, affectation par
+  `searchsorted`, comptage par jour. Égalité stricte avec `psi` testée (y compris valeurs
+  discrètes sur les bornes). Branché dans `daily_psi`, `RowScorer.aggregate` et E10.
+- E10 passe d'environ 40 min à 92 s ; `e10_results.csv` et les tables de E1 sont
+  identiques à l'octet près.

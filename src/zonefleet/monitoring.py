@@ -202,11 +202,22 @@ def daily_psi(
     reference: pd.DataFrame, analysis: pd.DataFrame, columns: list[str], bins: int = 10
 ) -> pd.DataFrame:
     """PSI journalier de chaque colonne contre la référence entière."""
-    rows = []
-    for day, d in analysis.groupby(analysis[TS].dt.floor(CHUNK)):
-        for col in columns:
-            rows.append({"date": day, "feature": col, "psi": psi(reference[col], d[col], bins)})
-    return pd.DataFrame(rows)
+    days = analysis[TS].dt.floor(CHUNK).to_numpy()
+    parts = [
+        psi_by_day(reference[col], analysis[col], days, bins)
+        .rename("psi")
+        .reset_index()
+        .assign(feature=col)
+        for col in columns
+    ]
+    out = pd.concat(parts, ignore_index=True)[["date", "feature", "psi"]]
+    order = out["feature"].map({c: i for i, c in enumerate(columns)})
+    return (
+        out.assign(_o=order)
+        .sort_values(["date", "_o"], kind="stable")
+        .drop(columns="_o")
+        .reset_index(drop=True)
+    )
 
 
 def prediction_drift(reference: pd.DataFrame, analysis: pd.DataFrame) -> pd.DataFrame:
@@ -295,3 +306,27 @@ def seasonal_zscore(
             z = (vals[col] - base[col].mean()) / sd if sd > 0 else 0.0
             rows.append({"date": day, "feature": col, "z": float(z)})
     return pd.DataFrame(rows)
+
+
+def psi_by_day(
+    reference: ArrayLike, values: ArrayLike, days: ArrayLike, bins: int = 10, eps: float = 1e-4
+) -> pd.Series:
+    """PSI de chaque jour contre la référence, vectorisé (mêmes bacs et plancher que `psi`).
+
+    Les bacs (quantiles de la référence) sont calculés une fois ; chaque ligne est affectée
+    à son bac par `np.digitize`, puis les effectifs sont comptés par jour.
+    """
+    ref = np.asarray(reference, float)
+    vals = np.asarray(values, float)
+    edges = np.unique(np.quantile(ref, np.linspace(0, 1, bins + 1)))
+    edges[0], edges[-1] = -np.inf, np.inf
+    nb = len(edges) - 1
+    r = np.histogram(ref, edges)[0] / len(ref)
+    r = np.clip(r, eps, None)
+    codes, uniq = pd.factorize(pd.Series(days), sort=True)
+    b = np.clip(np.searchsorted(edges, vals, side="right") - 1, 0, nb - 1)
+    counts = np.zeros((len(uniq), nb))
+    np.add.at(counts, (codes, b), 1)
+    c = np.clip(counts / counts.sum(axis=1, keepdims=True), eps, None)
+    out = ((c - r) * np.log(c / r)).sum(axis=1)
+    return pd.Series(out, index=pd.Index(uniq, name="date"))
