@@ -24,3 +24,9 @@ def test_contract_without_raw_files_exits_2(monkeypatch, capsys):
     monkeypatch.setattr("zonefleet.data.tlc_files", lambda years=None: [])
     assert main(["contract"]) == 2
     assert "make data" in capsys.readouterr().err
+
+
+def test_version_flag(capsys):
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(["--version"])
+    assert capsys.readouterr().out.startswith("zonefleet ")

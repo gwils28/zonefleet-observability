@@ -53,6 +53,14 @@ zonefleet alert --split congestion
 make dagster               # interface Dagster sur http://localhost:3000
 ```
 
+Sans installer Python localement :
+
+```bash
+docker build -t zonefleet .
+docker run --rm zonefleet make check            # 134 tests, lint, typage
+docker run --rm zonefleet make e1               # une expérience sur le panel versionné
+```
+
 Les données brutes (3,6 Go) ne sont nécessaires que pour reconstruire le panel :
 `make data` les télécharge et vérifie leurs empreintes SHA-256.
 
