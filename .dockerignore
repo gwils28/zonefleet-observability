@@ -1,0 +1,13 @@
+.venv
+data/raw
+data/interim
+results/cache
+results/mlflow
+results/reports
+site/_site
+site/.quarto
+.git
+**/__pycache__
+.pytest_cache
+.ruff_cache
+.mypy_cache
