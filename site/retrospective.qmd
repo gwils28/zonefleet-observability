@@ -52,7 +52,7 @@ dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
 
 ## Ce qui a surpris
 
-- **La PCA ne voit pas le COVID.** Quand toute la ville perd 80 % de sa demande, les lags
+- **La PCA ne voit pas le COVID.** Quand la ville perd 96 % de ses courses (avril contre février 2020), les lags
   chutent ensemble, le long de la première composante : l'erreur de reconstruction ne
   bouge presque pas. D'où le PSI des lags dans le signal de dérive.
 - **La perte estimée a raison en automne.** Sur les périodes « calmes », chacune de ses
@@ -61,6 +61,7 @@ dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
 - **La météo pèse peu.** Servir le modèle sur la vraie prévision de la veille au lieu de
   la météo réalisée change sa MAE de **+0,08 %** ([E9](experiences/e9-meteo.qmd)) :
   l'hypothèse optimiste du protocole était sans conséquence.
-- **Les dérives locales sont des concept drifts.** Presque aucune dérive limitée à
-  quelques zones n'est visible, ni à la ville ni à la zone : elles changent la relation
-  entre lags et demande, pas les lags eux-mêmes.
+- **Les dérives locales sont des concept drifts.** Parmi les dérives nuisibles limitées
+  à quelques zones, 26 sur 27 changent la relation entre lags et demande, pas les lags
+  eux-mêmes : aucune agrégation, ville ou groupe de zones, ne les rend visibles
+  ([E10](experiences/e10-zones.qmd)).
