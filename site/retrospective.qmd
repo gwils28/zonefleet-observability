@@ -41,7 +41,7 @@ dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
 - **L'ampleur estimée pendant une rupture.** Le 22 mars 2020, la perte estimée vaut
   0,48 ; la perte réalisée, connue en mai, vaut 1,75. La page avait raison sur le fait,
   tort sur l'ampleur ([notebook](notebooks/anatomie-alerte.ipynb)).
-- **La politique gardée en 2020.** Sur l'année du choc, le calendrier mensuel bat la
+- **La politique gardée en 2020.** Du 13 mars au 31 décembre 2020, le calendrier mensuel bat la
   politique gardée (MAE log 0,363 contre 0,411 avec des labels à J+1) : quand le monde
   change chaque semaine, attendre la preuve coûte plus que réentraîner à l'aveugle
   ([E5](experiences/e5-reentrainement.qmd)). En 2021, les deux politiques se valent avec
