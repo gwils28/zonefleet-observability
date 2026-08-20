@@ -17,3 +17,18 @@ sur 240 scénarios injectés ni sur trois périodes calmes. Mais il ne voit qu'u
 des dégradations : la perte estimée suit un covariate shift (taux de suivi 0,85 à 0,99)
 et reste aveugle à un concept drift pur (taux de suivi 0). Cette frontière, mesurée
 dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
+
+## Ce qui a tenu
+
+- **Le protocole figé.** `SPEC.md` n'a jamais été modifié. Chaque ajout (E6 à E10, la
+  calibration conforme, l'année 2021) est étiqueté comme extension ou variante a
+  posteriori, et les résultats déclarés sont publiés même quand ils déçoivent (le PSI par
+  zone de E6, le PSI saisonnier de E7).
+- **La condition jointe.** « Dérive nettoyée ET perte estimée » est le seul signal qui
+  combine un vrai rappel (51 % sur les dérives nuisibles, signal lissé) et zéro fausse
+  page. Évaluée par groupe de zones, elle monte à 55 % ([E10](experiences/e10-zones.qmd)).
+- **Le scoreur par ligne.** Reproduire les modèles ajustés par NannyML ligne par ligne,
+  avec un test d'égalité, a rendu possible un backtest de 240 scénarios en quelques
+  minutes au lieu de plusieurs jours.
+- **Les chiffres générés.** Aucun nombre du site n'est tapé à la main : chaque
+  régénération (vérifiée dans un conteneur vierge) reproduit les mêmes tables.
