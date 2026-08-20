@@ -32,3 +32,20 @@ dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
   minutes au lieu de plusieurs jours.
 - **Les chiffres générés.** Aucun nombre du site n'est tapé à la main : chaque
   régénération (vérifiée dans un conteneur vierge) reproduit les mêmes tables.
+
+## Ce qui a cédé
+
+- **La dérive seule comme page.** Après la taxe de congestion de janvier 2025, la dérive
+  des entrées alerte **177 jours sur 177** sans aucune dégradation : un signal qui
+  n'apprend rien à l'astreinte ([E2](experiences/e2-congestion.qmd)).
+- **L'ampleur estimée pendant une rupture.** Le 22 mars 2020, la perte estimée vaut
+  0,48 ; la perte réalisée, connue en mai, vaut 1,75. La page avait raison sur le fait,
+  tort sur l'ampleur ([notebook](notebooks/anatomie-alerte.ipynb)).
+- **La politique gardée en 2020.** Sur l'année du choc, le calendrier mensuel bat la
+  politique gardée (MAE log 0,363 contre 0,411 avec des labels à J+1) : quand le monde
+  change chaque semaine, attendre la preuve coûte plus que réentraîner à l'aveugle
+  ([E5](experiences/e5-reentrainement.qmd)). En 2021, les deux politiques se valent avec
+  9 remplacements contre 23.
+- **Le moniteur face aux bugs.** Un fichier dupliqué ou décalé d'une heure ne déclenche
+  pas la condition jointe ; seuls les contrôles de qualité le voient
+  ([E8](experiences/e8-qualite.qmd)).
