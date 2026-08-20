@@ -65,3 +65,31 @@ dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
   à quelques zones, 26 sur 27 changent la relation entre lags et demande, pas les lags
   eux-mêmes : aucune agrégation, ville ou groupe de zones, ne les rend visibles
   ([E10](experiences/e10-zones.qmd)).
+
+## Ce que je referais autrement
+
+- **Tester les signaux sur un cas synthétique avant les données réelles, toujours.** Le
+  PSI d'une journée contre une fenêtre de 28 jours était mal posé ; un test synthétique
+  écrit avant l'exécution l'a montré, mais seulement pour E7. Le même réflexe aurait
+  évité la variante a posteriori de E6.
+- **Écrire le scoreur par ligne dès le départ.** Il est arrivé avec E4 ; les premières
+  expériences ont tourné chunk par chunk dans NannyML, plus lentement et sans pouvoir
+  agréger par zone.
+- **Choisir des périodes calmes dans le protocole.** La mesure des fausses alertes sur
+  une seule période (E4) était fragile ; E4 ter l'a répliquée sur trois périodes, mais
+  hors protocole.
+- **Vectoriser plus tôt.** Le PSI journalier calculé jour par jour faisait durer E10
+  quarante minutes ; la version vectorisée, strictement égale, tourne en 92 secondes.
+
+## Ce qui reste ouvert
+
+1. **Le concept drift pur reste invisible avant les labels.** Seul un délai de labels
+   plus court le couvre : les journaux de l'opérateur (J+1) plutôt que la publication
+   TLC (J+60). C'est un choix d'architecture, pas de monitoring.
+2. **L'ampleur pendant une rupture.** Un minorant fiable de la perte serait plus utile
+   qu'une estimation centrale biaisée vers le bas.
+3. **Une seule ville, un seul modèle.** Les seuils (k, persistance, lissage) sont
+   calibrés sur New York ; leur transfert à un autre réseau n'est pas mesuré.
+4. **Le coût réel des alertes.** Le [notebook des coûts](notebooks/couts-alerte.ipynb)
+   repose sur des coûts supposés ; les mesurer chez un opérateur changerait peut-être le
+   seuil optimal.
