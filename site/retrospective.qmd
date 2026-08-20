@@ -1,0 +1,19 @@
+---
+title: "Rétrospective"
+description: "Deux mois de travail relus : ce qui a tenu, ce qui a cédé, ce qui a surpris, et ce qu'il faudrait faire ensuite."
+---
+
+Cette page relit le projet avec le recul de la fin. Tous les chiffres viennent des
+tables de `results/` ; les déviations au protocole sont détaillées dans le
+[journal de bord](journal.qmd).
+
+## La question, et la réponse
+
+> Peut-on surveiller un forecaster dont la vérité terrain arrive deux mois en retard ?
+
+Oui, à condition de savoir ce que l'on surveille. Sans aucun label, le moniteur a vu le
+choc du COVID en **9 jours** (contre 62 avec les labels) et n'a jamais pagé à tort, ni
+sur 240 scénarios injectés ni sur trois périodes calmes. Mais il ne voit qu'une partie
+des dégradations : la perte estimée suit un covariate shift (taux de suivi 0,85 à 0,99)
+et reste aveugle à un concept drift pur (taux de suivi 0). Cette frontière, mesurée
+dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
