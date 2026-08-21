@@ -10,7 +10,7 @@ modifier pour accommoder un résultat.
 - `make check` = lint + tests (rapide). `make data` télécharge ~5 Go dans `data/raw/`.
 - `make panel` agrège le panel ; `make e0` ... `make e5` (ou `make experiments`) ;
   `make figures` (figures + tables du site depuis `results/`) ; `make site`.
-- CLI : `zonefleet contract | monitor | alert | run eX`. Dagster : `make dagster`.
+- CLI : `zonefleet contract | monitor | alert | report | list | run eX` (`run e4-ter`, etc.). Dagster : `make dagster`.
 - E4 relit ses résultats sans tout relancer : `python -m zonefleet.experiments.e4_backtest --summary-only`.
 
 ## Pièges
