@@ -56,6 +56,7 @@ def _fake_signals(page: bool) -> pd.DataFrame:
             "perf_est": [False, False, page, page, page],
             "estimated": 0.3,
             "threshold": 0.4,
+            "perf_real": None,
         },
         index=idx,
     )
