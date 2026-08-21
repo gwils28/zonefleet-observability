@@ -5,7 +5,8 @@ Exemples :
     zonefleet monitor --split covid     # signaux journaliers (CSV sur la sortie standard)
     zonefleet alert --split congestion  # sévérité du dernier jour : page, ticket, aucune
     zonefleet report --date 2020-03-23 --split covid   # rapport du matin
-    zonefleet run e3                    # lance une expérience du SPEC
+    zonefleet run e3                    # lance une expérience (SPEC ou extension)
+    zonefleet list                      # liste les expériences disponibles
 """
 
 from __future__ import annotations
@@ -22,6 +23,21 @@ EXPERIMENTS = {
     "e4": "zonefleet.experiments.e4_backtest",
     "e5": "zonefleet.experiments.e5_retraining",
 }
+
+# Extensions et variantes, hors SPEC (E5 bis prend des arguments : passer par `make e5r`).
+EXTENSIONS = {
+    "e0-bis": "zonefleet.experiments.e0_conformal",
+    "e1-bis": "zonefleet.experiments.e1_chunks",
+    "e4-bis": "zonefleet.experiments.e4_sensitivity",
+    "e4-ter": "zonefleet.experiments.e4_calm",
+    "e4-quater": "zonefleet.experiments.e4_seasonal",
+    "e6": "zonefleet.experiments.e6_localisation",
+    "e7": "zonefleet.experiments.e7_seasonal",
+    "e8": "zonefleet.experiments.e8_quality",
+    "e9": "zonefleet.experiments.e9_weather",
+    "e10": "zonefleet.experiments.e10_zones",
+}
+ALL_EXPERIMENTS = {**EXPERIMENTS, **EXTENSIONS}
 
 
 def cmd_contract(_: argparse.Namespace) -> int:
@@ -107,7 +123,27 @@ def cmd_report(args: argparse.Namespace) -> int:
 
 
 def cmd_run(args: argparse.Namespace) -> int:
-    importlib.import_module(EXPERIMENTS[args.experiment]).main()
+    importlib.import_module(ALL_EXPERIMENTS[args.experiment]).main()
+    return 0
+
+
+def describe(module: str) -> str:
+    """Première ligne de la docstring du module, sans l'importer (lecture du source)."""
+    import ast
+    from importlib.util import find_spec
+
+    spec = find_spec(module)
+    if spec is None or spec.origin is None:
+        return "?"
+    with open(spec.origin, encoding="utf-8") as f:
+        doc = ast.get_docstring(ast.parse(f.read())) or "?"
+    return doc.splitlines()[0]
+
+
+def cmd_list(_: argparse.Namespace) -> int:
+    for key, mod in ALL_EXPERIMENTS.items():
+        tag = "SPEC" if key in EXPERIMENTS else "ext."
+        print(f"{key:<10} {tag:<5} {describe(mod)}")
     return 0
 
 
@@ -139,8 +175,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--date", default=None, help="AAAA-MM-JJ (défaut : dernier jour)")
     p.set_defaults(fn=cmd_report)
     p = sub.add_parser("run", help="lance une expérience")
-    p.add_argument("experiment", choices=sorted(EXPERIMENTS))
+    p.add_argument("experiment", choices=list(ALL_EXPERIMENTS))
     p.set_defaults(fn=cmd_run)
+    sub.add_parser("list", help="liste les expériences").set_defaults(fn=cmd_list)
     return ap
 
 

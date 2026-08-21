@@ -68,5 +68,5 @@ e8:          ## E8 : bugs de données amont, qualité contre moniteur de modèle
 	uv run python -m zonefleet.experiments.e8_quality
 e9:          ## E9 : vraie prévision météo de la veille
 	uv run python -m zonefleet.experiments.e9_weather
-e10:         ## E10 : alerter par groupe de zones (≈ 40 min)
+e10:         ## E10 : alerter par groupe de zones (≈ 2 min)
 	uv run python -m zonefleet.experiments.e10_zones
