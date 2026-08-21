@@ -59,7 +59,7 @@ Sans installer Python localement :
 
 ```bash
 docker build -t zonefleet .
-docker run --rm zonefleet make check            #  tests, lint, typage
+docker run --rm zonefleet make check            # 144 tests, lint, typage
 docker run --rm zonefleet make e1               # une expérience sur le panel versionné
 ```
 
