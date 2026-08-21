@@ -1,0 +1,95 @@
+---
+title: "Rétrospective"
+description: "Deux mois de travail relus : ce qui a tenu, ce qui a cédé, ce qui a surpris, et ce qu'il faudrait faire ensuite."
+---
+
+Cette page relit le projet avec le recul de la fin. Tous les chiffres viennent des
+tables de `results/` ; les déviations au protocole sont détaillées dans le
+[journal de bord](journal.qmd).
+
+## La question, et la réponse
+
+> Peut-on surveiller un forecaster dont la vérité terrain arrive deux mois en retard ?
+
+Oui, à condition de savoir ce que l'on surveille. Sans aucun label, le moniteur a vu le
+choc du COVID en **9 jours** (contre 62 avec les labels) et n'a jamais pagé à tort, ni
+sur 240 scénarios injectés ni sur trois périodes calmes. Mais il ne voit qu'une partie
+des dégradations : la perte estimée suit un covariate shift (taux de suivi 0,85 à 0,99)
+et reste aveugle à un concept drift pur (taux de suivi 0). Cette frontière, mesurée
+dans [E3](experiences/e3-frontiere.qmd), est le résultat central du projet.
+
+## Ce qui a tenu
+
+- **Le protocole figé.** `SPEC.md` n'a jamais été modifié. Chaque ajout (E6 à E10, la
+  calibration conforme, l'année 2021) est étiqueté comme extension ou variante a
+  posteriori, et les résultats déclarés sont publiés même quand ils déçoivent (le PSI par
+  zone de E6, le PSI saisonnier de E7).
+- **La condition jointe.** « Dérive nettoyée ET perte estimée » est le seul signal qui
+  combine un vrai rappel (51 % sur les dérives nuisibles, signal lissé) et zéro fausse
+  page. Évaluée par groupe de zones, elle monte à 55 % ([E10](experiences/e10-zones.qmd)).
+- **Le scoreur par ligne.** Reproduire les modèles ajustés par NannyML ligne par ligne,
+  avec un test d'égalité, a rendu possible un backtest de 240 scénarios en quelques
+  minutes au lieu de plusieurs jours.
+- **Les chiffres générés.** Aucun nombre du site n'est tapé à la main : chaque
+  régénération (vérifiée dans un conteneur vierge) reproduit les mêmes tables.
+
+## Ce qui a cédé
+
+- **La dérive seule comme page.** Après la taxe de congestion de janvier 2025, la dérive
+  des entrées alerte **177 jours sur 177** sans aucune dégradation : un signal qui
+  n'apprend rien à l'astreinte ([E2](experiences/e2-congestion.qmd)).
+- **L'ampleur estimée pendant une rupture.** Le 22 mars 2020, la perte estimée vaut
+  0,48 ; la perte réalisée, connue en mai, vaut 1,75. La page avait raison sur le fait,
+  tort sur l'ampleur ([notebook](notebooks/anatomie-alerte.ipynb)).
+- **La politique gardée en 2020.** Du 13 mars au 31 décembre 2020, le calendrier mensuel bat la
+  politique gardée (MAE log 0,363 contre 0,411 avec des labels à J+1) : quand le monde
+  change chaque semaine, attendre la preuve coûte plus que réentraîner à l'aveugle
+  ([E5](experiences/e5-reentrainement.qmd)). En 2021, les deux politiques se valent avec
+  9 remplacements contre 23.
+- **Le moniteur face aux bugs.** Un fichier dupliqué ou décalé d'une heure ne déclenche
+  pas la condition jointe ; seuls les contrôles de qualité le voient
+  ([E8](experiences/e8-qualite.qmd)).
+
+## Ce qui a surpris
+
+- **La PCA ne voit pas le COVID.** Quand la ville perd 96 % de ses courses (avril contre février 2020), les lags
+  chutent ensemble, le long de la première composante : l'erreur de reconstruction ne
+  bouge presque pas. D'où le PSI des lags dans le signal de dérive.
+- **La perte estimée a raison en automne.** Sur les périodes « calmes », chacune de ses
+  alertes seule tombait sur une vraie dégradation saisonnière (les fêtes) : elle mérite
+  un ticket, pas le silence ([E4 ter](experiences/e4-backtest.qmd#réplication-sur-trois-périodes-calmes-e4-ter)).
+- **La météo pèse peu.** Servir le modèle sur la vraie prévision de la veille au lieu de
+  la météo réalisée change sa MAE de **+0,08 %** ([E9](experiences/e9-meteo.qmd)) :
+  l'hypothèse optimiste du protocole était sans conséquence.
+- **Les dérives locales sont des concept drifts.** Parmi les dérives nuisibles limitées
+  à quelques zones, 26 sur 27 changent la relation entre lags et demande, pas les lags
+  eux-mêmes : aucune agrégation, ville ou groupe de zones, ne les rend visibles
+  ([E10](experiences/e10-zones.qmd)).
+
+## Ce que je referais autrement
+
+- **Tester les signaux sur un cas synthétique avant les données réelles, toujours.** Le
+  PSI d'une journée contre une fenêtre de 28 jours était mal posé ; un test synthétique
+  écrit avant l'exécution l'a montré, mais seulement pour E7. Le même réflexe aurait
+  évité la variante a posteriori de E6.
+- **Écrire le scoreur par ligne dès le départ.** Il est arrivé avec E4 ; les premières
+  expériences ont tourné chunk par chunk dans NannyML, plus lentement et sans pouvoir
+  agréger par zone.
+- **Choisir des périodes calmes dans le protocole.** La mesure des fausses alertes sur
+  une seule période (E4) était fragile ; E4 ter l'a répliquée sur trois périodes, mais
+  hors protocole.
+- **Vectoriser plus tôt.** Le PSI journalier calculé jour par jour faisait durer E10
+  quarante minutes ; la version vectorisée, strictement égale, tourne en 92 secondes.
+
+## Ce qui reste ouvert
+
+1. **Le concept drift pur reste invisible avant les labels.** Seul un délai de labels
+   plus court le couvre : les journaux de l'opérateur (J+1) plutôt que la publication
+   TLC (J+60). C'est un choix d'architecture, pas de monitoring.
+2. **L'ampleur pendant une rupture.** Un minorant fiable de la perte serait plus utile
+   qu'une estimation centrale biaisée vers le bas.
+3. **Une seule ville, un seul modèle.** Les seuils (k, persistance, lissage) sont
+   calibrés sur New York ; leur transfert à un autre réseau n'est pas mesuré.
+4. **Le coût réel des alertes.** Le [notebook des coûts](notebooks/couts-alerte.ipynb)
+   repose sur des coûts supposés ; les mesurer chez un opérateur changerait peut-être le
+   seuil optimal.

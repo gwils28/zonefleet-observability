@@ -83,6 +83,8 @@ website:
           - href: methode.qmd
           - href: journal.qmd
             text: Journal de bord
+          - href: retrospective.qmd
+            text: Rétrospective
           - href: references.qmd
             text: Références
           - href: glossaire.qmd

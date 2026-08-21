@@ -73,7 +73,7 @@ réentraîner par réflexe**.
 - Veille : [NannyML](veille/nannyml.qmd), [DriftGuard](veille/driftguard.qmd), [Sculley et al.](veille/sculley.qmd)
 - Données : [sources](donnees/sources.qmd), [data contract](donnees/data-contract.qmd), [panel](donnees/panel.qmd)
 - Notebooks : [DLE pas à pas](notebooks/tutoriel-dle.ipynb), [coût des alertes](notebooks/couts-alerte.ipynb)
-- [Méthode](methode.qmd) · [Journal de bord](journal.qmd) · [Références](references.qmd) · [Glossaire](glossaire.qmd) · [FAQ](faq.qmd)
+- [Méthode](methode.qmd) · [Journal de bord](journal.qmd) · [Rétrospective](retrospective.qmd) · [Références](references.qmd) · [Glossaire](glossaire.qmd) · [FAQ](faq.qmd)
 :::
 
 :::
