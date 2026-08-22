@@ -125,3 +125,45 @@ def test_data_quality_check_on_toy_panel():
     assert data_quality(p).passed
     p.loc[p["ts"] >= "2020-02-29", "pickups"] *= 3
     assert not data_quality(p).passed
+
+
+def _toy_predictions(days: int = 4, zones: int = 2) -> pd.DataFrame:
+    ts = pd.date_range("2020-03-01", periods=24 * days, freq="h")
+    df = pd.DataFrame(
+        [(t, z) for t in ts for z in range(1, zones + 1)], columns=["ts", "zone"]
+    ).assign(period="analysis", q10=1.0, q50=2.0, q90=3.0)
+    return df
+
+
+def test_prediction_gaps_complete_panel():
+    pytest.importorskip("dagster")
+    from zonefleet.ops.definitions import prediction_gaps
+
+    g = prediction_gaps(_toy_predictions(), pd.Timestamp("2020-03-04"))
+    assert g == {
+        "jours_incomplets": 0,
+        "valeurs_manquantes": 0,
+        "dernier_jour": "2020-03-04",
+        "retard_jours": 0,
+    }
+
+
+def test_prediction_gaps_detects_holes_nan_and_delay():
+    pytest.importorskip("dagster")
+    from zonefleet.ops.definitions import prediction_gaps
+
+    p = _toy_predictions()
+    p = p.drop(p.index[(p["ts"].dt.day == 2) & (p["zone"] == 2)][:5])
+    p.loc[p.index[0], "q50"] = float("nan")
+    g = prediction_gaps(p, pd.Timestamp("2020-03-06"))
+    # un jour amputé, deux jours attendus mais absents
+    assert g["jours_incomplets"] == 3 and g["valeurs_manquantes"] == 1
+    assert g["retard_jours"] == 2
+
+
+def test_dagster_registers_prediction_check():
+    pytest.importorskip("dagster")
+    from zonefleet.ops.definitions import defs
+
+    names = {k.name for k in defs.resolve_asset_graph().asset_check_keys}
+    assert "predictions_complete" in names
