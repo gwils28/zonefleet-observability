@@ -11,7 +11,8 @@ Graphe d'assets (un asset = une donnée versionnable, pas une tâche) :
                                                                     alert_decision, retrain_decision
 
 Les contrôles qualité sont des asset checks : data contract (aucune violation), panel
-(aucun doublon, plafonds), fraîcheur des prédictions.
+(aucun doublon, plafonds), qualité du dernier jour, complétude des prédictions (une par
+zone et par heure jusqu'au dernier jour attendu).
 """
 
 # Pas de `from __future__ import annotations` : Dagster résout les annotations de
@@ -142,6 +143,34 @@ def predictions(
     return pd.concat(parts, ignore_index=True)
 
 
+def prediction_gaps(pred: pd.DataFrame, last_day: pd.Timestamp) -> dict:
+    """Trous dans les prévisions de l'analysis : jours incomplets, valeurs manquantes, retard.
+
+    Attendu : une prévision par zone et par heure pour chaque jour, jusqu'à `last_day`.
+    """
+    an = pred[pred["period"] == "analysis"]
+    n_zones = an["zone"].nunique()
+    per_day = an.groupby(an["ts"].dt.floor("D")).size()
+    days = pd.date_range(per_day.index.min(), last_day, freq="D")
+    per_day = per_day.reindex(days, fill_value=0)
+    return {
+        "jours_incomplets": int((per_day < 24 * n_zones).sum()),
+        "valeurs_manquantes": int(an[["q10", "q50", "q90"]].isna().sum().sum()),
+        "dernier_jour": str(per_day.index[per_day > 0].max().date()),
+        "retard_jours": int((last_day - per_day.index[per_day > 0].max()).days),
+    }
+
+
+@dg.asset_check(asset="predictions", description="Une prévision par zone et par heure, sans trou.")
+def predictions_complete(
+    config: MonitoringConfig, predictions: pd.DataFrame
+) -> dg.AssetCheckResult:
+    last_day = SPLITS[config.split].period("analysis")[1] - pd.Timedelta(days=1)
+    gaps = prediction_gaps(predictions, pd.Timestamp(last_day))
+    ok = gaps["jours_incomplets"] == 0 and gaps["valeurs_manquantes"] == 0
+    return dg.AssetCheckResult(passed=ok, severity=dg.AssetCheckSeverity.ERROR, metadata=gaps)
+
+
 @dg.asset(group_name="monitoring", description="Signaux journaliers : dérive, DLE, réalisé.")
 def monitoring_signals(predictions: pd.DataFrame) -> pd.DataFrame:
     from zonefleet.monitoring import monitor
@@ -206,7 +235,7 @@ defs = dg.Definitions(
         retrain_recommendation,
         daily_report,
     ],
-    asset_checks=[contract_respected, panel_is_valid, data_quality],
+    asset_checks=[contract_respected, panel_is_valid, data_quality, predictions_complete],
     jobs=[monitoring_job],
     schedules=[
         dg.ScheduleDefinition(

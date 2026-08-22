@@ -42,7 +42,7 @@ flowchart LR
 | `weather` | météo locale en cache | - |
 | `feature_matrix` | features à lags ≥ 24 h | - |
 | `champion_model` | modèle désigné par l'alias `champion` du registry (repli : modèle figé du SPEC) | - |
-| `predictions` | prévisions sur référence et analysis | - |
+| `predictions` | prévisions sur référence et analysis | `predictions_complete` : une prévision par zone et par heure jusqu'au dernier jour attendu, sans valeur manquante |
 | `monitoring_signals` | signaux journaliers (dérive, DLE, réalisé) | - |
 | `alert_decision` | sévérité du dernier jour, en métadonnée | - |
 | `retrain_recommendation` | décision et raison (politique gardée de E5) | - |
@@ -76,9 +76,9 @@ positionnement de la flotte.
 ## Vérification de bout en bout
 
 La matérialisation complète du graphe (`--select '*'`) a été exécutée sur le panel
-versionné : 9 assets et 2 contrôles qualité passés, le champion chargé depuis le
-registry MLflow (version 2, modèle 2024), les signaux journaliers calculés en environ
-11 secondes. Rejouée jour par jour, la sévérité produite est :
+versionné : 10 assets et 4 contrôles qualité passés (contrat, panel, qualité du dernier
+jour, complétude des prédictions), le champion chargé depuis le registry MLflow
+(version 2, modèle 2024), le graphe entier en 22 secondes. Rejouée jour par jour, la sévérité produite est :
 
 | Analysis | aucune | ticket | page |
 |---|---|---|---|
