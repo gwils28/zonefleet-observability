@@ -84,3 +84,18 @@ description: "Les termes du projet, définis une fois."
 **Z-score saisonnier**
 : Écart de la moyenne journalière d'une feature à la distribution des moyennes
   journalières des mêmes semaines de l'année précédente ([E7](experiences/e7-saisonnier.qmd)).
+
+**Champion / challenger**
+: Le champion est le modèle servi (alias `champion` du registry) ; un challenger,
+  réentraîné, ne le remplace qu'après une validation sur une fenêtre postérieure, avec un
+  gain d'au moins 5 % ([registry](mlops/mlflow.qmd)).
+
+**Dérive nettoyée**
+: Signal de dérive restreint aux entrées qui portent la demande : PCA ou PSI de `lag_24`
+  et `lag_168`, sans calendrier ni météo, qui dérivent par construction
+  ([politiques](concepts/politiques-alerte.qmd)).
+
+**Politique gardée**
+: Réentraîner seulement après une dégradation confirmée (condition jointe ou labels) et
+  au moins 14 jours de labels postérieurs, puis promouvoir le challenger s'il bat le
+  champion ([E5](experiences/e5-reentrainement.qmd)).
