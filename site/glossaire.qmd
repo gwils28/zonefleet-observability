@@ -87,8 +87,8 @@ description: "Les termes du projet, définis une fois."
 
 **Champion / challenger**
 : Le champion est le modèle servi (alias `champion` du registry) ; un challenger,
-  réentraîné, ne le remplace qu'après une validation sur une fenêtre postérieure, avec un
-  gain d'au moins 5 % ([registry](mlops/mlflow.qmd)).
+  réentraîné, ne le remplace qu'après une validation de 14 jours sur une fenêtre
+  postérieure, avec un gain d'au moins 5 % ([registry](mlops/mlflow.qmd)).
 
 **Dérive nettoyée**
 : Signal de dérive restreint aux entrées qui portent la demande : PCA ou PSI de `lag_24`
@@ -97,5 +97,6 @@ description: "Les termes du projet, définis une fois."
 
 **Politique gardée**
 : Réentraîner seulement après une dégradation confirmée (condition jointe ou labels) et
-  au moins 14 jours de labels postérieurs, puis promouvoir le challenger s'il bat le
-  champion ([E5](experiences/e5-reentrainement.qmd)).
+  au moins 28 jours de labels postérieurs à l'alerte, puis promouvoir le challenger s'il
+  bat le champion d'au moins 5 % sur les 14 jours de validation suivants
+  ([E5](experiences/e5-reentrainement.qmd)).
