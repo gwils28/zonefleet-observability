@@ -66,3 +66,10 @@ année sur l'autre et fait des fausses alertes ([E7](experiences/e7-saisonnier.q
 Pas tels quels : 72 % de couverture pour 80 % visés. Une calibration conforme glissante
 sur les 28 derniers jours de labels les ramène à 80 %, à condition d'avoir des labels
 rapides ([E0 bis](modele/e0.qmd)).
+
+### « Et si ce sont les données qui sont fausses ? »
+Alors le moniteur de modèle ne sert à rien : sur quatre bugs injectés le 3 mars 2025
+(fichier tronqué, dupliqué, décalé d'une heure, zone muette), la condition jointe reste
+muette sur les quatre. Les contrôles de qualité journaliers les signalent tous le 3 ou
+le 4 mars, avec une seule fausse alerte sans bug, le 9 mars, jour du passage à l'heure
+d'été ([E8](experiences/e8-qualite.qmd)).
