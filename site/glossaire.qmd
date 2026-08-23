@@ -101,3 +101,23 @@ description: "Les termes du projet, définis une fois."
   au moins 28 jours de labels postérieurs à l'alerte, puis promouvoir le challenger s'il
   bat le champion d'au moins 5 % sur les 14 derniers jours de labels, exclus de son
   entraînement ([E5](experiences/e5-reentrainement.qmd)).
+
+**Scoreur par ligne**
+: Classe `RowScorer` : réutilise le nanny model et la PCA ajustés par NannyML pour scorer
+  chaque ligne une fois, puis agréger n'importe quel scénario en millisecondes ; égalité
+  avec les sorties officielles testée chunk par chunk.
+
+**Sévérité**
+: Niveau de réponse d'un jour : **page** (condition jointe ou labels dégradés, deux
+  jours de suite), **ticket** (dérive nettoyée seule pendant sept jours, ou perte estimée
+  seule pendant deux jours), **aucune** ; « incident données » prime sur les trois
+  ([runbook](exploitation/runbook.qmd)).
+
+**Groupe de zones**
+: Sous-ensemble de zones (CBD, hors CBD) sur lequel la condition jointe est évaluée
+  séparément ; l'alerte part si un groupe alerte ([E10](experiences/e10-zones.qmd)).
+
+**Kolmogorov-Smirnov, Wasserstein**
+: Distances entre deux distributions univariées : écart maximal entre fonctions de
+  répartition (KS, sans unité) ; masse à déplacer fois distance (W1, dans l'unité de la
+  feature) ([dérive univariée](concepts/derive-univariee.qmd)).
