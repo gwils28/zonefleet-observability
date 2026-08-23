@@ -3,14 +3,20 @@ title: "Glossaire"
 description: "Les termes du projet, définis une fois."
 ---
 
-**Chunk**
-: Paquet de lignes sur lequel un signal de monitoring est calculé ; ici un jour
-  (60 zones x 24 heures = 1 440 lignes).
-
 **Calibration conforme (CQR)**
 : Élargissement d'un intervalle de prévision par le quantile empirique des scores
   max(q_bas - y, y - q_haut) sur un échantillon de calibration ; garantie de couverture
   sous échangeabilité seulement ([E0 bis](modele/e0.qmd)).
+
+**Champion / challenger**
+: Le champion est le modèle servi (alias `champion` du registry) ; un challenger,
+  réentraîné, ne le remplace que s'il fait mieux d'au moins 5 % sur une fenêtre de
+  validation de 14 jours postérieure à ses propres données d'entraînement
+  ([registry](mlops/mlflow.qmd)).
+
+**Chunk**
+: Paquet de lignes sur lequel un signal de monitoring est calculé ; ici un jour
+  (60 zones x 24 heures = 1 440 lignes).
 
 **Concept drift**
 : Changement de la relation entre entrées et cible, P(y | X). **Pur** si les entrées
@@ -24,16 +30,21 @@ description: "Les termes du projet, définis une fois."
 : Le même scénario sans dérive injectée, sur les mêmes jours ; sert à isoler l'effet
   d'une injection.
 
-**Covariate shift**
-: Changement de la distribution des entrées P(X), la relation P(y | X) restant stable.
-
 **Contrôles de qualité**
 : Indicateurs journaliers du panel (volume, profil horaire, zones muettes) comparés aux
   mêmes jours de semaine précédents, calendrier connu exclu ([E8](experiences/e8-qualite.qmd)).
 
+**Covariate shift**
+: Changement de la distribution des entrées P(X), la relation P(y | X) restant stable.
+
 **Data contract**
 : Description versionnée de ce que le pipeline attend des fichiers bruts : colonnes,
   types, ruptures connues et datées ([page](donnees/data-contract.qmd)).
+
+**Dérive nettoyée**
+: Signal de dérive restreint aux entrées qui portent la demande : PCA ou PSI de `lag_24`
+  et `lag_168`, sans calendrier ni météo, qui dérivent par construction
+  ([politiques](concepts/politiques-alerte.qmd)).
 
 **DLE (Direct Loss Estimation)**
 : Méthode NannyML qui estime la perte d'un modèle de régression sans labels, à l'aide
@@ -45,9 +56,22 @@ description: "Les termes du projet, définis une fois."
 **Front montant**
 : Jour où une alerte s'allume ; une alarme déjà allumée ne détecte rien (E4).
 
+**Groupe de zones**
+: Sous-ensemble de zones (CBD, hors CBD) sur lequel la condition jointe est évaluée
+  séparément ; l'alerte part si un groupe alerte ([E10](experiences/e10-zones.qmd)).
+
 **Horloge de décision**
 : Date à laquelle une alerte peut réellement être levée : veille du jour cible pour les
   signaux avancés, jour cible + L pour les labels.
+
+**Incident données**
+: Sévérité du rapport du matin quand un contrôle de qualité échoue ; elle prime sur
+  toute alerte du modèle.
+
+**Kolmogorov-Smirnov, Wasserstein**
+: Distances entre deux distributions univariées : écart maximal entre fonctions de
+  répartition (KS, sans unité) ; masse à déplacer fois distance (W1, dans l'unité de la
+  feature) ([dérive univariée](concepts/derive-univariee.qmd)).
 
 **MASE**
 : Erreur absolue moyenne divisée par celle du seasonal naive sur l'entraînement
@@ -59,23 +83,36 @@ description: "Les termes du projet, définis une fois."
 **Persistance**
 : Nombre de jours consécutifs de dépassement exigé avant d'alerter (2 ici).
 
+**Politique gardée**
+: Réentraîner seulement après une dégradation confirmée (condition jointe ou labels) et
+  au moins 28 jours de labels postérieurs à l'alerte, puis promouvoir le challenger s'il
+  bat le champion d'au moins 5 % sur les 14 derniers jours de labels, exclus de son
+  entraînement ([E5](experiences/e5-reentrainement.qmd)).
+
 **PSI (Population Stability Index)**
 : Écart de répartition d'une variable dans les déciles de la référence ; repère : > 0,25
   = dérive forte ([page](concepts/derive-univariee.qmd)).
-
-**Référence**
-: Période hors échantillon sur laquelle le moniteur apprend ce qui est « normal ».
 
 **Reconstruction PCA**
 : Erreur de reconstruction d'une ligne après projection sur les composantes principales
   de la référence ([page](concepts/derive-multivariee.qmd)).
 
+**Référence**
+: Période hors échantillon sur laquelle le moniteur apprend ce qui est « normal ».
+
+**Scoreur par ligne**
+: Classe `RowScorer` : réutilise le nanny model et la PCA ajustés par NannyML pour scorer
+  chaque ligne une fois, puis agréger n'importe quel scénario en millisecondes ; égalité
+  avec les sorties officielles testée chunk par chunk.
+
 **Seasonal naive**
 : Prévision « même heure la semaine précédente » (lag 168 h).
 
-**Incident données**
-: Sévérité du rapport du matin quand un contrôle de qualité échoue ; elle prime sur
-  toute alerte du modèle.
+**Sévérité**
+: Niveau de réponse d'un jour : **page** (condition jointe ou labels dégradés, deux
+  jours de suite), **ticket** (dérive nettoyée seule pendant sept jours, ou perte estimée
+  seule pendant deux jours), **aucune** ; « incident données » prime sur les trois
+  ([runbook](exploitation/runbook.qmd)).
 
 **Taux de suivi**
 : Hausse de l'erreur estimée divisée par la hausse de l'erreur réalisée ; 1 = DLE suit,
@@ -84,40 +121,3 @@ description: "Les termes du projet, définis une fois."
 **Z-score saisonnier**
 : Écart de la moyenne journalière d'une feature à la distribution des moyennes
   journalières des mêmes semaines de l'année précédente ([E7](experiences/e7-saisonnier.qmd)).
-
-**Champion / challenger**
-: Le champion est le modèle servi (alias `champion` du registry) ; un challenger,
-  réentraîné, ne le remplace que s'il fait mieux d'au moins 5 % sur une fenêtre de
-  validation de 14 jours postérieure à ses propres données d'entraînement
-  ([registry](mlops/mlflow.qmd)).
-
-**Dérive nettoyée**
-: Signal de dérive restreint aux entrées qui portent la demande : PCA ou PSI de `lag_24`
-  et `lag_168`, sans calendrier ni météo, qui dérivent par construction
-  ([politiques](concepts/politiques-alerte.qmd)).
-
-**Politique gardée**
-: Réentraîner seulement après une dégradation confirmée (condition jointe ou labels) et
-  au moins 28 jours de labels postérieurs à l'alerte, puis promouvoir le challenger s'il
-  bat le champion d'au moins 5 % sur les 14 derniers jours de labels, exclus de son
-  entraînement ([E5](experiences/e5-reentrainement.qmd)).
-
-**Scoreur par ligne**
-: Classe `RowScorer` : réutilise le nanny model et la PCA ajustés par NannyML pour scorer
-  chaque ligne une fois, puis agréger n'importe quel scénario en millisecondes ; égalité
-  avec les sorties officielles testée chunk par chunk.
-
-**Sévérité**
-: Niveau de réponse d'un jour : **page** (condition jointe ou labels dégradés, deux
-  jours de suite), **ticket** (dérive nettoyée seule pendant sept jours, ou perte estimée
-  seule pendant deux jours), **aucune** ; « incident données » prime sur les trois
-  ([runbook](exploitation/runbook.qmd)).
-
-**Groupe de zones**
-: Sous-ensemble de zones (CBD, hors CBD) sur lequel la condition jointe est évaluée
-  séparément ; l'alerte part si un groupe alerte ([E10](experiences/e10-zones.qmd)).
-
-**Kolmogorov-Smirnov, Wasserstein**
-: Distances entre deux distributions univariées : écart maximal entre fonctions de
-  répartition (KS, sans unité) ; masse à déplacer fois distance (W1, dans l'unité de la
-  feature) ([dérive univariée](concepts/derive-univariee.qmd)).
