@@ -73,3 +73,10 @@ Alors le moniteur de modèle ne sert à rien : sur quatre bugs injectés le 3 ma
 muette sur les quatre. Les contrôles de qualité journaliers les signalent tous le 3 ou
 le 4 mars, avec une seule fausse alerte sans bug, le 9 mars, jour du passage à l'heure
 d'été ([E8](experiences/e8-qualite.qmd)).
+
+### « Peut-on savoir quelles zones souffrent, sans labels ? »
+En partie. La perte estimée moyenne par zone classe les zones touchées par le COVID
+presque comme l'erreur réalisée (corrélation de rang 0,74) et localise parfaitement un
+choc injecté dans le CBD (AUC 1,0). Le PSI brut par zone, lui, se trompe (AUC 0,46),
+trompé par la saison. Et un concept drift local reste invisible (AUC 0,5)
+([E6](experiences/e6-localisation.qmd)).
