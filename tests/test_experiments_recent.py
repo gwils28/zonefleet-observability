@@ -128,3 +128,27 @@ def test_e1_chunks_run_on_toy_world(toy_world):
     d = run_chunk(ref, an, "semaine", "W")
     assert set(d["chunk"]) == {"semaine"} and (d["ci_rel_width"] > 0).all()
     assert summarize(d)["n_chunks"] == len(d)
+
+
+def test_e3_seeds_stability_and_separation():
+    from zonefleet.experiments.e3_seeds import families_separated, stability
+
+    per_seed = pd.DataFrame(
+        {
+            "seed": [1, 1, 2, 2],
+            "scenario": ["cov", "con", "cov", "con"],
+            "family": ["covariate nuisible", "concept pur"] * 2,
+            "severity": [1.0, 0.7] * 2,
+            "tracking_steady": [0.9, 0.0, 0.1, 0.2],
+        }
+    )
+    st = stability(per_seed).set_index("scenario")
+    assert st.loc["cov", "min"] == 0.1 and st.loc["cov", "max"] == 0.9
+    sep = families_separated(per_seed)
+    assert sep[1] and not sep[2]
+
+
+def test_make_tables_no_negative_zero():
+    from scripts.make_tables import fr
+
+    assert fr(-0.0001) == "0,00" and fr(-0.004, 2) == "0,00" and fr(-0.006, 2) == "-0,01"

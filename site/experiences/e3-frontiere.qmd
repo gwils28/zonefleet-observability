@@ -87,6 +87,27 @@ C'est la **mécanique exacte du décrochage** observé en E1 :
    revient à son niveau habituel, mais DLE, qui a appris que « faible niveau » rime avec
    « forte erreur », la surestime légèrement.
 
+## Stabilité selon les graines (E3 bis)
+
+*Extension hors SPEC, critère déclaré avant exécution (issue #119) : la conclusion tient
+si, pour chaque graine, le taux de suivi de toute dérive covariable nuisible dépasse celui
+de tout concept drift pur.*
+
+Les 13 scénarios ont été rejoués avec cinq graines (1 à 5). Le critère est rempli pour
+les cinq : le pire covariate shift nuisible suit à 0,84, le meilleur concept drift pur à
+0,00.
+
+![Taux de suivi en régime établi, un point par graine. Les familles ne se chevauchent pour aucune graine.](../figures/e3_graines.png){#fig-e3-graines}
+
+{{< include ../_tables/e3_seeds.md >}}
+
+Ce que la variation des graines a réellement fait varier, constaté à l'exécution : le
+nanny model de DLE (LightGBM sans sous-échantillonnage) est **déterministe**, ses sorties
+sont identiques pour les six graines (0 à 5). L'écart observé vient donc du seul
+rééchantillonnage du covariate shift ; le concept drift et le choc propagé, sans tirage,
+donnent les mêmes valeurs qu'en E3. La robustesse mesurée est celle à l'injection, pas
+au nanny model.
+
 ::: {.callout-tip}
 ## La même frontière, zone par zone
 [E6](e6-localisation.qmd) retrouve cette frontière à la maille de la zone (perte estimée :

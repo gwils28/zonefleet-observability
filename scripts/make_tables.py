@@ -37,6 +37,8 @@ def fr(x, digits: int = 2) -> str:
         return x
     if pd.isna(x):
         return "-"
+    if round(x, digits) == 0:
+        x = 0.0  # pas de « -0,00 »
     s = f"{x:,.{digits}f}".replace(",", " ").replace(".", ",")
     return s
 
@@ -174,6 +176,21 @@ def e3_summary() -> pd.DataFrame:
             "Δ estimé (établi)": s["delta_est_steady"].map(f2),
             "Suivi (établi)": s["tracking_steady"].map(lambda v: fr(v, 2)),
             "Jours en dérive (P1b)": s["share_drift_clean"].map(lambda v: fr(100 * v, 0) + " %"),
+        }
+    )
+
+
+@table("e3_seeds")
+def e3_seeds_table() -> pd.DataFrame:
+    s = pd.read_csv(T / "e3_seeds_summary.csv")
+    s = s[s["family"].isin(["covariate nuisible", "covariate bénin", "concept pur"])]
+    f2 = lambda v: fr(v, 2)  # noqa: E731
+    return pd.DataFrame(
+        {
+            "Scénario": s["scenario"],
+            "Suivi établi, min": s["min"].map(f2),
+            "médiane": s["median"].map(f2),
+            "max": s["max"].map(f2),
         }
     )
 

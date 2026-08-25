@@ -151,3 +151,14 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   discrètes sur les bornes). Branché dans `daily_psi`, `RowScorer.aggregate` et E10.
 - E10 passe d'environ 40 min à 92 s ; `e10_results.csv` et les tables de E1 sont
   identiques à l'octet près.
+
+## 2026-08-25 : E3 bis, stabilité selon les graines (extension)
+
+- Critère déclaré avant exécution (issue #119) : séparation des familles pour chaque
+  graine. Rempli pour les 5 graines (covariate nuisible 0,84 à 0,94 ; concept pur 0,00).
+- Constaté à l'exécution : le nanny model de DLE est déterministe (LightGBM sans bagging
+  ni sous-échantillonnage de features), ses sorties sont identiques pour toutes les
+  graines. E3 bis ne fait donc varier que le rééchantillonnage du covariate shift ; la
+  page le dit explicitement.
+- Correction associée : `fr` n'affiche plus de zéro négatif (table E3 modifiée d'autant,
+  sans changement de valeur).

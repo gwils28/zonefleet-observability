@@ -436,6 +436,31 @@ def e3_frontier() -> None:
 
 
 @group("e3")
+def e3_seeds() -> None:
+    """E3 bis : intervalle du taux de suivi établi sur 5 graines, par scénario."""
+    st = pd.read_csv(T / "e3_seeds_summary.csv")
+    per = pd.read_csv(T / "e3_seeds.csv")
+    fams = ["covariate nuisible", "covariate bénin", "concept pur"]
+    st = st[st["family"].isin(fams)].reset_index(drop=True)
+    fig, ax = plt.subplots(figsize=(9, 4.6))
+    for i, r in st.iterrows():
+        c = FAMILY_COLOR[r["family"]]
+        ax.plot([r["min"], r["max"]], [i, i], color=c, lw=2, solid_capstyle="round")
+        pts = per.loc[per["scenario"] == r["scenario"], "tracking_steady"]
+        ax.scatter(pts, [i] * len(pts), s=36, color=c, edgecolor=viz.SURFACE, lw=1.5, zorder=3)
+    ax.set_yticks(range(len(st)), st["scenario"])
+    ax.invert_yaxis()
+    ax.axvline(0, color=viz.GRID, lw=1)
+    ax.axvline(1, color=viz.MUTED, lw=1, ls="--")
+    ax.set_xlim(-0.08, 1.08)
+    ax.set_xlabel("taux de suivi en régime établi (1 = DLE suit, 0 = DLE aveugle)")
+    ax.set_title("E3 bis : taux de suivi sur 5 graines (un point par graine)")
+    ax.grid(axis="x")
+    fig.tight_layout()
+    viz.save(fig, "e3_graines")
+
+
+@group("e3")
 def e3_series() -> None:
     from zonefleet.experiments.e3_frontier import ONSET
 
