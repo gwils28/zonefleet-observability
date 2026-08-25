@@ -88,7 +88,8 @@ prévision, le même modèle perd 0,08 % de MAE ; réentraîné sur des prévisi
 ([E9](experiences/e9-meteo.qmd)).
 
 ### « Faut-il surveiller zone par zone ? »
-Pas zone par zone : 60 zones, c'est 60 fois plus de bruit. Par groupe (CBD, hors CBD),
-oui : la condition jointe passe de 51 % à 55 % de rappel, toujours sans fausse alerte. Ce
+Le projet n'a pas mesuré d'alerte zone par zone (24 lignes par jour et par zone). Par
+groupe (CBD, hors CBD), oui : la condition jointe passe de 51 % à 55 % de rappel,
+toujours sans fausse alerte. Pour le diagnostic, la lecture par zone sert (E6). Ce
 qui reste manqué est presque entièrement du concept drift local
 ([E10](experiences/e10-zones.qmd)).
