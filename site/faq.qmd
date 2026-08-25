@@ -80,3 +80,15 @@ presque comme l'erreur réalisée (corrélation de rang 0,74) et localise parfai
 choc injecté dans le CBD (AUC 1,0). Le PSI brut par zone, lui, se trompe (AUC 0,46),
 trompé par la saison. Et un concept drift local reste invisible (AUC 0,5)
 ([E6](experiences/e6-localisation.qmd)).
+
+### « Utiliser la météo réalisée, n'est-ce pas tricher ? »
+Si, un peu : en production, le modèle ne connaît que la prévision de la veille. Mesuré
+sur 2025 avec l'archive des prévisions Open-Meteo, l'écart est négligeable : servi sur la
+prévision, le même modèle perd 0,08 % de MAE ; réentraîné sur des prévisions, 0,99 %
+([E9](experiences/e9-meteo.qmd)).
+
+### « Faut-il surveiller zone par zone ? »
+Pas zone par zone : 60 zones, c'est 60 fois plus de bruit. Par groupe (CBD, hors CBD),
+oui : la condition jointe passe de 51 % à 55 % de rappel, toujours sans fausse alerte. Ce
+qui reste manqué est presque entièrement du concept drift local
+([E10](experiences/e10-zones.qmd)).
