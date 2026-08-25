@@ -235,6 +235,9 @@ Briques de monitoring : dérive des entrées et des prédictions, performance es
 `psi(reference: ArrayLike, current: ArrayLike, bins: int = 10, eps: float = 0.0001) -> float`
 : *fonction*. Population Stability Index, bacs définis par les quantiles de la référence.
 
+`psi_by_day(reference: ArrayLike, values: ArrayLike, days: ArrayLike, bins: int = 10, eps: float = 0.0001) -> pd.Series`
+: *fonction*. PSI de chaque jour contre la référence, vectorisé (mêmes bacs et plancher que `psi`).
+
 `realized_performance(df: pd.DataFrame, scale: str = count, freq: str = D) -> pd.DataFrame`
 : *fonction*. MAE et RMSE réalisées par chunk, une fois les labels révélés.
 
@@ -355,6 +358,9 @@ Interface en ligne de commande.
 `cmd_contract(_: argparse.Namespace) -> int`
 : *fonction*.
 
+`cmd_list(_: argparse.Namespace) -> int`
+: *fonction*.
+
 `cmd_monitor(args: argparse.Namespace) -> int`
 : *fonction*.
 
@@ -367,5 +373,11 @@ Interface en ligne de commande.
 `daily_report(split: str, day: str | None = None) -> str`
 : *fonction*. Rapport Markdown d'un jour (par défaut le dernier jour de l'analysis).
 
+`describe(module: str) -> str`
+: *fonction*. Première ligne de la docstring du module, sans l'importer (lecture du source).
+
 `main(argv: list[str] | None = None) -> int`
 : *fonction*.
+
+`version() -> str`
+: *fonction*. Version installée du package (métadonnées), « inconnue » en mode source brut.
