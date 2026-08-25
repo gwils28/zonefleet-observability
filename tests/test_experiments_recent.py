@@ -146,3 +146,9 @@ def test_e3_seeds_stability_and_separation():
     assert st.loc["cov", "min"] == 0.1 and st.loc["cov", "max"] == 0.9
     sep = families_separated(per_seed)
     assert sep[1] and not sep[2]
+
+
+def test_make_tables_no_negative_zero():
+    from scripts.make_tables import fr
+
+    assert fr(-0.0001) == "0,00" and fr(-0.004, 2) == "0,00" and fr(-0.006, 2) == "-0,01"
