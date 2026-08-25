@@ -49,7 +49,7 @@ make check                 # ruff + pytest
 make e0 e1 e2 e3           # le panel agrégé est versionné : pas besoin des données brutes
 make e4 e5                 # ≈ 20 min
 make figures site          # figures, tables et site Quarto
-zonefleet list             # les 16 expériences (SPEC et extensions)
+zonefleet list             # les 17 expériences (SPEC et extensions)
 zonefleet run e4-ter       # en lancer une
 zonefleet alert --split congestion
 make dagster               # interface Dagster sur http://localhost:3000

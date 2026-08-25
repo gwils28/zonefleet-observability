@@ -28,6 +28,7 @@ EXPERIMENTS = {
 EXTENSIONS = {
     "e0-bis": "zonefleet.experiments.e0_conformal",
     "e1-bis": "zonefleet.experiments.e1_chunks",
+    "e3-bis": "zonefleet.experiments.e3_seeds",
     "e4-bis": "zonefleet.experiments.e4_sensitivity",
     "e4-ter": "zonefleet.experiments.e4_calm",
     "e4-quater": "zonefleet.experiments.e4_seasonal",
