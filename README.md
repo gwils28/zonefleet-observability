@@ -14,7 +14,7 @@ un mensonge ?
 
 | Question | Réponse mesurée | Où |
 |---|---|---|
-| La performance estimée sans labels (NannyML DLE) suit-elle l'erreur réelle ? | oui sous **covariate shift** (taux de suivi 0,85 à 0,99), **non** sous **concept drift pur** (0,00) | E3 |
+| La performance estimée sans labels (NannyML DLE) suit-elle l'erreur réelle ? | oui sous **covariate shift** (taux de suivi 0,85 à 0,99), **non** sous **concept drift pur** (0,00) ; stable sur 5 graines d'injection | E3, E3 bis |
 | Sur un choc réel ? | COVID : détection sans labels en **9 jours** contre 62 avec ; mais DLE sous-estime l'ampleur d'un facteur 2,7 pendant la transition | E1 |
 | Alerter sur la dérive des entrées ? | dérive seule : alarme **permanente** (100 % des jours) ; après la taxe de congestion, 177 jours d'alerte pour un modèle qui ne s'est pas dégradé | E2, E4 |
 | Quelle politique d'alerte ? | **dérive nettoyée ET DLE**, lissée 7 jours : 51 % de rappel, **0 fausse alerte** sur 240 scénarios, 3 jours de délai médian | E4 |
@@ -24,6 +24,7 @@ un mensonge ?
 | Et la saisonnalité ? | un z-score saisonnier supprime la dérive de la température ; pour les lags, il importe la croissance d'une année sur l'autre | E7, E4 quater |
 | Et si ce sont les données qui mentent ? | des contrôles de qualité voient 4 bugs injectés dès le 1er jour ; le moniteur de modèle, non | E8 |
 | La météo « parfaite » biaise-t-elle tout ? | non : servie sur la vraie prévision de la veille, la MAE bouge de 0,1 % | E9 |
+| Alerter à la ville ou par quartier ? | par groupe (CBD, hors CBD) : 55 % de rappel au lieu de 51 %, toujours sans fausse alerte ; les dérives locales manquées sont des concept drifts | E10 |
 
 ## Le projet
 
@@ -37,7 +38,8 @@ un mensonge ?
 - **Expériences** : E1 COVID, E2 tarification de congestion, E3 dérives pures
   construites, E4 backtest du moniteur (240 scénarios, sensibilité, trois périodes
   calmes), E5 politiques de réentraînement (2020-2021), E6 localisation par zone, E7 base
-  saisonnière, E8 bugs de données, E9 vraie prévision météo ; calibration conforme.
+  saisonnière, E8 bugs de données, E9 vraie prévision météo, E10 alerte par groupe de
+  zones ; calibration conforme, stabilité selon les graines (`zonefleet list`).
 - **Mise en production de démonstration** : graphe d'assets Dagster avec contrôles
   qualité, registry MLflow (champion/challenger), rapport du matin, CLI `zonefleet`.
 
@@ -73,8 +75,8 @@ SPEC.md                  protocole figé avant les résultats
 docs/notes/              déviations au protocole, fiches de veille
 configs/                 data contract, zones, manifeste des données
 src/zonefleet/           code (données, modèle, monitoring, alertes, scénarios, ops)
-src/zonefleet/experiments/   E0 à E5
-scripts/                 panel, météo, figures, tables, notebook, registry
+src/zonefleet/experiments/   E0 à E5 (SPEC), puis extensions et variantes jusqu'à E10
+scripts/                 panel, météo, figures, tables, notebooks, registry, API
 results/tables/          tous les chiffres publiés (générés)
 site/                    site Quarto (figures et tables générées, jamais à la main)
 tests/                   tests (anti-fuite, contrat, pureté des injections, égalité NannyML)
