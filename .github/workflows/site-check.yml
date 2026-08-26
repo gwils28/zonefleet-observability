@@ -18,5 +18,7 @@ jobs:
             grep "Unable to resolve link target" render.log
             exit 1
           fi
+      - name: Ancres, cibles et images du site rendu
+        run: python3 scripts/check_links.py site/_site
       - name: Aucun tiret cadratin dans le site rendu
         run: python3 scripts/hooks/check_no_em_dash.py $(find site -name "*.qmd" -o -name "*.md")

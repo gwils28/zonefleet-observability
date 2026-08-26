@@ -46,8 +46,9 @@ figures:     ## Figures et tables du site (depuis results/)
 	uv run python scripts/make_interactive.py
 	uv run python scripts/make_reports.py
 	uv run python scripts/make_api_docs.py
-site:        ## Rendu du site Quarto (site/_site)
+site:        ## Rendu du site Quarto (site/_site), puis vérification des liens et ancres
 	quarto render site
+	uv run python scripts/check_links.py
 all: check experiments figures notebook site
 e4s:         ## E4 bis : sensibilité au protocole (relit le cache de E4, ≈ 10 s)
 	uv run python -m zonefleet.experiments.e4_sensitivity
