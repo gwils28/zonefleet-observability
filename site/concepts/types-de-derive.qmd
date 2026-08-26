@@ -8,7 +8,7 @@ description: "Une taxonomie opérationnelle des dérives, du point de vue de ce 
 Un modèle apprend une relation entre des entrées X et une cible y, à partir de la loi
 jointe P(X, y) = P(y | X) · P(X). Chacun des deux termes peut bouger.
 
-![Le même modèle face aux deux dérives. À gauche la référence ; au centre les entrées se déplacent vers une région où le modèle se trompait déjà davantage ; à droite la relation elle-même change, à entrées identiques.](../figures/concept_types_derive.png){#fig-drift-types}
+![Le même modèle face aux deux dérives. À gauche la référence ; au centre les entrées se déplacent vers une région où le modèle se trompait déjà davantage ; à droite la relation elle-même change, à entrées identiques.](../figures/concept_types_derive.png){#fig-drift-types fig-alt="Trois panneaux montrant les entrées et l'erreur d'un même modèle : la situation de référence, un covariate shift où les points se déplacent vers une zone d'erreur élevée, et un concept drift où les points restent en place mais la relation change."}
 
 | Dérive | Ce qui change | Trace dans X ? | Exemple ZoneFleet |
 |---|---|---|---|
