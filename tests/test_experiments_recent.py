@@ -152,3 +152,20 @@ def test_make_tables_no_negative_zero():
     from scripts.make_tables import fr
 
     assert fr(-0.0001) == "0,00" and fr(-0.004, 2) == "0,00" and fr(-0.006, 2) == "-0,01"
+
+
+def test_clean_notebooks_strips_execution_metadata(tmp_path):
+    import nbformat
+
+    from scripts.clean_notebooks import clean
+
+    nb = nbformat.v4.new_notebook()
+    cell = nbformat.v4.new_code_cell("1 + 1")
+    cell.metadata["execution"] = {"iopub.execute_input": "2026-11-23T20:50:13Z"}
+    cell.outputs = [nbformat.v4.new_output("execute_result", data={"text/plain": "2"})]
+    nb.cells = [cell]
+    p = tmp_path / "n.ipynb"
+    nbformat.write(nb, p)
+    assert clean(p) and not clean(p)
+    back = nbformat.read(p, as_version=4)
+    assert "execution" not in back.cells[0].metadata and back.cells[0].outputs
