@@ -36,7 +36,7 @@ aveugle.
 
 ## Le résultat
 
-![Pour chaque scénario, hausse de l'erreur réalisée (abscisse) contre hausse de l'erreur estimée par DLE (ordonnée), sur les 14 premiers jours puis en régime établi. La taille des points croît avec l'intensité. Sur la diagonale, DLE dit vrai ; sur l'axe horizontal, il est aveugle.](../figures/e3_frontiere.png){#fig-frontier}
+![Pour chaque scénario, hausse de l'erreur réalisée (abscisse) contre hausse de l'erreur estimée par DLE (ordonnée), sur les 14 premiers jours puis en régime établi. La taille des points croît avec l'intensité. Sur la diagonale, DLE dit vrai ; sur l'axe horizontal, il est aveugle.](../figures/e3_frontiere.png){#fig-frontier fig-alt="Deux nuages de points, 14 premiers jours après l'injection et régime établi : hausse de l'erreur réalisée en abscisse, hausse estimée par DLE en ordonnée, un point par scénario coloré par famille, avec la diagonale. Les covariate shifts nuisibles et bénins sont sur la diagonale ; les concepts purs restent à zéro en ordonnée jusqu'à près de 0,4 en abscisse ; les chocs propagés sont proches de zéro."}
 
 ::: {.callout-tip}
 ## Version interactive
