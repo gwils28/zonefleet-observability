@@ -5,7 +5,7 @@ description: "Le mécanisme de Direct Loss Estimation illustré, ses conditions 
 
 ## L'intuition en trois images
 
-![DLE en trois temps : apprendre la carte des erreurs sur la référence, constater que les entrées de l'analysis se déplacent, en déduire l'erreur attendue sans aucun label.](../figures/concept_dle_mecanisme.png){#fig-dle fig-alt="Schéma en trois panneaux : une carte de l'erreur apprise sur la référence en fonction des entrées, le nuage des entrées de l'analysis qui se déplace sur cette carte, puis la moyenne de l'erreur lue aux nouvelles positions."}
+![DLE en trois temps : apprendre la carte des erreurs sur la référence, constater que les entrées de l'analysis se déplacent, en déduire l'erreur attendue sans aucun label.](../figures/concept_dle_mecanisme.png){#fig-dle fig-alt="Trois panneaux. Un nuage de points de l'erreur absolue en fonction d'une feature, avec la courbe apprise par le nanny model, plus basse au centre. Deux histogrammes de la feature, l'analysis décalée vers la droite par rapport à la référence. Des barres de MAE estimée et réalisée, proches l'une de l'autre, plus hautes pour l'analysis que pour la référence."}
 
 1. **Sur la référence**, chaque observation a une erreur connue. Un second modèle, le
    *nanny model*, apprend à prédire cette erreur à partir des entrées et de la prédiction.

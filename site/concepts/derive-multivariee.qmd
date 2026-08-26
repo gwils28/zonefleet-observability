@@ -20,7 +20,7 @@ l'alerte se déclenche au-delà de la moyenne des chunks de référence plus tro
 
 ## Ce qu'elle voit, ce qu'elle ne voit pas
 
-![Deux dérives de même ampleur visuelle. À gauche, toutes les features se déplacent ensemble le long de la première composante : l'erreur de reconstruction ne bouge pas (0,09 contre 0,09). À droite, la corrélation est cassée : l'erreur est multipliée par 9.](../figures/concept_pca_limite.png){#fig-pca fig-alt="Deux nuages de points en deux dimensions avec la première composante principale tracée : à gauche un déplacement le long de cette composante, à droite un déplacement perpendiculaire, chacun annoté de son erreur de reconstruction."}
+![Deux dérives de même ampleur visuelle. À gauche, toutes les features se déplacent ensemble le long de la première composante : l'erreur de reconstruction ne bouge pas (0,09 contre 0,09). À droite, la corrélation est cassée : l'erreur est multipliée par 9.](../figures/concept_pca_limite.png){#fig-pca fig-alt="Deux nuages de points de lag_168 contre lag_24 standardisés, avec la première composante principale en diagonale. À gauche, l'analysis s'étire le long de la diagonale : erreur de reconstruction 0,09, comme la référence. À droite, l'analysis s'écarte de la diagonale : erreur de reconstruction 0,79."}
 
 Dans un panel de demande, les lags 24, 48, 72, 168, 336 h et les moyennes glissantes sont
 **très corrélés** : la première composante est, à peu près, « le niveau de la zone ». Un

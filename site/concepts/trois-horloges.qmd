@@ -5,7 +5,7 @@ description: "Émission, cible, label : pourquoi un forecaster ne peut pas être
 
 ## Une prévision vit sur trois horloges
 
-![La fenêtre aveugle d'une prévision ZoneFleet : 24 heures d'horizon, puis 60 jours de délai de publication.](../figures/concept_trois_horloges.png){#fig-clocks fig-alt="Frise chronologique avec trois repères : l'émission de la prévision, la cible 24 heures plus tard, puis la publication du label 60 jours après la cible ; l'intervalle entre émission et label est ombré comme fenêtre aveugle."}
+![La fenêtre aveugle d'une prévision ZoneFleet : 24 heures d'horizon, puis 60 jours de délai de publication.](../figures/concept_trois_horloges.png){#fig-clocks fig-alt="Frise chronologique : émission de la prévision, cible 24 heures plus tard, publication du label 60 jours après la cible. Une bande ombrée entre l'émission et le label marque la fenêtre aveugle d'environ 61 jours."}
 
 | Horloge | Notation | ZoneFleet | Ce qui est connu |
 |---|---|---|---|
