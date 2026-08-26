@@ -4,6 +4,29 @@ Format inspiré de *Keep a Changelog*. Les dates sont celles de fusion dans `mai
 
 ## [Non publié]
 
+## [0.10.0] - 2026-08-26
+### Ajouté
+- E10 : condition jointe par groupe de zones (CBD, hors CBD), 55 % de rappel sans fausse
+  alerte.
+- E3 bis : stabilité du taux de suivi sur 5 graines (critère déclaré avant exécution,
+  rempli) ; le nanny model s'avère déterministe.
+- Notebook « anatomie d'une alerte » (22 mars 2020) ; page Rétrospective.
+- Asset check `predictions_complete` ; `zonefleet list`, `zonefleet run` pour toutes les
+  extensions, `zonefleet --version`.
+- Image Docker de reproduction (vérifiée dans un conteneur vierge).
+### Modifié
+- PSI journalier vectorisé (`psi_by_day`, égalité stricte testée) : E10 passe d'environ
+  40 min à 92 s, résultats identiques à l'octet.
+- Typage mypy de tous les modules, sans exclusion ; génération du site déterministe
+  (identifiants plotly fixes) ; relecture de 18 pages ; glossaire (29 entrées) et FAQ.
+### Corrigé
+- Notebooks publiés : message d'aide MLflow (date, chemins locaux) et horodatages
+  d'exécution retirés.
+- Zéro négatif dans les tables ; seuils de la politique gardée dans le glossaire.
+- CI rouge après #91 (ruff sur les notebooks générés).
+### Retiré
+- Dependabot (PR datées hors période, pandas 3 incompatible avec NannyML 0.13).
+
 ## [0.9.0] - 2026-08-10
 ### Ajouté
 - E8 : bugs de données amont ; module `quality`, asset check `data_quality`, sévérité
