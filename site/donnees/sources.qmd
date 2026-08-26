@@ -18,7 +18,7 @@ décalage** : c'est le L = 60 jours de nos [trois horloges](../concepts/trois-ho
 | Fichiers | 120 Parquet, 3,6 Go | `make data`, empreintes SHA-256 vérifiées (`configs/manifest_sha256.txt`) |
 | Granularité | zone de prise en charge x heure locale | maille du positionnement de flotte |
 
-![Courses journalières (moyenne glissante 7 jours). En avril 2020, le volume tombe à 3,9 % de celui de février ; fin 2021, il n'a retrouvé que 45 % de son niveau de 2019. Début 2025, aucune chute visible après la tarification de congestion : le choc est local, pas global.](../figures/data_volumes_ville.png){#fig-volumes}
+![Courses journalières (moyenne glissante 7 jours). En avril 2020, le volume tombe à 3,9 % de celui de février ; fin 2021, il n'a retrouvé que 45 % de son niveau de 2019. Début 2025, aucune chute visible après la tarification de congestion : le choc est local, pas global.](../figures/data_volumes_ville.png){#fig-volumes fig-alt="Deux panneaux de courbes de courses journalières en milliers (moyenne 7 jours), taxis jaunes et verts. 2019-2021 : environ 200 000 courses jaunes par jour, chute brutale le 13 mars 2020 vers moins de 10 000, puis remontée lente jusqu'à environ 100 000 fin 2021. 2024-2025 : entre 80 000 et 160 000, sans rupture à la tarification de congestion du 5 janvier 2025. Les taxis verts restent proches de zéro."}
 
 ::: {.callout-note}
 ## Deux ruptures de nature très différente
@@ -49,7 +49,7 @@ l'[API d'archive Open-Meteo](https://open-meteo.com/en/docs/historical-weather-a
 récupérées en UTC puis ramenées en heure locale sur la même convention que les courses.
 Cache versionné : `data/processed/weather.csv` (35 184 heures, aucune valeur manquante).
 
-![La météo dérive par nature : une référence d'automne et une analysis d'hiver n'ont pas la même distribution de température. C'est une dérive attendue, sans impact si le modèle a vu des hivers.](../figures/data_meteo.png){#fig-weather}
+![La météo dérive par nature : une référence d'automne et une analysis d'hiver n'ont pas la même distribution de température. C'est une dérive attendue, sans impact si le modèle a vu des hivers.](../figures/data_meteo.png){#fig-weather fig-alt="Deux séries journalières de 2019 à 2025, sans données en 2022 et 2023 : température moyenne, avec un cycle saisonnier entre environ -5 et 30 degrés, et précipitations en barres, la plupart sous 25 mm par jour avec quelques pics au-delà de 75 mm."}
 
 ::: {.callout-warning}
 ## Hypothèse optimiste assumée, puis levée
