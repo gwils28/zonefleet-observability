@@ -4,7 +4,7 @@ description: "Évaluer la condition jointe séparément sur les zones CBD et hor
 ---
 
 ::: {.callout-note appearance="minimal"}
-Script : `uv run python -m zonefleet.experiments.e10_zones` (≈ 40 min) · tables :
+Script : `uv run python -m zonefleet.experiments.e10_zones` (≈ 2 min) · tables :
 `results/tables/e10_*.csv` · protocole déclaré dans l'issue #80 · mêmes 240 scénarios,
 même nuisance et mêmes injections que [E4](e4-backtest.qmd).
 :::
@@ -19,6 +19,8 @@ propres à chaque groupe, puis alerter si l'un des groupes alerte, détecte-t-il
 ## Résultats
 
 {{< include ../_tables/e10_summary.md >}}
+
+![Scénarios nuisibles par sous-ensemble de zones et par type de dérive. Plein : détectés ; clair : manqués. L'alerte par groupe rattrape trois covariate shifts et le choc de niveau du CBD ; tout ce qui reste manqué localement est du concept drift.](../figures/e10_sous_ensembles.png){#fig-e10}
 
 - **Le rappel global passe de 51 % à 55 %, toujours sans fausse alerte.** Le gain vient
   de trois covariate shifts à l'échelle de la ville et du seul choc de niveau limité au
