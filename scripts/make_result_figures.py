@@ -1113,6 +1113,64 @@ def e8_quality() -> None:
     viz.save(fig, "e8_qualite")
 
 
+@group("e10")
+def e10_subsets() -> None:
+    """Scénarios nuisibles par sous-ensemble et type : détectés (plein) ou manqués (clair)."""
+    r = pd.read_csv(T / "e10_results.csv")
+    h = r[r["harmful"]]
+    kinds = {
+        "covariate_harmful": ("covariate nuisible", FAMILY_COLOR["covariate nuisible"]),
+        "level": ("choc propagé", FAMILY_COLOR["choc propagé"]),
+        "concept": ("concept pur", FAMILY_COLOR["concept pur"]),
+    }
+    subsets = {
+        "all": "ville entière",
+        "cbd": "CBD",
+        "hors_cbd": "hors CBD",
+        "evening": "soir",
+        "night": "nuit",
+    }
+    policies = {"ville": "alerte à la ville", "par_groupe": "alerte par groupe"}
+    rows = [(s, p) for s in subsets for p in policies]
+    fig, ax = plt.subplots(figsize=(10, 5.2))
+    for y, (sub, pol) in enumerate(rows):
+        left = 0
+        d = h[(h["subset"] == sub) & (h["policy"] == pol)]
+        for kind, (_, color) in kinds.items():
+            k = d[d["kind"] == kind]
+            hit, n = int(k["detected"].sum()), len(k)
+            ax.barh(y, hit, left=left, color=color, height=0.7, edgecolor=viz.SURFACE, lw=2)
+            ax.barh(
+                y,
+                n - hit,
+                left=left + hit,
+                color=color,
+                alpha=0.25,
+                height=0.7,
+                edgecolor=viz.SURFACE,
+                lw=2,
+            )
+            left += n
+        ax.text(
+            left + 0.6,
+            y,
+            f"{int(d['detected'].sum())} / {len(d)}",
+            va="center",
+            fontsize=9,
+            color=viz.INK2,
+        )
+    ax.set_yticks(range(len(rows)), [f"{subsets[s]}, {policies[p]}" for s, p in rows])
+    ax.invert_yaxis()
+    ax.set_xlabel("scénarios nuisibles (plein : détectés, clair : manqués)")
+    ax.set_title("E10 : ce que l'alerte par groupe rattrape, et ce qu'elle ne peut pas voir")
+    ax.set_axisbelow(True)
+    handles = [plt.Rectangle((0, 0), 1, 1, color=c) for _, c in kinds.values()]
+    ax.legend(handles, [lab for lab, _ in kinds.values()], loc="lower right")
+    ax.grid(axis="x")
+    fig.tight_layout()
+    viz.save(fig, "e10_sous_ensembles")
+
+
 def main(argv: list[str]) -> None:
     viz.setup()
     names = argv or list(GROUPS)
