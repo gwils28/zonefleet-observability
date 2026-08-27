@@ -36,11 +36,11 @@ Garde-fou testé : aucun modèle n'est entraîné sur un label postérieur à
 
 ## Résultats
 
-![Erreur relative réalisée (moyenne glissante 7 jours) du modèle en service, selon la politique. Les petits traits en bas de chaque panneau marquent les remplacements de modèle.](../figures/e5_trajectoires.png){#fig-traj}
+![Erreur relative réalisée (moyenne glissante 7 jours) du modèle en service, selon la politique. Les petits traits en bas de chaque panneau marquent les remplacements de modèle.](../figures/e5_trajectoires.png){#fig-traj fig-alt="Deux panneaux de l'erreur relative réalisée du modèle en service en 2020, moyenne 7 jours, une courbe par politique de réentraînement, labels à J+1 puis à J+60 ; de petits traits en bas marquent les remplacements de modèle. Toutes les courbes bondissent au-dessus de 1,2 après le 13 mars. À J+1, calendrier et politique gardée redescendent vers 0,3 à 0,4 ; réflexe et réflexe court restent vers 0,5 à 0,7. À J+60, les courbes restent proches et décroissent lentement."}
 
 {{< include ../_tables/e5_summary.md >}}
 
-![Erreur moyenne par période et par politique.](../figures/e5_periodes.png){#fig-periods}
+![Erreur moyenne par période et par politique.](../figures/e5_periodes.png){#fig-periods fig-alt="Barres groupées de l'erreur moyenne par période (choc, printemps, second semestre) et par politique, pour des labels à 1 jour et à 60 jours. Pendant le choc, toutes les politiques sont entre 0,6 et 1,1 ; au second semestre, calendrier et politique gardée sont autour de 0,3."}
 
 ## Lecture
 
@@ -119,7 +119,7 @@ exceptionnelle. Après l'extension du panel à 2021 (issue #61), la même simula
 prolongée jusqu'au 31 décembre 2021 (issue #63, protocole déclaré avant exécution) :
 une année de reprise lente, de sens inverse, sans choc brutal.
 
-![À gauche, erreur relative du modèle en service de juillet 2020 à décembre 2021 (labels à J + 1). À droite, nombre de remplacements de modèle sur deux ans et erreur moyenne de 2021.](../figures/e5_reprise.png){#fig-reprise}
+![À gauche, erreur relative du modèle en service de juillet 2020 à décembre 2021 (labels à J + 1). À droite, nombre de remplacements de modèle sur deux ans et erreur moyenne de 2021.](../figures/e5_reprise.png){#fig-reprise fig-alt="À gauche, l'erreur relative de juillet 2020 à décembre 2021 par politique, labels à J+1 : calendrier et politique gardée restent entre 0,2 et 0,35, réflexe court entre 0,5 et 0,75. À droite, barres du nombre de remplacements : 23 pour le calendrier (MAE 2021 0,261), 9 pour la politique gardée (0,264), 1 pour chaque réflexe (0,397 et 0,611)."}
 
 {{< include ../_tables/e5_reprise.md >}}
 

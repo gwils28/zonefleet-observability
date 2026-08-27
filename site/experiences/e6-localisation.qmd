@@ -21,9 +21,9 @@ Les scores par ligne de `RowScorer` (perte estimée par le nanny model, valeur d
 
 ## Sur le choc réel : le COVID
 
-![Hausse de l'erreur relative par zone de Manhattan pendant le mois qui suit l'état d'urgence : réalisée (à gauche, connue 60 jours plus tard) et estimée sans labels (à droite). Les échelles diffèrent : DLE sous-estime l'ampleur, mais dessine la même carte.](../figures/e6_cartes_covid.png){#fig-maps}
+![Hausse de l'erreur relative par zone de Manhattan pendant le mois qui suit l'état d'urgence : réalisée (à gauche, connue 60 jours plus tard) et estimée sans labels (à droite). Les échelles diffèrent : DLE sous-estime l'ampleur, mais dessine la même carte.](../figures/e6_cartes_covid.png){#fig-maps fig-alt="Deux cartes de Manhattan par zone, du 13 mars au 12 avril 2020 : hausse de l'erreur réalisée en orange, de 0 à 1,4, et hausse estimée par DLE en bleu, de 0 à 0,3. Les deux cartes sont les plus foncées dans le sud de Manhattan et les plus claires au nord."}
 
-![Chaque point est une zone. À gauche, le COVID : la perte estimée classe les zones presque comme l'erreur réalisée (corrélation 0,76). À droite, la taxe de congestion : variations minuscules et de signe négatif (le modèle va plutôt mieux), corrélation 0,41.](../figures/e6_estime_vs_realise_zones.png){#fig-scatter}
+![Chaque point est une zone. À gauche, le COVID : la perte estimée classe les zones presque comme l'erreur réalisée (corrélation 0,76). À droite, la taxe de congestion : variations minuscules et de signe négatif (le modèle va plutôt mieux), corrélation 0,41.](../figures/e6_estime_vs_realise_zones.png){#fig-scatter fig-alt="Deux nuages de points, un point par zone colorée CBD ou hors CBD : hausse réalisée en abscisse, hausse estimée par DLE en ordonnée. COVID : nuage croissant, corrélation 0,76. Taxe de congestion : petites variations négatives sans tendance nette, corrélation 0,41."}
 
 Les huit zones les plus dégradées sont toutes dans le CBD, autour des quartiers de vie
 nocturne et de bureaux du sud de Manhattan :
@@ -45,7 +45,7 @@ les zones CBD au-dessus des autres (1 = localisation parfaite, 0,5 = hasard).
 
 {{< include ../_tables/e6_auc.md >}}
 
-![AUC de localisation de chaque signal, pour les deux dérives injectées dans le CBD.](../figures/e6_auc.png){#fig-auc}
+![AUC de localisation de chaque signal, pour les deux dérives injectées dans le CBD.](../figures/e6_auc.png){#fig-auc fig-alt="Barres d'AUC de localisation pour deux dérives limitées au CBD, avec une ligne pointillée à 0,5 pour le hasard. Choc propagé : 1,0 pour la perte estimée, 0,46 pour le PSI de lag_168, 1,0 pour le PSI rapporté au contrefactuel et pour l'erreur réalisée. Concept pur : 0,5, 0,21, 0,5 et 1,0."}
 
 - **Perte estimée (DLE)** : localisation **parfaite** du choc propagé (AUC 1,00),
   **hasard** pour le concept drift (0,50). La frontière de [E3](e3-frontiere.qmd) se

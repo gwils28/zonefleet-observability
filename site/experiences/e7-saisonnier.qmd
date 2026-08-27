@@ -33,7 +33,7 @@ Le z-score corrige ce défaut en comparant des moyennes journalières entre elle
 
 ## Résultats
 
-![Rapport de chaque signal à son seuil (PSI > 0,25 ; |z| > 3), en 2020 et en 2025, pour la température et `lag_24`. Au-dessus de 1, alerte.](../figures/e7_signaux.png){#fig-e7}
+![Rapport de chaque signal à son seuil (PSI > 0,25 ; |z| > 3), en 2020 et en 2025, pour la température et `lag_24`. Au-dessus de 1, alerte.](../figures/e7_signaux.png){#fig-e7 fig-alt="Quatre panneaux, température et lag_24 en 2020 et en 2025 : rapport au seuil en échelle log pour le PSI contre la référence et pour le z-score saisonnier, avec une ligne à 1. Pour la température, le PSI reste au-dessus de 10 et le z-score sous 1. Pour lag_24 en 2020, les deux franchissent 1 mi-mars et y restent ; en 2025, les deux oscillent autour de 1."}
 
 {{< include ../_tables/e7_summary.md >}}
 
