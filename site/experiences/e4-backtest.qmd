@@ -38,7 +38,7 @@ P1b et P3b (« dérive nettoyée » : PCA ou PSI sur `lag_24` et `lag_168` seule
 
 ## Qui est réellement nuisible ?
 
-![Hausse d'erreur réalisée sur 28 jours, pour chaque scénario. Les covariate shifts nuisibles le sont tous ; les bénins améliorent tous le modèle ; deux concept drifts sur trois dépassent le seuil ; les chocs propagés ne le dépassent presque jamais, le modèle à lags les absorbe.](../figures/e4_nuisance.png){#fig-harm}
+![Hausse d'erreur réalisée sur 28 jours, pour chaque scénario. Les covariate shifts nuisibles le sont tous ; les bénins améliorent tous le modèle ; deux concept drifts sur trois dépassent le seuil ; les chocs propagés ne le dépassent presque jamais, le modèle à lags les absorbe.](../figures/e4_nuisance.png){#fig-harm fig-alt="Nuage de points des 240 scénarios par famille, hausse de l'erreur réalisée sur 28 jours en abscisse, de -40 à 150 %, avec un trait au seuil de nuisance de 10 %. Les covariate shifts bénins sont tous entre -40 et -10 % ; les nuisibles tous entre 10 et 80 % ; les chocs propagés restent pour la plupart sous 10 % ; les concepts purs s'étalent de 0 à 150 % ; les scénarios sans dérive sont à zéro."}
 
 87 scénarios sont nuisibles : 50 covariate shifts, 31 concept drifts, 6 chocs propagés.
 Cette répartition est elle-même un résultat : sur un modèle à lags, **un choc de niveau
@@ -77,7 +77,7 @@ plus bas.
 
 ## Le compromis selon le seuil
 
-![Rappel contre fausses alertes par mois, quand le seuil k varie de 0,5 à 3 écarts-types. La condition jointe nettoyée (violet) reste collée à l'axe des fausses alertes nulles sur toute la plage ; DLE seul (bleu) achète son rappel par des fausses alertes ; les labels (orange) ne valent que si l'on peut attendre deux mois.](../figures/e4_compromis.png){#fig-tradeoff}
+![Rappel contre fausses alertes par mois, quand le seuil k varie de 0,5 à 3 écarts-types. La condition jointe nettoyée (violet) reste collée à l'axe des fausses alertes nulles sur toute la plage ; DLE seul (bleu) achète son rappel par des fausses alertes ; les labels (orange) ne valent que si l'on peut attendre deux mois.](../figures/e4_compromis.png){#fig-tradeoff fig-alt="Deux panneaux, signal journalier et signal lissé 7 jours : rappel en ordonnée contre fausses alertes par 30 jours en abscisse, une courbe par politique quand le seuil k varie de 0,5 à 3. La condition jointe nettoyée reste sur l'axe vertical à zéro fausse alerte, avec un rappel jusqu'à 55 % ; DLE seul atteint 55 à 67 % avec 0,6 à 2,3 fausses alertes ; la dérive nettoyée est un point unique vers 67 %."}
 
 ::: {.callout-tip}
 ## Version interactive (signal lissé 7 jours)
@@ -95,7 +95,7 @@ alerte** (56 % lissé) : la dérive nettoyée sert de filtre, DLE de juge.
 
 {{< include ../_tables/e4_by_kind.md >}}
 
-![Rappel par type de dérive nuisible, à k = 1.](../figures/e4_rappel_par_type.png){#fig-kind}
+![Rappel par type de dérive nuisible, à k = 1.](../figures/e4_rappel_par_type.png){#fig-kind fig-alt="Barres groupées du rappel par politique et par type de dérive nuisible à k = 1. Covariate nuisible : 96 % pour la dérive nettoyée, 78 % pour DLE, 76 % pour la condition jointe et pour les labels. Choc propagé : 83, 33, 17 et 100 %. Concept pur : 16, 26, 0 et 55 %."}
 
 - Sur les **covariate shifts nuisibles**, toutes les politiques avancées détectent de
   76 % à 96 % : c'est leur terrain.
@@ -112,7 +112,7 @@ dépasser environ 64 % de rappel *honnête*.
 
 ## Délais
 
-![Délai de détection des scénarios nuisibles détectés, sur l'horloge de décision. Les signaux avancés détectent le jour de l'injection ou dans les jours qui suivent ; le lissage ajoute environ trois jours ; les labels arrivent après deux mois.](../figures/e4_delais.png){#fig-delays}
+![Délai de détection des scénarios nuisibles détectés, sur l'horloge de décision. Les signaux avancés détectent le jour de l'injection ou dans les jours qui suivent ; le lissage ajoute environ trois jours ; les labels arrivent après deux mois.](../figures/e4_delais.png){#fig-delays fig-alt="Points des délais de détection, en jours après l'injection, pour quatre politiques, ronds pour le signal journalier et carrés pour le lissé. Dérive nettoyée, DLE et condition jointe détectent entre 0 et 15 jours, avec quelques cas vers 25 ; les labels détectent entre 60 et 85 jours."}
 
 ## Choisir par le coût
 
@@ -140,7 +140,7 @@ Trois choix du protocole ont été fixés a priori : persistance de 2 jours, nui
 signaux journaliers déjà calculés (aucune injection relancée), au réglage retenu
 (k = 1, signal lissé 7 jours).
 
-![Rappel (en haut) et fausses alertes (en bas) de chaque politique quand un seul paramètre du protocole varie.](../figures/e4_sensibilite.png){#fig-sensitivity}
+![Rappel (en haut) et fausses alertes (en bas) de chaque politique quand un seul paramètre du protocole varie.](../figures/e4_sensibilite.png){#fig-sensitivity fig-alt="Six petits graphiques de rappel (en haut) et de fausses alertes (en bas) pour quatre politiques, quand varient la persistance (1 à 3 jours), le seuil de nuisance (5 à 20 %) et la fenêtre (14 à 42 jours). Les fausses alertes de la condition jointe restent à zéro dès 2 jours de persistance ; son rappel varie entre 45 et 64 %."}
 
 Condition jointe nettoyée (P3b) :
 

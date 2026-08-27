@@ -97,7 +97,7 @@ Les 13 scénarios ont été rejoués avec cinq graines (1 à 5). Le critère est
 les cinq : le pire covariate shift nuisible suit à 0,84, le meilleur concept drift pur à
 0,00.
 
-![Taux de suivi en régime établi, un point par graine. Les familles ne se chevauchent pour aucune graine.](../figures/e3_graines.png){#fig-e3-graines}
+![Taux de suivi en régime établi, un point par graine. Les familles ne se chevauchent pour aucune graine.](../figures/e3_graines.png){#fig-e3-graines fig-alt="Points du taux de suivi en régime établi pour neuf scénarios, un point par graine. Covariate shifts nuisibles entre 0,84 et 0,94 ; bénins entre 0,95 et 0,99 ; les trois concepts purs à 0 pour toutes les graines."}
 
 {{< include ../_tables/e3_seeds.md >}}
 
