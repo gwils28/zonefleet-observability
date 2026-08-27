@@ -213,7 +213,13 @@ def intermittency() -> None:
 def weather() -> None:
     """Température et précipitations journalières."""
     w = load_weather().set_index("ts")
-    daily = w.resample("D").agg({"temperature_2m": "mean", "precipitation": "sum"}).dropna()
+    # pas de dropna : les jours absents (2022-2023) restent NaN et coupent la courbe
+    daily = pd.DataFrame(
+        {
+            "temperature_2m": w["temperature_2m"].resample("D").mean(),
+            "precipitation": w["precipitation"].resample("D").sum(min_count=1),
+        }
+    )
     fig, axes = plt.subplots(2, 1, figsize=(12, 4.2), sharex=True)
     axes[0].plot(daily.index, daily["temperature_2m"], color=viz.ORANGE, lw=1)
     axes[0].set_ylabel("°C (moy. jour)")
