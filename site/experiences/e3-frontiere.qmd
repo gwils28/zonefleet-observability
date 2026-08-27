@@ -62,7 +62,7 @@ Survoler un point pour voir le scénario et son taux de suivi.
 
 ## Quatre trajectoires
 
-![Erreur relative journalière estimée (bleu) et réalisée (orange), avec en gris l'erreur réalisée sans dérive. Le trait vertical marque l'injection.](../figures/e3_series.png){#fig-series}
+![Erreur relative journalière estimée (bleu) et réalisée (orange), avec en gris l'erreur réalisée sans dérive. Le trait vertical marque l'injection.](../figures/e3_series.png){#fig-series fig-alt="Quatre panneaux de l'erreur relative journalière de janvier à juin 2025, injection le 3 mars : estimée par DLE, réalisée, et réalisée sans dérive en gris. Covariate shift nuisible : estimée et réalisée montent ensemble vers 0,4. Covariate shift bénin : les deux descendent ensemble vers 0,15. Concept drift pur : la réalisée saute vers 0,6 à 0,7 tandis que l'estimée reste à 0,25. Choc propagé : un pic le premier jour, puis les courbes reviennent près de leur niveau."}
 
 - **En haut à gauche**, le cas d'école : l'erreur monte, DLE la suit au jour près.
 - **En haut à droite**, la dérive bénigne : les entrées bougent autant, mais l'erreur
@@ -73,7 +73,7 @@ Survoler un point pour voir le scénario et son taux de suivi.
 
 ## Le choc propagé, au ralenti
 
-![Choc x0,5 le 3 mars. L'erreur réalisée bondit le premier jour (les lags décrivent encore l'ancien niveau), puis redescend par paliers à mesure que les lags de 24 h, 168 h et 336 h basculent. DLE monte tard et peu.](../figures/e3_transition.png){#fig-transition}
+![Choc x0,5 le 3 mars. L'erreur réalisée bondit le premier jour (les lags décrivent encore l'ancien niveau), puis redescend par paliers à mesure que les lags de 24 h, 168 h et 336 h basculent. DLE monte tard et peu.](../figures/e3_transition.png){#fig-transition fig-alt="Courbes journalières de l'erreur estimée et réalisée de mi-février à début avril 2025 autour d'un choc x0,5 le 3 mars, avec trois traits verticaux marquant le moment où lag_24, lag_168 puis lag_336 absorbent le choc. La réalisée bondit à 0,62 le jour du choc puis redescend par paliers ; l'estimée monte modérément vers 0,37 avant de revenir vers 0,3."}
 
 C'est la **mécanique exacte du décrochage** observé en E1 :
 
