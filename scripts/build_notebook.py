@@ -55,7 +55,7 @@ DLE ne sert à rien si le modèle se trompe partout pareil. Regardons l'erreur r
     ),
     (
         "code",
-        """#| fig-alt: Barres de l'erreur relative moyenne par décile de lag_168 dans la référence : environ 0,44 au premier décile, décroissante jusqu'à environ 0,17 aux deux derniers.
+        """#| fig-alt: "Barres de l'erreur relative moyenne par décile de lag_168 dans la référence : environ 0,44 au premier décile, décroissante jusqu'à environ 0,17 aux deux derniers."
 err = np.abs(np.log1p(ref["pickups"]) - np.log1p(ref["q50"]))
 decile = pd.qcut(ref["lag_168"], 10, labels=[f"D{i}" for i in range(1, 11)])
 by_decile = err.groupby(decile, observed=True).mean()
@@ -76,7 +76,7 @@ ensuite pour comparer.""",
     ),
     (
         "code",
-        """#| fig-alt: Courbes journalières de l'erreur estimée et réalisée sur l'analysis 2025 sans dérive, avec le seuil NannyML vers 0,52 : les deux courbes oscillent entre 0,2 et 0,5 ; l'estimée approche le seuil en janvier et fin février.
+        """#| fig-alt: "Courbes journalières de l'erreur estimée et réalisée sur l'analysis 2025 sans dérive, avec le seuil NannyML vers 0,52 : les deux courbes oscillent entre 0,2 et 0,5 ; l'estimée approche le seuil en janvier et fin février."
 est = estimate_performance(ref, an, scale="log", metrics=("mae",))
 real = realized_performance(an, scale="log").query("metric == 'mae_log'")
 cmp = est.merge(real, on=["date", "metric"])
@@ -99,7 +99,7 @@ relation X → y n'a pas changé, seule la distribution des entrées bouge.""",
     ),
     (
         "code",
-        """#| fig-alt: Courbes journalières de l'erreur estimée et réalisée en 2025 avec un trait au 3 mars : après l'injection d'un covariate shift nuisible, les deux montent ensemble vers 0,4.
+        """#| fig-alt: "Courbes journalières de l'erreur estimée et réalisée en 2025 avec un trait au 3 mars : après l'injection d'un covariate shift nuisible, les deux montent ensemble vers 0,4."
 onset = pd.Timestamp("2025-03-03")
 stats = (ref["lag_168"].mean(), ref["lag_168"].std())
 an_cov = covariate_shift(an, onset, kappa=1.5, ref_stats=stats, seed=0)
@@ -129,7 +129,7 @@ features** : le modèle et DLE voient exactement les mêmes entrées qu'avant.""
     ),
     (
         "code",
-        """#| fig-alt: Courbes journalières de l'erreur estimée et réalisée en 2025 avec un trait au 3 mars : après un concept drift pur, la réalisée saute vers 0,6 à 0,7 tandis que l'estimée reste vers 0,25.
+        """#| fig-alt: "Courbes journalières de l'erreur estimée et réalisée en 2025 avec un trait au 3 mars : après un concept drift pur, la réalisée saute vers 0,6 à 0,7 tandis que l'estimée reste vers 0,25."
 an_con = concept_drift(an, onset, factor=0.5)
 compare(an_con, "Concept drift pur : DLE ne voit rien")""",
     ),
@@ -212,7 +212,7 @@ reste à 10) et on regarde quelle politique gagne.""",
     ),
     (
         "code",
-        """#| fig-alt: Points du coût attendu minimal en fonction du coût d'une fausse page, en échelle log de 0,1 à 20, colorés par politique gagnante : la dérive nettoyée gagne jusqu'à environ 0,7, avec un coût croissant de 1,40 à 1,67 ; au-delà, la condition jointe gagne avec un coût constant d'environ 1,70.
+        """#| fig-alt: "Points du coût attendu minimal en fonction du coût d'une fausse page, en échelle log de 0,1 à 20, colorés par politique gagnante : la dérive nettoyée gagne jusqu'à environ 0,7, avec un coût croissant de 1,40 à 1,67 ; au-delà, la condition jointe gagne avec un coût constant d'environ 1,70."
 grid = np.geomspace(0.1, 20, 30)
 winners = []
 for c in grid:
@@ -314,7 +314,7 @@ print(daily_report("covid", "2020-03-23"))""",
     ("md", """## Deux mois plus tard : ce que disent les labels"""),
     (
         "code",
-        """#| fig-alt: Courbes journalières du 9 mars au 15 avril 2020, avec un trait au 13 mars : l'erreur réalisée monte de 0,2 à 1,75 le 22 mars puis redescend vers 0,75 ; l'erreur estimée ne dépasse pas 0,53.
+        """#| fig-alt: "Courbes journalières du 9 mars au 15 avril 2020, avec un trait au 13 mars : l'erreur réalisée monte de 0,2 à 1,75 le 22 mars puis redescend vers 0,75 ; l'erreur estimée ne dépasse pas 0,53."
 late = sig.loc["2020-03-09":"2020-04-15", ["estimated", "realized"]]
 ax = late.rename(columns={"estimated": "estimée", "realized": "réalisée"}).plot(
     figsize=(9, 3.2), color=["#2a78d6", "#eb6834"]
