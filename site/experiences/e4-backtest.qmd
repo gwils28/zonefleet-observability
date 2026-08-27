@@ -77,7 +77,7 @@ plus bas.
 
 ## Le compromis selon le seuil
 
-![Rappel contre fausses alertes par mois, quand le seuil k varie de 0,5 à 3 écarts-types. La condition jointe nettoyée (violet) reste collée à l'axe des fausses alertes nulles sur toute la plage ; DLE seul (bleu) achète son rappel par des fausses alertes ; les labels (orange) ne valent que si l'on peut attendre deux mois.](../figures/e4_compromis.png){#fig-tradeoff fig-alt="Deux panneaux, signal journalier et signal lissé 7 jours : rappel en ordonnée contre fausses alertes par 30 jours en abscisse, une courbe par politique quand le seuil k varie de 0,5 à 3. La condition jointe nettoyée reste sur l'axe vertical à zéro fausse alerte, avec un rappel jusqu'à 55 % ; DLE seul atteint 55 à 67 % avec 0,6 à 2,3 fausses alertes ; la dérive nettoyée est un point unique vers 67 %."}
+![Rappel contre fausses alertes par mois, quand le seuil k varie de 0,5 à 3 écarts-types. La condition jointe nettoyée (violet) reste collée à l'axe des fausses alertes nulles sur toute la plage ; DLE seul (bleu) achète son rappel par des fausses alertes ; les labels (orange) ne valent que si l'on peut attendre deux mois.](../figures/e4_compromis.png){#fig-tradeoff fig-alt="Deux panneaux, signal journalier et signal lissé 7 jours : rappel en ordonnée contre fausses alertes par 30 jours en abscisse, une courbe par politique quand le seuil k varie de 0,5 à 3. La condition jointe nettoyée reste sur l'axe vertical à zéro fausse alerte, avec un rappel de 7 à 56 % ; DLE seul va de 18 à 67 % de rappel pour 0,9 à 2,3 fausses alertes (journalier) et de 21 à 56 % pour 0,3 à 0,9 (lissé) ; la dérive nettoyée est un point unique à 67 % pour 0,16 fausse alerte."}
 
 ::: {.callout-tip}
 ## Version interactive (signal lissé 7 jours)
