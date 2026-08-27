@@ -27,7 +27,7 @@ données : 120 fichiers sont contrôlés en moins d'une seconde.
 
 ## Ce que le contrat a trouvé
 
-![Présence et type de sept colonnes des fichiers jaunes, mois par mois. `airport_fee` est de type nul jusqu'en 2020, les compteurs passent de flottant à entier en 2024, `cbd_congestion_fee` apparaît en janvier 2025.](../figures/data_schema_timeline.png){#fig-schema}
+![Présence et type de sept colonnes des fichiers jaunes, mois par mois. `airport_fee` est de type nul jusqu'en 2020, les compteurs passent de flottant à entier en 2024, `cbd_congestion_fee` apparaît en janvier 2025.](../figures/data_schema_timeline.png){#fig-schema fig-alt="Grille colorée de sept colonnes des fichiers de taxis jaunes sur 60 mois de 2019 à 2025, la couleur indiquant le type. airport_fee est de type nul jusqu'en 2020 puis flottant ; passenger_count et ratecodeid passent de flottant à entier en 2024 ; cbd_congestion_fee n'apparaît qu'en 2025."}
 
 | Rupture | Fichiers | Classement |
 |---|---|---|

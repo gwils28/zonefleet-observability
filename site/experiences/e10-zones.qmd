@@ -20,7 +20,7 @@ propres à chaque groupe, puis alerter si l'un des groupes alerte, détecte-t-il
 
 {{< include ../_tables/e10_summary.md >}}
 
-![Scénarios nuisibles par sous-ensemble de zones et par type de dérive. Plein : détectés ; clair : manqués. L'alerte par groupe rattrape trois covariate shifts et le choc de niveau du CBD ; tout ce qui reste manqué localement est du concept drift.](../figures/e10_sous_ensembles.png){#fig-e10}
+![Scénarios nuisibles par sous-ensemble de zones et par type de dérive. Plein : détectés ; clair : manqués. L'alerte par groupe rattrape trois covariate shifts et le choc de niveau du CBD ; tout ce qui reste manqué localement est du concept drift.](../figures/e10_sous_ensembles.png){#fig-e10 fig-alt="Barres horizontales empilées du nombre de scénarios nuisibles par sous-ensemble de zones (ville entière, CBD, hors CBD, soir, nuit) et par politique (alerte à la ville, alerte par groupe), découpées par type de dérive ; partie pleine pour les détectés, claire pour les manqués. Ville entière : 44 sur 60 détectés à la ville, 47 sur 60 par groupe. CBD : 0 puis 1 sur 14. Hors CBD, soir et nuit : aucun détecté, uniquement des concepts purs."}
 
 - **Le rappel global passe de 51 % à 55 %, toujours sans fausse alerte.** Le gain vient
   de trois covariate shifts à l'échelle de la ville et du seul choc de niveau limité au

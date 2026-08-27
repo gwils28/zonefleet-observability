@@ -3,7 +3,7 @@ title: "Dérive univariée : KS, Wasserstein, PSI"
 description: "Trois statistiques pour comparer une distribution de feature à sa référence, ce que chacune mesure et comment les lire."
 ---
 
-![Les trois statistiques sur le même couple de distributions : la distance maximale entre fonctions de répartition (KS), l'aire entre elles (Wasserstein), et l'écart de répartition dans les déciles de la référence (PSI).](../figures/concept_derive_univariee.png){#fig-univ}
+![Les trois statistiques sur le même couple de distributions : la distance maximale entre fonctions de répartition (KS), l'aire entre elles (Wasserstein), et l'écart de répartition dans les déciles de la référence (PSI).](../figures/concept_derive_univariee.png){#fig-univ fig-alt="Trois panneaux. Deux histogrammes superposés, le chunk courant décalé vers la droite. Les deux fonctions de répartition, avec l'écart vertical maximal (KS 0,24) et l'aire entre elles (Wasserstein 0,63). Des barres par décile de la référence : 10 % par bac pour la référence, parts du chunk courant concentrées dans le dernier décile (PSI 0,35)."}
 
 ## Trois questions différentes
 

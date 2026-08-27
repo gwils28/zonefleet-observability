@@ -11,7 +11,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: quarto-dev/quarto-actions/setup@v2
       - name: Rendu du site (sans exécution)
-        run: quarto render site 2>&1 | tee render.log
+        run: |
+          set -o pipefail
+          quarto render site 2>&1 | tee render.log
       - name: Aucun lien interne cassé
         run: |
           if grep -q "Unable to resolve link target" render.log; then

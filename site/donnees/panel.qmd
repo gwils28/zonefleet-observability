@@ -28,7 +28,7 @@ Elles concentrent 93 % des courses de 2019 (`data_summary.csv`). La liste est fi
 `configs/zones.yaml` : la recalculer sur 2025 changerait l'objet surveillé en même temps
 que le monde, et rendrait les comparaisons impossibles.
 
-![Les 60 zones surveillées. En bleu, les 32 zones de la zone de tarification de congestion (CBD), identifiées à partir des données ; en vert, les 28 autres.](../figures/data_carte_zones.png){#fig-map}
+![Les 60 zones surveillées. En bleu, les 32 zones de la zone de tarification de congestion (CBD), identifiées à partir des données ; en vert, les 28 autres.](../figures/data_carte_zones.png){#fig-map fig-alt="Deux cartes de New York par zone de taxi. Les 32 zones CBD surveillées, en bleu, couvrent le sud de Manhattan ; les 28 zones hors CBD surveillées, en vert, couvrent le nord de Manhattan, les aéroports et quelques quartiers de Brooklyn et du Queens ; les autres zones sont grises. Le second panneau zoome sur Manhattan."}
 
 ### L'indicateur CBD se lit dans les données
 
@@ -37,16 +37,16 @@ prise en charge, la part des courses 2025 avec `cbd_congestion_fee > 0`. Une cou
 **commence** dans la zone tarifée paie toujours : une zone intérieure a une part proche
 de 1.
 
-![Distribution de la part de courses taxées par zone (zones de plus de 1 000 courses en 2025) : deux modes nets, sans ambiguïté autour du seuil.](../figures/data_cbd_bimodal.png){#fig-cbd}
+![Distribution de la part de courses taxées par zone (zones de plus de 1 000 courses en 2025) : deux modes nets, sans ambiguïté autour du seuil.](../figures/data_cbd_bimodal.png){#fig-cbd fig-alt="Histogramme du nombre de zones selon la part 2025 de leurs courses soumises à la taxe de congestion. Une grande masse de zones entre 0 et 0,6, aucune entre 0,6 et 0,9, un second pic au-dessus de 0,9 ; un trait rouge marque le seuil de 0,8."}
 
 Les zones CBD ont toutes une part supérieure à 0,93 ; les autres restent sous 0,6. Le
 seuil de 0,8 ne tombe sur aucune zone : la classification est robuste.
 
 ## Profils et niveaux
 
-![Courses moyennes par zone, selon l'heure et le jour (2019). Les zones CBD ont un pic du soir en semaine et une activité nocturne le week-end ; les zones hors CBD un double pic plus étalé.](../figures/data_profils_horaires.png){#fig-profiles}
+![Courses moyennes par zone, selon l'heure et le jour (2019). Les zones CBD ont un pic du soir en semaine et une activité nocturne le week-end ; les zones hors CBD un double pic plus étalé.](../figures/data_profils_horaires.png){#fig-profiles fig-alt="Deux cartes de chaleur des courses moyennes par heure (colonnes) et jour de la semaine (lignes) en 2019, pour les zones CBD et hors CBD. Les zones CBD culminent en soirée de semaine et restent actives la nuit le week-end ; les zones hors CBD ont un plateau en journée."}
 
-![Niveau moyen et part d'heures sans course, par zone. Les 60 zones surveillées sont peu intermittentes (au plus 6 % d'heures à zéro), mais leurs niveaux couvrent deux ordres de grandeur.](../figures/data_intermittence.png){#fig-levels}
+![Niveau moyen et part d'heures sans course, par zone. Les 60 zones surveillées sont peu intermittentes (au plus 6 % d'heures à zéro), mais leurs niveaux couvrent deux ordres de grandeur.](../figures/data_intermittence.png){#fig-levels fig-alt="Nuage de points des 60 zones : courses moyennes par heure en abscisse logarithmique, de 20 à plus de 300, et part d'heures sans course en ordonnée. Presque toutes les zones sont sous 1 % ; deux zones hors CBD atteignent 4 et 6 %."}
 
 Deux conséquences pour la modélisation :
 

@@ -18,7 +18,7 @@ modèle n'en souffre pas**.
 
 ## La demande a-t-elle bougé ?
 
-![À gauche, évolution de la demande moyenne par heure entre le premier semestre 2024 et le premier semestre 2025, pour les zones CBD et hors CBD. À droite, part du CBD dans le volume des 60 zones (moyenne 7 jours).](../figures/e2_demande.png){#fig-demand}
+![À gauche, évolution de la demande moyenne par heure entre le premier semestre 2024 et le premier semestre 2025, pour les zones CBD et hors CBD. À droite, part du CBD dans le volume des 60 zones (moyenne 7 jours).](../figures/e2_demande.png){#fig-demand fig-alt="Deux panneaux. Des barres de l'évolution de la demande entre le premier semestre 2024 et le premier semestre 2025, par heure, zones CBD et hors CBD : hausse de 7 à 42 %, plus forte hors CBD la nuit. Une courbe de la part du CBD dans les 60 zones, entre 55 et 63 %, sans rupture au 5 janvier 2025."}
 
 - Toute la ville progresse entre 2024 et 2025 (+7 à +42 % selon l'heure) : la reprise des
   taxis se poursuit, la taxe ne provoque **aucun effondrement**.
@@ -46,11 +46,11 @@ surtaxe de 0,75 $ par course de taxi n'est pas un COVID.
 
 ## Ce que le moniteur en dit
 
-![Erreur relative estimée et réalisée, séparément pour les zones CBD et hors CBD. DLE reste sous son seuil, à deux épisodes près : la vague de froid du 20 au 23 janvier et celle du 17 au 20 février.](../figures/e2_estime_vs_realise.png){#fig-perf}
+![Erreur relative estimée et réalisée, séparément pour les zones CBD et hors CBD. DLE reste sous son seuil, à deux épisodes près : la vague de froid du 20 au 23 janvier et celle du 17 au 20 février.](../figures/e2_estime_vs_realise.png){#fig-perf fig-alt="Deux panneaux de l'erreur relative estimée et réalisée en 2025, zones CBD et hors CBD, avec un seuil pointillé vers 0,5. Les deux courbes oscillent entre 0,2 et 0,4 ; l'estimée approche le seuil en janvier et fin février dans le CBD."}
 
 {{< include ../_tables/e2_detection.md >}}
 
-![Jours en alerte par politique : la dérive seule alerte en continu, toutes les autres politiques restent muettes.](../figures/e2_alertes.png){#fig-alerts}
+![Jours en alerte par politique : la dérive seule alerte en continu, toutes les autres politiques restent muettes.](../figures/e2_alertes.png){#fig-alerts fig-alt="Frise des jours en alerte par politique en 2025, un trait rouge par jour. La dérive seule (P1) alerte tous les jours ; la dérive nettoyée (P1b) a quatre jours d'alerte en mai et juin ; DLE, les conditions jointes et les labels n'alertent jamais."}
 
 C'est le cas d'école de la **dérive sans impact** :
 
@@ -65,7 +65,7 @@ C'est le cas d'école de la **dérive sans impact** :
 
 ### Anatomie des fausses alertes
 
-![Part des jours où chaque feature dépasse le seuil PSI de 0,25, en E1 et en E2.](../figures/e2_fausses_alertes.png){#fig-fa}
+![Part des jours où chaque feature dépasse le seuil PSI de 0,25, en E1 et en E2.](../figures/e2_fausses_alertes.png){#fig-fa fig-alt="Barres horizontales de la part des jours avec un PSI supérieur à 0,25, pour quatre features, en 2020 et en 2025. temperature_2m : 100 % les deux années ; roll_mean_168 : environ 67 et 73 % ; lag_168 et lag_24 : environ 57 et 60 % en 2020, moins de 3 % en 2025."}
 
 - **`temperature_2m`** dépasse le seuil **100 % des jours** dans les deux expériences :
   hiver et printemps contre une référence d'automne. Dérive vraie, impact nul.

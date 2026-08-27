@@ -60,6 +60,10 @@ extend-exclude = [".claude", "site/notebooks"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
+[tool.ruff.lint.per-file-ignores]
+# textes alternatifs des figures (options de cellule Quarto sur une seule ligne)
+"scripts/build_notebook.py" = ["E501"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

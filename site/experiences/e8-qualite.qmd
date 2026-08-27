@@ -46,7 +46,7 @@ Du lundi 3 au dimanche 9 mars 2025 : **troncature** (40 % des courses perdues),
 CBD à zéro). Features et prévisions sont recalculées sur le panel bogué, comme en
 production.
 
-![Les trois indicateurs de qualité autour de la semaine bogué (bande rose). La bande grise et le trait rouge marquent les seuils calibrés sur 2024.](../figures/e8_qualite.png){#fig-quality}
+![Les trois indicateurs de qualité autour de la semaine bogué (bande rose). La bande grise et le trait rouge marquent les seuils calibrés sur 2024.](../figures/e8_qualite.png){#fig-quality fig-alt="Trois panneaux de mi-février à fin mars 2025, une courbe par bug injecté et une sans bug, une bande rose sur la semaine boguée : rapport du volume à la médiane des mêmes jours (la duplication monte à 2,2, la troncature tombe à 0,6), corrélation du profil horaire (le décalage d'une heure tombe à 0,72), nombre de zones sans course (3 pour la zone muette, 0 sinon)."}
 
 {{< include ../_tables/e8_summary.md >}}
 

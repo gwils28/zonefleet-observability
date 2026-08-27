@@ -5,7 +5,7 @@ description: "Pourquoi la MAE en courses peut s'améliorer pendant une catastrop
 
 ## Le paradoxe de la MAE absolue
 
-![Un choc de niveau simulé. L'erreur en courses explose au moment du choc puis baisse mécaniquement avec le volume ; l'erreur relative reste élevée tant que le modèle n'a pas rattrapé le nouveau régime.](../figures/concept_metriques_echelles.png){#fig-scales}
+![Un choc de niveau simulé. L'erreur en courses explose au moment du choc puis baisse mécaniquement avec le volume ; l'erreur relative reste élevée tant que le modèle n'a pas rattrapé le nouveau régime.](../figures/concept_metriques_echelles.png){#fig-scales fig-alt="Trois courbes sur 120 jours avec un choc au jour 60. La demande réalisée chute de 300 à environ 30 courses, la prévision la suit avec retard. L'erreur en courses bondit au choc puis décroît vers zéro. L'erreur relative en log bondit au choc et reste élevée plusieurs semaines."}
 
 Quand la demande d'une zone passe de 300 à 30 courses par heure, une erreur de 50 % ne
 pèse plus que 15 courses au lieu de 150. La MAE en courses **baisse**, le modèle est

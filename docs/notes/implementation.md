@@ -162,3 +162,14 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   page le dit explicitement.
 - Correction associée : `fr` n'affiche plus de zéro négatif (table E3 modifiée d'autant,
   sans changement de valeur).
+
+## 2026-08-27 : accessibilité des figures
+
+- Constaté sur le site rendu : 53 images sur 53 sans texte alternatif. Chaque figure a
+  désormais un `fig-alt` qui décrit ce qu'elle trace (forme, axes, valeurs lisibles) ;
+  la légende garde l'interprétation. Chaque texte a été écrit en regardant l'image, et
+  les valeurs citées ont été vérifiées dans les tables (deux corrections : fourchettes du
+  compromis E4, descriptions des figures de concepts).
+- Effet de bord trouvé : le rendu Quarto pouvait échouer sans faire échouer site-check
+  (code de sortie masqué par `tee`) ; corrigé avec `pipefail`. Le vérificateur de liens
+  refuse aussi les images sans texte alternatif.

@@ -24,7 +24,7 @@ entrées du modèle se déplacent vers des régions où il se trompait déjà da
 entrées et demande qui change (*concept drift*). Pour un forecaster à lags, tout choc
 brutal commence par un concept drift, le temps que les lags l'absorbent.
 
-![Pour chaque dérive injectée : hausse d'erreur réalisée (abscisse) contre hausse estimée sans labels (ordonnée). Sur la diagonale, l'estimation dit vrai ; sur l'axe horizontal, elle ment.](figures/e3_frontiere.png){#fig-home}
+![Pour chaque dérive injectée : hausse d'erreur réalisée (abscisse) contre hausse estimée sans labels (ordonnée). Sur la diagonale, l'estimation dit vrai ; sur l'axe horizontal, elle ment.](figures/e3_frontiere.png){#fig-home fig-alt="Deux nuages de points, 14 premiers jours après l'injection et régime établi : hausse de l'erreur réalisée en abscisse, hausse estimée par DLE en ordonnée, un point par scénario coloré par famille, avec la diagonale. Les covariate shifts nuisibles et bénins sont sur la diagonale ; les concepts purs restent à zéro en ordonnée jusqu'à près de 0,4 en abscisse ; les chocs propagés sont proches de zéro."}
 
 D'où l'architecture recommandée : **contrôler la qualité des données d'abord** (un bug
 amont est invisible pour le moniteur de modèle), **alerter sur la condition jointe**

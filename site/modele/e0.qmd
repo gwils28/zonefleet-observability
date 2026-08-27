@@ -39,15 +39,15 @@ ne change pas le classement.
 
 ## Par zone
 
-![Gain de MAE de LightGBM sur le seasonal naive, par zone, en fonction du niveau de demande. Le modèle gagne partout, de 19 % à 33 %, sans dépendance nette au volume ni au statut CBD.](../figures/e0_skill_zones.png){#fig-zones}
+![Gain de MAE de LightGBM sur le seasonal naive, par zone, en fonction du niveau de demande. Le modèle gagne partout, de 19 % à 33 %, sans dépendance nette au volume ni au statut CBD.](../figures/e0_skill_zones.png){#fig-zones fig-alt="Deux nuages de points, références 2019 et 2024 : gain de MAE du modèle sur le seasonal naive en pourcentage, en fonction des courses moyennes par heure en échelle logarithmique, zones CBD en bleu et hors CBD en vert. Tous les points sont entre environ 19 et 33 %, sans tendance avec le niveau."}
 
 ## À quoi ressemblent les prévisions
 
-![Une semaine de référence pour une zone CBD dense et une zone du Queens. La médiane suit bien le cycle ; les pics du soir sont parfois sous-estimés, et l'intervalle [q10, q90] est trop étroit.](../figures/e0_traces.png){#fig-traces}
+![Une semaine de référence pour une zone CBD dense et une zone du Queens. La médiane suit bien le cycle ; les pics du soir sont parfois sous-estimés, et l'intervalle [q10, q90] est trop étroit.](../figures/e0_traces.png){#fig-traces fig-alt="Deux séries horaires sur une semaine d'octobre 2019, Midtown Center et Astoria : courses réalisées, prévision médiane émise 24 heures avant et bande de l'intervalle q10-q90. La prévision suit le cycle quotidien dans les deux zones ; certains pics du soir à Midtown dépassent la prévision."}
 
 ## Calibration des intervalles
 
-![Couverture empirique de l'intervalle [q10, q90] par heure : entre 66 % et 76 %, sous la cible de 80 %, avec un creux à la pointe du matin.](../figures/e0_couverture_heure.png){#fig-cov}
+![Couverture empirique de l'intervalle [q10, q90] par heure : entre 66 % et 76 %, sous la cible de 80 %, avec un creux à la pointe du matin.](../figures/e0_couverture_heure.png){#fig-cov fig-alt="Courbes de couverture empirique de l'intervalle q10-q90 par heure de la journée, références 2019 et 2024, sous une ligne pointillée à 80 %. La couverture varie entre 66 et 76 %, avec un creux vers 7 et 8 heures."}
 
 La couverture globale est de 72 % sur les deux références. Ce défaut est **assumé et
 documenté** plutôt que corrigé : la conformalisation des quantiles est hors périmètre
@@ -80,7 +80,7 @@ max(q10 - y, y - q90), en échelle log1p. Sa garantie de couverture repose sur
 l'**échangeabilité** entre calibration et usage. Calibration ici : septembre-octobre de
 la référence ; évaluation : novembre-décembre, puis les analysis.
 
-![Couverture de l'intervalle 80 % avant et après calibration conforme (globale ou par heure).](../figures/e0_conforme.png){#fig-conformal}
+![Couverture de l'intervalle 80 % avant et après calibration conforme (globale ou par heure).](../figures/e0_conforme.png){#fig-conformal fig-alt="Barres groupées de couverture de l'intervalle 80 %, sans calibration, avec calibration globale et avec calibration par heure, pour la fin de référence et deux périodes d'analysis, modèles 2019 et 2024. Pour 2024, la calibration amène la couverture près de 80 % ; pour 2019, elle tombe à 56-65 % pendant le COVID malgré la calibration."}
 
 {{< include ../_tables/e0_conformal.md >}}
 
@@ -107,7 +107,7 @@ jours de labels **publiés**, soit à J + 1 (journaux de l'opérateur), soit à 
 (publication TLC). La fonction `conformal.rolling` ne lit jamais un label postérieur à
 `jour - délai` (testé).
 
-![Couverture journalière (moyenne 7 jours) de l'intervalle brut et de l'intervalle calibré en glissant, selon le délai des labels.](../figures/e0_conforme_glissant.png){#fig-conformal-rolling}
+![Couverture journalière (moyenne 7 jours) de l'intervalle brut et de l'intervalle calibré en glissant, selon le délai des labels.](../figures/e0_conforme_glissant.png){#fig-conformal-rolling fig-alt="Deux séries de couverture journalière en moyenne sur 7 jours, modèle 2019 de septembre 2019 à juin 2020 et modèle 2024 de septembre 2024 à juin 2025 : intervalle brut, calibration glissante avec labels à J+60 et avec labels à J+1. En mars 2020, toutes chutent vers 10 % ; la version à J+1 remonte au-dessus de 80 % en avril, celle à J+60 seulement en juin. En 2024-2025, les trois restent proches de 80 %."}
 
 - **Labels à J + 1** : la couverture plonge avec le choc (aucune calibration ne
   l'anticipe), puis **revient à 80 % le 3 avril** (moyenne 7 jours), trois semaines après
