@@ -1,4 +1,4 @@
-"""Vérifie les liens internes du site rendu : fichier cible, ancre, images.
+"""Vérifie les liens internes du site rendu : fichier cible, ancre, images, textes alternatifs.
 
 Usage : uv run python scripts/check_links.py [dossier]  (défaut : site/_site)
 Code de sortie 1 si un lien est cassé. Les liens externes ne sont pas suivis.
@@ -23,6 +23,7 @@ class Page(HTMLParser):
         self.ids: set[str] = set()
         self.links: list[str] = []
         self.images: list[str] = []
+        self.no_alt: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         a = dict(attrs)
@@ -33,6 +34,8 @@ class Page(HTMLParser):
             self.links.append(str(a["href"]))
         if tag == "img" and a.get("src"):
             self.images.append(str(a["src"]))
+            if not (a.get("alt") or "").strip():
+                self.no_alt.append(str(a["src"]))
 
 
 def parse(path: Path) -> Page:
@@ -60,6 +63,8 @@ def check(site: Path) -> list[str]:
     errors = []
     for path, page in pages.items():
         rel = path.relative_to(site)
+        for url in page.no_alt:
+            errors.append(f"{rel} : image sans texte alternatif {url}")
         for url in page.images:
             if is_internal(url) and not url.startswith("data:"):
                 target = resolve(site, path, unquote(urlsplit(url).path))
