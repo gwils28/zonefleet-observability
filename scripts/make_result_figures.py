@@ -428,8 +428,10 @@ def e3_frontier() -> None:
         ax.set_title(title)
         ax.grid(axis="x")
     axes[0].set_ylabel("hausse de l'erreur estimée par DLE")
-    axes[0].annotate("estimé = réalisé", (0.17, 0.19), rotation=33, fontsize=9, color=viz.INK2)
-    axes[1].annotate("concept pur : DLE ne bouge pas", (0.20, 0.012), fontsize=9, color=viz.INK2)
+    axes[0].annotate("estimé = réalisé", (0.12, 0.19), rotation=33, fontsize=9, color=viz.INK2)
+    axes[1].annotate(
+        "concept pur : DLE ne bouge pas", (0.13, 0.03), fontsize=9, color=viz.INK2
+    )  # au-dessus des points à y = 0, sans dépasser le bord droit
     axes[0].legend(loc="upper left")
     fig.tight_layout()
     viz.save(fig, "e3_frontiere")
