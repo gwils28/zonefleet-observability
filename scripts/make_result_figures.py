@@ -704,8 +704,9 @@ def e5_trajectories() -> None:
     axes[0].legend(loc="upper right", ncols=5, fontsize=9)
     axes[0].annotate(
         "traits en bas : remplacements de modèle",
-        (0.01, 0.12),
+        (0.99, 0.10),  # à droite, sous les courbes (à gauche, la courbe de janvier passe ici)
         xycoords="axes fraction",
+        ha="right",
         fontsize=8.5,
         color=viz.INK2,
     )
