@@ -1022,7 +1022,8 @@ def e7_signals() -> None:
             ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
     axes[0, 0].set_ylabel("rapport au seuil")
     axes[1, 0].set_ylabel("rapport au seuil")
-    axes[0, 0].legend(loc="upper left", fontsize=8.5)
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=2, frameon=False, fontsize=9.5)
     fig.suptitle(
         "Au-dessus de 1 : alerte. La température ne dérive plus contre sa propre saison ; "
         "le choc sur les lags reste visible",
@@ -1031,7 +1032,7 @@ def e7_signals() -> None:
         fontweight="bold",
         fontsize=11,
     )
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.05, 1, 1))  # légende sous les quatre panneaux
     viz.save(fig, "e7_signaux")
 
 
@@ -1096,7 +1097,8 @@ def e8_quality() -> None:
     for bug, c in bugs:
         d = q[q["bug"] == bug]
         lw = 2.6 if bug == "aucun" else 1.6
-        axes[0].plot(d["date"], d["volume_ratio"], color=c, lw=lw, label=bug.replace("_", " "))
+        label = {"decalage_1h": "décalage d'1 h", "zone_muette": "zone muette"}.get(bug, bug)
+        axes[0].plot(d["date"], d["volume_ratio"], color=c, lw=lw, label=label)
         axes[1].plot(d["date"], d["profile_corr"], color=c, lw=lw)
         axes[2].plot(d["date"], d["zero_zones"], color=c, lw=lw)
     axes[0].axhspan(th["volume_low"], th["volume_high"], color=viz.GRID, alpha=0.5, lw=0)
@@ -1112,9 +1114,11 @@ def e8_quality() -> None:
             alpha=0.06,
             lw=0,
         )
+        ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
-    axes[0].legend(loc="lower left", fontsize=8)
-    fig.tight_layout()
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=5, frameon=False, fontsize=9)
+    fig.tight_layout(rect=(0, 0.08, 1, 1))  # légende sous les trois panneaux
     viz.save(fig, "e8_qualite")
 
 
