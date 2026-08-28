@@ -428,8 +428,10 @@ def e3_frontier() -> None:
         ax.set_title(title)
         ax.grid(axis="x")
     axes[0].set_ylabel("hausse de l'erreur estimée par DLE")
-    axes[0].annotate("estimé = réalisé", (0.17, 0.19), rotation=33, fontsize=9, color=viz.INK2)
-    axes[1].annotate("concept pur : DLE ne bouge pas", (0.20, 0.012), fontsize=9, color=viz.INK2)
+    axes[0].annotate("estimé = réalisé", (0.12, 0.19), rotation=33, fontsize=9, color=viz.INK2)
+    axes[1].annotate(
+        "concept pur : DLE ne bouge pas", (0.13, 0.03), fontsize=9, color=viz.INK2
+    )  # au-dessus des points à y = 0, sans dépasser le bord droit
     axes[0].legend(loc="upper left")
     fig.tight_layout()
     viz.save(fig, "e3_frontiere")
@@ -496,12 +498,15 @@ def e3_transition() -> None:
     t = d[d["scenario"] == "choc propagé x0.5"]
     t = t[(t.index >= ONSET - pd.Timedelta(days=14)) & (t.index < ONSET + pd.Timedelta(days=35))]
     fig, ax = plt.subplots(figsize=(11, 3.8))
-    for k, lab in [(1, "lag 24 h"), (7, "lag 168 h"), (14, "lag 336 h")]:
+    # annotations étagées : les traits à J+1 et J+7 sont trop proches pour une seule ligne
+    for (k, lab), yf in zip(
+        [(1, "lag 24 h"), (7, "lag 168 h"), (14, "lag 336 h")], (0.97, 0.88, 0.79), strict=True
+    ):
         x = ONSET + pd.Timedelta(days=k)
         ax.axvline(x, color=viz.GRID, lw=1)
         ax.annotate(
             f"{lab} absorbe le choc",
-            (x, 0.97),
+            (x, yf),
             xycoords=("data", "axes fraction"),
             xytext=(3, 0),
             textcoords="offset points",
@@ -701,8 +706,9 @@ def e5_trajectories() -> None:
     axes[0].legend(loc="upper right", ncols=5, fontsize=9)
     axes[0].annotate(
         "traits en bas : remplacements de modèle",
-        (0.01, 0.12),
+        (0.99, 0.10),  # à droite, sous les courbes (à gauche, la courbe de janvier passe ici)
         xycoords="axes fraction",
+        ha="right",
         fontsize=8.5,
         color=viz.INK2,
     )
@@ -944,14 +950,16 @@ def e0_conformal() -> None:
                 .set_index("period")
                 .loc[periods, "coverage"]
             )
-            ax.bar(x + (j - 1) * 0.26, 100 * v, width=0.25, color=col, label=f"calibration {m}")
+            lab = "sans calibration" if m == "aucune" else f"calibration {m}"
+            ax.bar(x + (j - 1) * 0.26, 100 * v, width=0.25, color=col, label=lab)
         ax.axhline(80, color=viz.ALERT, ls="--", lw=1)
         ax.set_xticks(x, ["fin de référence", "analysis 1-3 mois", "analysis 4-6 mois"])
         ax.set_title(title, fontsize=11)
     axes[0].set_ylabel("couverture de l'intervalle 80 % (%)")
     axes[0].set_ylim(40, 90)
-    axes[0].legend(loc="lower left", fontsize=8.5)
-    fig.tight_layout()
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=3, frameon=False, fontsize=9)
+    fig.tight_layout(rect=(0, 0.07, 1, 1))  # légende sous les deux panneaux
     viz.save(fig, "e0_conforme")
 
 
@@ -1017,7 +1025,8 @@ def e7_signals() -> None:
             ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
     axes[0, 0].set_ylabel("rapport au seuil")
     axes[1, 0].set_ylabel("rapport au seuil")
-    axes[0, 0].legend(loc="upper left", fontsize=8.5)
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=2, frameon=False, fontsize=9.5)
     fig.suptitle(
         "Au-dessus de 1 : alerte. La température ne dérive plus contre sa propre saison ; "
         "le choc sur les lags reste visible",
@@ -1026,7 +1035,7 @@ def e7_signals() -> None:
         fontweight="bold",
         fontsize=11,
     )
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.05, 1, 1))  # légende sous les quatre panneaux
     viz.save(fig, "e7_signaux")
 
 
@@ -1091,7 +1100,8 @@ def e8_quality() -> None:
     for bug, c in bugs:
         d = q[q["bug"] == bug]
         lw = 2.6 if bug == "aucun" else 1.6
-        axes[0].plot(d["date"], d["volume_ratio"], color=c, lw=lw, label=bug.replace("_", " "))
+        label = {"decalage_1h": "décalage d'1 h", "zone_muette": "zone muette"}.get(bug, bug)
+        axes[0].plot(d["date"], d["volume_ratio"], color=c, lw=lw, label=label)
         axes[1].plot(d["date"], d["profile_corr"], color=c, lw=lw)
         axes[2].plot(d["date"], d["zero_zones"], color=c, lw=lw)
     axes[0].axhspan(th["volume_low"], th["volume_high"], color=viz.GRID, alpha=0.5, lw=0)
@@ -1107,9 +1117,11 @@ def e8_quality() -> None:
             alpha=0.06,
             lw=0,
         )
+        ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
-    axes[0].legend(loc="lower left", fontsize=8)
-    fig.tight_layout()
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=5, frameon=False, fontsize=9)
+    fig.tight_layout(rect=(0, 0.08, 1, 1))  # légende sous les trois panneaux
     viz.save(fig, "e8_qualite")
 
 
