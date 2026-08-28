@@ -1,4 +1,4 @@
-.PHONY: help data weather panel test lint check e0 e1 e2 e3 e4 e5 experiments figures notebook registry dagster site all
+.PHONY: help data weather panel test lint check release-check e0 e1 e2 e3 e4 e5 experiments figures notebook registry dagster site all
 
 help:        ## Liste des cibles
 	@grep -E '^[a-z0-9]+:.*##' Makefile | sed 's/:.*##/ :/'
@@ -15,6 +15,16 @@ lint:
 typecheck:   ## Vérification du typage (mypy)
 	uv run mypy
 check: lint typecheck test
+release-check: check  ## Avant une version : régénération sans différence, rendu, liens
+	uv run python scripts/make_concept_figures.py
+	uv run python scripts/make_data_figures.py
+	uv run python scripts/make_result_figures.py
+	uv run python scripts/make_tables.py
+	uv run python scripts/make_interactive.py
+	uv run python scripts/make_api_docs.py
+	git diff --exit-code -- site/figures site/_tables site/_widgets site/reference-api.qmd
+	quarto render site
+	uv run python scripts/check_links.py
 e0:          ## E0 : qualité du modèle surveillé (≈ 6 min, MSTL inclus)
 	uv run python -m zonefleet.experiments.e0_model
 e1:          ## E1 : choc COVID, DLE estimé vs réalisé
