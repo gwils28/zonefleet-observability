@@ -496,12 +496,15 @@ def e3_transition() -> None:
     t = d[d["scenario"] == "choc propagé x0.5"]
     t = t[(t.index >= ONSET - pd.Timedelta(days=14)) & (t.index < ONSET + pd.Timedelta(days=35))]
     fig, ax = plt.subplots(figsize=(11, 3.8))
-    for k, lab in [(1, "lag 24 h"), (7, "lag 168 h"), (14, "lag 336 h")]:
+    # annotations étagées : les traits à J+1 et J+7 sont trop proches pour une seule ligne
+    for (k, lab), yf in zip(
+        [(1, "lag 24 h"), (7, "lag 168 h"), (14, "lag 336 h")], (0.97, 0.88, 0.79), strict=True
+    ):
         x = ONSET + pd.Timedelta(days=k)
         ax.axvline(x, color=viz.GRID, lw=1)
         ax.annotate(
             f"{lab} absorbe le choc",
-            (x, 0.97),
+            (x, yf),
             xycoords=("data", "axes fraction"),
             xytext=(3, 0),
             textcoords="offset points",
