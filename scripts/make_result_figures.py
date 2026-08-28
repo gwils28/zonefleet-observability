@@ -944,14 +944,16 @@ def e0_conformal() -> None:
                 .set_index("period")
                 .loc[periods, "coverage"]
             )
-            ax.bar(x + (j - 1) * 0.26, 100 * v, width=0.25, color=col, label=f"calibration {m}")
+            lab = "sans calibration" if m == "aucune" else f"calibration {m}"
+            ax.bar(x + (j - 1) * 0.26, 100 * v, width=0.25, color=col, label=lab)
         ax.axhline(80, color=viz.ALERT, ls="--", lw=1)
         ax.set_xticks(x, ["fin de référence", "analysis 1-3 mois", "analysis 4-6 mois"])
         ax.set_title(title, fontsize=11)
     axes[0].set_ylabel("couverture de l'intervalle 80 % (%)")
     axes[0].set_ylim(40, 90)
-    axes[0].legend(loc="lower left", fontsize=8.5)
-    fig.tight_layout()
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=3, frameon=False, fontsize=9)
+    fig.tight_layout(rect=(0, 0.07, 1, 1))  # légende sous les deux panneaux
     viz.save(fig, "e0_conforme")
 
 
