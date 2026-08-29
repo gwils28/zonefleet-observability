@@ -27,3 +27,24 @@ lire. Choisissez un parcours.
 
 Question à vous poser en sortant : pouvez-vous obtenir vos labels plus tôt que vos
 fournisseurs ne les publient ? C'est la seule parade au concept drift pur.
+
+## Construire le moniteur, en une heure
+
+1. **[Les trois horloges](concepts/trois-horloges.qmd)** (5 min) : émission, cible,
+   label ; tout délai de détection se mesure sur l'horloge de décision.
+2. **[DLE](concepts/dle.qmd)** puis **[types de dérive](concepts/types-de-derive.qmd)**
+   (10 min) : ce que la perte estimée peut voir, et ce qu'elle ne verra jamais.
+3. **[Dérive univariée](concepts/derive-univariee.qmd)** et
+   **[multivariée](concepts/derive-multivariee.qmd)** (10 min) : pourquoi la dérive
+   « nettoyée » se limite aux lags, et pourquoi la PCA seule ne suffit pas.
+4. **[Politiques d'alerte](concepts/politiques-alerte.qmd)** (10 min) : page, ticket,
+   incident données, et les seuils calibrés sur la référence.
+5. **[E4 : backtest du moniteur](experiences/e4-backtest.qmd)** (10 min) : rappel,
+   délai, fausses alertes sur 240 scénarios ; le moniteur se teste comme un modèle.
+6. **[Runbook](exploitation/runbook.qmd)** et **[rapport du matin](exploitation/rapport.qmd)**
+   (10 min) : quoi faire quand ça sonne.
+7. **[Dagster](mlops/dagster.qmd)** et **[registry](mlops/mlflow.qmd)** (5 min) : le
+   graphe d'assets, ses contrôles, le champion et son challenger.
+
+Pour manipuler sans lire : le [tutoriel DLE](notebooks/tutoriel-dle.ipynb) rejoue un
+covariate shift et un concept drift en quelques cellules.
