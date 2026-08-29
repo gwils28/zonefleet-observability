@@ -169,3 +169,21 @@ def test_clean_notebooks_strips_execution_metadata(tmp_path):
     assert clean(p) and not clean(p)
     back = nbformat.read(p, as_version=4)
     assert "execution" not in back.cells[0].metadata and back.cells[0].outputs
+
+
+def test_e10_load_scenarios_types(tmp_path, monkeypatch):
+    from zonefleet.experiments import e10_zones as E
+
+    pd.DataFrame(
+        {
+            "id": [0],
+            "kind": ["concept"],
+            "severity": [0.7],
+            "subset": ["cbd"],
+            "onset": ["2025-03-03"],
+        }
+    ).to_csv(tmp_path / "e4_scenarios.csv", index=False)
+    monkeypatch.setattr(E, "TABLES", tmp_path)
+    (sc,) = E.load_scenarios()
+    assert sc == E.Scen(0, "concept", 0.7, "cbd", pd.Timestamp("2025-03-03"))
+    assert isinstance(sc.onset, pd.Timestamp) and isinstance(sc.id, int)
