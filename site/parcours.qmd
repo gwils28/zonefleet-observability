@@ -1,0 +1,80 @@
+---
+title: "Par où commencer"
+description: "Trois parcours de lecture selon le temps dont vous disposez et ce que vous voulez en faire : décider, construire, reproduire."
+---
+
+Le site couvre une question (surveiller un forecaster dont la vérité arrive deux mois
+trop tard), dix expériences et leur mise en exploitation. Personne n'a besoin de tout
+lire. Choisissez un parcours.
+
+| Parcours | Durée | Pour | Vous repartez avec |
+|---|---|---|---|
+| [Décider](#décider-en-15-minutes) | 15 min | responsable produit ou technique | l'architecture recommandée et ses limites |
+| [Construire](#construire-le-moniteur-en-une-heure) | 1 h | ingénieur MLOps | les signaux, les seuils, les sévérités, le runbook |
+| [Reproduire](#reproduire-et-contester-en-une-journée) | 1 jour | data scientist, relecteur | les chiffres régénérés et les points à attaquer |
+
+## Décider, en 15 minutes
+
+1. **[Accueil](index.qmd)** (3 min) : la question, la réponse courte et la figure qui
+   résume le projet, la frontière entre covariate shift et concept drift.
+2. **[System design](system-design.qmd)**, la décision en dix lignes (5 min) : ce qu'il
+   faut surveiller pendant la fenêtre aveugle, quand pager, quand réentraîner.
+3. **[Rétrospective](retrospective.qmd)** (5 min) : ce qui a tenu, ce qui a cédé, ce qui
+   reste ouvert. C'est là que se trouvent les limites à connaître avant d'engager une
+   équipe.
+4. **[FAQ](faq.qmd)** (2 min, en diagonale) : les objections courantes et les chiffres
+   qui y répondent.
+
+Question à vous poser en sortant : pouvez-vous obtenir vos labels plus tôt que vos
+fournisseurs ne les publient ? C'est la seule parade au concept drift pur.
+
+## Construire le moniteur, en une heure
+
+1. **[Les trois horloges](concepts/trois-horloges.qmd)** (5 min) : émission, cible,
+   label ; tout délai de détection se mesure sur l'horloge de décision.
+2. **[DLE](concepts/dle.qmd)** puis **[types de dérive](concepts/types-de-derive.qmd)**
+   (10 min) : ce que la perte estimée peut voir, et ce qu'elle ne verra jamais.
+3. **[Dérive univariée](concepts/derive-univariee.qmd)** et
+   **[multivariée](concepts/derive-multivariee.qmd)** (10 min) : pourquoi la dérive
+   « nettoyée » se limite aux lags, et pourquoi la PCA seule ne suffit pas.
+4. **[Politiques d'alerte](concepts/politiques-alerte.qmd)** (10 min) : page, ticket,
+   incident données, et les seuils calibrés sur la référence.
+5. **[E4 : backtest du moniteur](experiences/e4-backtest.qmd)** (10 min) : rappel,
+   délai, fausses alertes sur 240 scénarios ; le moniteur se teste comme un modèle.
+6. **[Runbook](exploitation/runbook.qmd)** et **[rapport du matin](exploitation/rapport.qmd)**
+   (10 min) : quoi faire quand ça sonne.
+7. **[Dagster](mlops/dagster.qmd)** et **[registry](mlops/mlflow.qmd)** (5 min) : le
+   graphe d'assets, ses contrôles, le champion et son challenger.
+
+Pour manipuler sans lire : le [tutoriel DLE](notebooks/tutoriel-dle.ipynb) rejoue un
+covariate shift et un concept drift en quelques cellules.
+
+## Reproduire et contester, en une journée
+
+**Le matin : reproduire.**
+
+```bash
+git clone https://github.com/gwils28/zonefleet-observability && cd zonefleet-observability
+docker build -t zonefleet . && docker run --rm zonefleet make check   # ou uv sync --all-extras
+zonefleet list                       # les 17 expériences
+make e1 e3 e3s                       # COVID, frontière, stabilité selon les graines
+make release-check                   # toutes les figures et tables régénérées sans différence
+```
+
+Le panel agrégé est versionné : aucune donnée brute n'est nécessaire, sauf pour
+reconstruire le panel (`make data`, 3,6 Go).
+
+**L'après-midi : contester.** Les points les plus faibles, à attaquer en premier :
+
+1. **Le protocole** ([`SPEC.md`](https://github.com/gwils28/zonefleet-observability/blob/main/SPEC.md))
+   et ses **déviations**, toutes datées dans le [journal de bord](journal.qmd) : deux
+   variantes ont été ajoutées après coup (PSI par zone de E6, z-score de E7) et sont
+   étiquetées comme telles.
+2. **Les injections** ([E3](experiences/e3-frontiere.qmd)) : un concept drift « pur »
+   gèle les features, ce qui n'arrive jamais tout à fait en vrai ; le choc propagé est la
+   version réaliste.
+3. **Les seuils** ([E4 bis](experiences/e4-backtest.qmd)) : persistance, nuisance et
+   fenêtre varient un par un ; la conclusion « zéro fausse page » tient dès deux jours de
+   persistance.
+4. **Une seule ville** ([rétrospective](retrospective.qmd#ce-qui-reste-ouvert)) : rien
+   ne dit que k = 1 et deux jours de persistance se transposent ailleurs.

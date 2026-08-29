@@ -80,6 +80,8 @@ website:
           - href: exploitation/deploiement.qmd
       - text: À propos
         menu:
+          - href: parcours.qmd
+            text: Par où commencer
           - href: methode.qmd
           - href: journal.qmd
             text: Journal de bord
