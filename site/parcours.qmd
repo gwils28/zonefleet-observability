@@ -48,3 +48,33 @@ fournisseurs ne les publient ? C'est la seule parade au concept drift pur.
 
 Pour manipuler sans lire : le [tutoriel DLE](notebooks/tutoriel-dle.ipynb) rejoue un
 covariate shift et un concept drift en quelques cellules.
+
+## Reproduire et contester, en une journée
+
+**Le matin : reproduire.**
+
+```bash
+git clone https://github.com/gwils28/zonefleet-observability && cd zonefleet-observability
+docker build -t zonefleet . && docker run --rm zonefleet make check   # ou uv sync --all-extras
+zonefleet list                       # les 17 expériences
+make e1 e3 e3s                       # COVID, frontière, stabilité selon les graines
+make release-check                   # toutes les figures et tables régénérées sans différence
+```
+
+Le panel agrégé est versionné : aucune donnée brute n'est nécessaire, sauf pour
+reconstruire le panel (`make data`, 3,6 Go).
+
+**L'après-midi : contester.** Les points les plus faibles, à attaquer en premier :
+
+1. **Le protocole** ([`SPEC.md`](https://github.com/gwils28/zonefleet-observability/blob/main/SPEC.md))
+   et ses **déviations**, toutes datées dans le [journal de bord](journal.qmd) : deux
+   variantes ont été ajoutées après coup (PSI par zone de E6, z-score de E7) et sont
+   étiquetées comme telles.
+2. **Les injections** ([E3](experiences/e3-frontiere.qmd)) : un concept drift « pur »
+   gèle les features, ce qui n'arrive jamais tout à fait en vrai ; le choc propagé est la
+   version réaliste.
+3. **Les seuils** ([E4 bis](experiences/e4-backtest.qmd)) : persistance, nuisance et
+   fenêtre varient un par un ; la conclusion « zéro fausse page » tient dès deux jours de
+   persistance.
+4. **Une seule ville** ([rétrospective](retrospective.qmd#ce-qui-reste-ouvert)) : rien
+   ne dit que k = 1 et deux jours de persistance se transposent ailleurs.
