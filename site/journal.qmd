@@ -47,6 +47,10 @@ Le détail est dans `docs/notes/implementation.md`.
 | 2 août | E7 : z-score saisonnier, étiqueté a posteriori | PSI d'une journée contre 28 jours mal posé | température débarrassée de sa saison |
 | 4 août | E4 ter : périodes calmes supplémentaires, hors SPEC | une seule période calme mesurée | zéro page répliqué ; ticket « perte estimée seule » |
 | 5 août | panel étendu à 2021 | départager les politiques de réentraînement | résultats publiés identiques ; E5 bis |
+| 13 août | E10 : condition jointe par groupe de zones, hors SPEC | les dérives locales sont diluées à la ville | +4 points de rappel, toujours zéro fausse page |
+| 19 août | PSI journalier vectorisé | E10 durait 40 minutes | 92 secondes, résultats identiques à l'octet |
+| 25 août | E3 bis : stabilité selon les graines, hors SPEC | une seule graine publiée en E3 | conclusion stable ; nanny model découvert déterministe |
+| 27 août | textes alternatifs, contrôle de rendu durci | 53 images sans texte alternatif ; rendu en échec masqué en CI | site accessible ; CI qui échoue vraiment |
 
 ## Résultats imprévus
 
