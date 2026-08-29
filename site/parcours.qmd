@@ -1,0 +1,14 @@
+---
+title: "Par où commencer"
+description: "Trois parcours de lecture selon le temps dont vous disposez et ce que vous voulez en faire : décider, construire, reproduire."
+---
+
+Le site couvre une question (surveiller un forecaster dont la vérité arrive deux mois
+trop tard), dix expériences et leur mise en exploitation. Personne n'a besoin de tout
+lire. Choisissez un parcours.
+
+| Parcours | Durée | Pour | Vous repartez avec |
+|---|---|---|---|
+| [Décider](#décider-en-15-minutes) | 15 min | responsable produit ou technique | l'architecture recommandée et ses limites |
+| [Construire](#construire-le-moniteur-en-une-heure) | 1 h | ingénieur MLOps | les signaux, les seuils, les sévérités, le runbook |
+| [Reproduire](#reproduire-et-contester-en-une-journée) | 1 jour | data scientist, relecteur | les chiffres régénérés et les points à attaquer |
