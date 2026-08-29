@@ -12,3 +12,18 @@ lire. Choisissez un parcours.
 | [Décider](#décider-en-15-minutes) | 15 min | responsable produit ou technique | l'architecture recommandée et ses limites |
 | [Construire](#construire-le-moniteur-en-une-heure) | 1 h | ingénieur MLOps | les signaux, les seuils, les sévérités, le runbook |
 | [Reproduire](#reproduire-et-contester-en-une-journée) | 1 jour | data scientist, relecteur | les chiffres régénérés et les points à attaquer |
+
+## Décider, en 15 minutes
+
+1. **[Accueil](index.qmd)** (3 min) : la question, la réponse courte et la figure qui
+   résume le projet, la frontière entre covariate shift et concept drift.
+2. **[System design](system-design.qmd)**, la décision en dix lignes (5 min) : ce qu'il
+   faut surveiller pendant la fenêtre aveugle, quand pager, quand réentraîner.
+3. **[Rétrospective](retrospective.qmd)** (5 min) : ce qui a tenu, ce qui a cédé, ce qui
+   reste ouvert. C'est là que se trouvent les limites à connaître avant d'engager une
+   équipe.
+4. **[FAQ](faq.qmd)** (2 min, en diagonale) : les objections courantes et les chiffres
+   qui y répondent.
+
+Question à vous poser en sortant : pouvez-vous obtenir vos labels plus tôt que vos
+fournisseurs ne les publient ? C'est la seule parade au concept drift pur.
