@@ -93,3 +93,10 @@ groupe (CBD, hors CBD), oui : la condition jointe passe de 51 % à 55 % de rappe
 toujours sans fausse alerte. Pour le diagnostic, la lecture par zone sert (E6). Ce
 qui reste manqué est presque entièrement du concept drift local
 ([E10](experiences/e10-zones.qmd)).
+
+### « Comment savoir si les chiffres du site sont à jour ? »
+Chaque PR régénère les tables et graphiques interactifs depuis `results/` et échoue sur
+la moindre différence ; avant une version, `make release-check` régénère aussi toutes les
+figures et compare. Les chiffres cités dans le texte, eux, sont écrits à la main et
+relus contre ces tables : c'est le maillon le moins automatisé
+([méthode](methode.qmd)).
