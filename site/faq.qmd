@@ -97,5 +97,6 @@ qui reste manqué est presque entièrement du concept drift local
 ### « Comment savoir si les chiffres du site sont à jour ? »
 Chaque PR régénère les tables et graphiques interactifs depuis `results/` et échoue sur
 la moindre différence ; avant une version, `make release-check` régénère aussi toutes les
-figures et compare. Les chiffres du texte sont repris des tables, jamais tapés de mémoire
+figures et compare. Les chiffres cités dans le texte, eux, sont écrits à la main et
+relus contre ces tables : c'est le maillon le moins automatisé
 ([méthode](methode.qmd)).
