@@ -46,6 +46,19 @@ L'image Docker du dépôt (`docker build -t zonefleet .`) fige l'environnement p
 typage) et `make e1`, sans aucun cache, reproduit à l'identique les dates de décision et
 les délais publiés pour les six politiques.
 
+## Ce que la CI vérifie à chaque PR
+
+| Contrôle | Ce qu'il attrape |
+|---|---|
+| lint, typage (mypy sur tous les modules), 157 tests | régressions de code, fuites temporelles, égalité avec NannyML |
+| tables et graphiques interactifs régénérés depuis `results/` | un chiffre publié qui ne correspond plus aux résultats |
+| rendu complet du site (échec si Quarto échoue) | une page cassée, un YAML invalide |
+| liens, ancres, images et textes alternatifs du site rendu | un renvoi mort, une figure inaccessible |
+| absence de tiret cadratin | la règle typographique du projet |
+
+Avant une version, `make release-check` ajoute la régénération de toutes les figures
+(comparées octet par octet en local, pas en CI : leur rendu dépend des polices).
+
 ## Outils
 
 Python 3.12 (uv), LightGBM, NannyML, statsforecast, duckdb, Dagster, MLflow, Quarto,
