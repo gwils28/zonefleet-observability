@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "Pour citer ce travail, merci d'utiliser les métadonnées ci-dessous."
+title: "ZoneFleet : observabilité d'un forecaster de demande quand la vérité terrain arrive deux mois trop tard"
+type: software
+authors:
+  - family-names: Goma
+    given-names: Wilson
+repository-code: "https://github.com/gwils28/zonefleet-observability"
+url: "https://gwils28.github.io/zonefleet-observability/"
+license: MIT
+version: 1.0.0
+date-released: "2026-09-02"
+keywords:
+  - MLOps
+  - observabilité
+  - dérive de données
+  - performance estimée
+  - NannyML
+  - prévision de demande
