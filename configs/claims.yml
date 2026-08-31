@@ -165,3 +165,18 @@
   expr: >-
     (lambda s: pct(s.loc["semaine"], 1) + " de l'estimation contre " + pct(s.loc["jour"], 1))(
     t("e1_chunks_summary").set_index("chunk")["ci_rel_width_median"])
+
+- id: e7-psi-temperature
+  text: "99 % avant le COVID, 100 % en 2025"
+  files: [site/experiences/e7-saisonnier.qmd]
+  expr: >-
+    (lambda s: pct(s.query("split == 'covid'")["share_alert_before"].min()) + " avant le COVID, "
+    + pct(s.query("split == 'congestion'")["share_alert_after"].min()) + " en 2025")(
+    t("e7_summary").query("feature == 'temperature_2m' and signal.str.startswith('PSI')"))
+
+- id: e7-zscore-temperature-2025
+  text: "0,6 % des jours"
+  files: [site/experiences/e7-saisonnier.qmd]
+  expr: >-
+    pct(t("e7_summary").query("feature == 'temperature_2m' and signal == 'z-score saisonnier'"
+    " and split == 'congestion'")["share_alert_after"].iloc[0], 1) + " des jours"
