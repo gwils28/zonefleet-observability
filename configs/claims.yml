@@ -83,3 +83,64 @@
   expr: >-
     (lambda h: f"{(h['kind'] == 'concept').sum()} sur {len(h)}")(
     t("e10_results").query("harmful and subset != 'all' and policy == 'ville'"))
+
+- id: e1-22-mars-estime
+  text: "0,48 ; la perte réalisée"
+  files: [site/retrospective.qmd]
+  expr: >-
+    fr(t("e1_performance").query("metric == 'mae_log' and date == '2020-03-22'")
+    ["estimated"].iloc[0], 2) + " ; la perte réalisée"
+
+- id: e1-22-mars-realise
+  text: "vaut 1,75"
+  files: [site/retrospective.qmd]
+  expr: >-
+    "vaut " + fr(t("e1_performance").query("metric == 'mae_log' and date == '2020-03-22'")
+    ["realized"].iloc[0], 2)
+
+- id: e3bis-pire-covariate
+  text: "suit à 0,84"
+  files: [site/experiences/e3-frontiere.qmd]
+  expr: >-
+    "suit à " + fr(t("e3_seeds_summary").query("family == 'covariate nuisible'")["min"].min(), 2)
+
+- id: e4-rappel-p3b-fourchette
+  text: "45 à 51 %"
+  files: [site/faq.qmd]
+  expr: >-
+    (lambda s: fr(100 * s.loc[1], 0) + " à " + pct(s.loc[7]))(
+    t("e4_summary").query("policy == 'P3b_clean_and_dle' and k == 1.0").set_index("smooth")["recall"])
+
+- id: e4-rappel-dle
+  text: "contre 56 % pour DLE seul"
+  files: [site/faq.qmd]
+  expr: >-
+    "contre " + pct(t("e4_summary").query("policy == 'P2_dle' and k == 1.0 and smooth == 7")
+    ["recall"].iloc[0]) + " pour DLE seul"
+
+- id: e6-psi-zone
+  text: "AUC 0,46"
+  files: [site/faq.qmd]
+  expr: >-
+    "AUC " + fr(t("e6_auc").query("cas == 'choc propagé CBD' and signal == 'PSI lag_168'")
+    ["auc"].iloc[0], 2)
+
+- id: e9-erreur-temperature
+  text: "1,5 °C d'erreur moyenne"
+  files: [site/donnees/sources.qmd]
+  expr: fr(t("e9_forecast_error")["mae_temperature"].iloc[0], 1) + " °C d'erreur moyenne"
+
+- id: e9-reentraine-prevision
+  text: "0,99 %"
+  files: [site/faq.qmd]
+  expr: >-
+    fr(t("e9_variants").query("variant.str.startswith('c') and period == 'analysis'")
+    ["delta_mae_pct"].iloc[0], 2) + " %"
+
+- id: e4-plafond-sans-labels
+  # part des dérives nuisibles qui ne sont pas des concept drifts : le maximum visible sans labels
+  text: "environ 64 %"
+  files: [site/faq.qmd, site/experiences/e4-backtest.qmd]
+  expr: >-
+    "environ " + pct((t("e4_results").query("harmful and k == 1.0 and smooth == 7")
+    .drop_duplicates("id")["kind"] != "concept").mean())
