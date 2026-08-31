@@ -24,7 +24,9 @@ make check
 7. **Chaque figure a un texte alternatif** (`fig-alt`, ou `#| fig-alt:` entre guillemets
    dans une cellule de notebook) qui décrit ce qu'elle trace ; `scripts/check_links.py`
    refuse une image sans texte alternatif.
-8. **Les notebooks publiés sont nettoyés** après exécution (`scripts/clean_notebooks.py`,
+8. **Un chiffre clé cité dans la prose entre au registre** `configs/claims.yml`, avec
+   l'expression qui le recalcule depuis `results/tables` (`scripts/check_claims.py`).
+9. **Les notebooks publiés sont nettoyés** après exécution (`scripts/clean_notebooks.py`,
    lancé par `make notebook`) : pas d'horodatage ni de chemin local dans les sorties.
 
 ## Flux
