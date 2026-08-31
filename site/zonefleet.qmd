@@ -112,7 +112,7 @@ que la frontière de la performance estimée se lit ([E1](experiences/e1-covid.q
 3. **Dérive seule en ticket hebdomadaire**, pour ne pas perdre l'indice d'un concept
    drift naissant.
 4. **Réentraînement gardé**, toujours via champion/challenger ; il égale un calendrier
-   mensuel en régime de reprise avec 2,5 fois moins de remplacements
+   mensuel en régime de reprise avec 2,6 fois moins de remplacements
    ([E5 bis](experiences/e5-reentrainement.qmd#e5-bis-la-reprise-de-2021)), un fond
    trimestriel servant de filet en cas de choc.
 5. **Zones témoins et journal de la demande non servie** avant tout réentraînement sur
