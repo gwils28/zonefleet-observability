@@ -144,3 +144,39 @@
   expr: >-
     "environ " + pct((t("e4_results").query("harmful and k == 1.0 and smooth == 7")
     .drop_duplicates("id")["kind"] != "concept").mean())
+
+- id: e1-facteur-sous-estimation
+  text: "facteur 2,7"
+  files: [README.md]
+  expr: >-
+    "facteur " + fr(1 / t("e1_phases").query("metric == 'mae_log' and phase.str.startswith('choc')")
+    ["ratio_est_real"].iloc[0], 1)
+
+- id: e1bis-ic-semaine
+  text: "2,7 fois plus étroit"
+  files: [site/experiences/e1-covid.qmd]
+  expr: >-
+    (lambda s: fr(s.loc["jour"] / s.loc["semaine"], 1) + " fois plus étroit")(
+    t("e1_chunks_summary").set_index("chunk")["ci_rel_width_median"])
+
+- id: e1bis-ic-largeurs
+  text: "3,7 % de l'estimation contre 9,9 %"
+  files: [site/experiences/e1-covid.qmd]
+  expr: >-
+    (lambda s: pct(s.loc["semaine"], 1) + " de l'estimation contre " + pct(s.loc["jour"], 1))(
+    t("e1_chunks_summary").set_index("chunk")["ci_rel_width_median"])
+
+- id: e7-psi-temperature
+  text: "99 % avant le COVID, 100 % en 2025"
+  files: [site/experiences/e7-saisonnier.qmd]
+  expr: >-
+    (lambda s: pct(s.query("split == 'covid'")["share_alert_before"].min()) + " avant le COVID, "
+    + pct(s.query("split == 'congestion'")["share_alert_after"].min()) + " en 2025")(
+    t("e7_summary").query("feature == 'temperature_2m' and signal.str.startswith('PSI')"))
+
+- id: e7-zscore-temperature-2025
+  text: "0,6 % des jours"
+  files: [site/experiences/e7-saisonnier.qmd]
+  expr: >-
+    pct(t("e7_summary").query("feature == 'temperature_2m' and signal == 'z-score saisonnier'"
+    " and split == 'congestion'")["share_alert_after"].iloc[0], 1) + " des jours"
