@@ -23,6 +23,7 @@ release-check: check  ## Avant une version : régénération sans différence, r
 	uv run python scripts/make_interactive.py
 	uv run python scripts/make_api_docs.py
 	git diff --exit-code -- site/figures site/_tables site/_widgets site/reference-api.qmd
+	uv run python scripts/check_claims.py
 	quarto render site
 	uv run python scripts/check_links.py
 e0:          ## E0 : qualité du modèle surveillé (≈ 6 min, MSTL inclus)

@@ -52,6 +52,7 @@ les délais publiés pour les six politiques.
 |---|---|
 | lint, typage (mypy sur tous les modules), 157 tests | régressions de code, fuites temporelles, égalité avec NannyML |
 | tables et graphiques interactifs régénérés depuis `results/` | un chiffre publié qui ne correspond plus aux résultats |
+| registre des chiffres cités dans la prose (`configs/claims.yml`), recalculés | une phrase qui cite une valeur périmée ou mal arrondie |
 | rendu complet du site (échec si Quarto échoue) | une page cassée, un YAML invalide |
 | liens, ancres, images et textes alternatifs du site rendu | un renvoi mort, une figure inaccessible |
 | absence de tiret cadratin | la règle typographique du projet |

@@ -173,3 +173,11 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
 - Effet de bord trouvé : le rendu Quarto pouvait échouer sans faire échouer site-check
   (code de sortie masqué par `tee`) ; corrigé avec `pipefail`. Le vérificateur de liens
   refuse aussi les images sans texte alternatif.
+
+## 2026-08-31 : registre des chiffres cités
+
+- `configs/claims.yml` : 22 chiffres de la prose (README, accueil, rétrospective, FAQ,
+  system design, pages d'expérience), chacun avec l'expression qui le recalcule depuis
+  `results/tables`. Vérifié en CI et par `make release-check`.
+- Première exécution : un écart, « 2,5 fois moins de remplacements » (23 / 9 = 2,56),
+  corrigé en 2,6 dans le system design et la page ZoneFleet. Les 21 autres concordaient.

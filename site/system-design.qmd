@@ -27,7 +27,7 @@ description: "Décision d'architecture en 10 lignes, puis le raisonnement comple
    champion/challenger sur une fenêtre postérieure, promotion si gain ≥ 5 %.
 8. **Jamais de réentraînement réflexe** : à L = 60 jours, il apprend sur l'ancien monde ;
    sur 8 jours de labels, il apprend du bruit ; en régime de reprise, la politique gardée
-   égale un calendrier mensuel avec 2,5 fois moins de remplacements (E5 bis).
+   égale un calendrier mensuel avec 2,6 fois moins de remplacements (E5 bis).
 9. **Anti-boucle de rétroaction** : zones témoins à positionnement indépendant du
    modèle, journal de la demande non servie, refus d'apprendre sur une fenêtre pilotée
    à 100 % par le modèle.

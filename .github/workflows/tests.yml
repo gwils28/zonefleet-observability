@@ -37,3 +37,5 @@ jobs:
           uv run --frozen python scripts/make_interactive.py
       - name: Aucune différence avec le dépôt
         run: git diff --exit-code -- site/_tables site/_widgets
+      - name: Chiffres cités dans la prose, recalculés depuis results/
+        run: uv run --frozen python scripts/check_claims.py

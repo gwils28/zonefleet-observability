@@ -1,0 +1,146 @@
+# Chiffres cités dans la prose, recalculés depuis results/tables (scripts/check_claims.py).
+# text : tel qu'il apparaît ; files : où il est cité ; expr : recalcul (t, fr, pct).
+
+- id: e1-delai-dle
+  text: "9 jours"
+  files: [README.md, site/retrospective.qmd]
+  expr: fr(t("e1_detection").set_index("policy").loc["P2_dle", "delay_days"], 0) + " jours"
+
+- id: e1-delai-labels
+  text: "contre 62 avec"
+  files: [README.md, site/retrospective.qmd]
+  expr: '"contre " + fr(t("e1_detection").set_index("policy").loc["P4_realized", "delay_days"], 0) + " avec"'
+
+- id: e3-suivi-covariate
+  text: "0,85 à 0,99"
+  files: [README.md, site/retrospective.qmd, site/veille/nannyml.qmd]
+  expr: >-
+    (lambda s: fr(s.min(), 2) + " à " + fr(s.max(), 2))(
+    t("e3_summary").query("family.str.startswith('covariate')")["tracking_steady"])
+
+- id: e4-rappel-p3b
+  text: "51 %"
+  files: [README.md, site/retrospective.qmd, site/faq.qmd]
+  expr: >-
+    pct(t("e4_summary").query("policy == 'P3b_clean_and_dle' and k == 1.0 and smooth == 7")
+    ["recall"].iloc[0])
+
+- id: e10-rappel-groupes
+  text: "55 %"
+  files: [README.md, site/retrospective.qmd, site/faq.qmd]
+  expr: pct(t("e10_summary").set_index("policy").loc["par_groupe", "recall"])
+
+- id: e2-jours-derive
+  text: "177 jours"
+  files: [README.md, site/zonefleet.qmd]
+  expr: >-
+    str(int(t("e2_detection_by_group").query("policy == 'P1_drift'")["alert_days_after"].max()))
+    + " jours"
+
+- id: e5-calendrier-contre-garde
+  text: "0,363 contre 0,411"
+  files: [site/retrospective.qmd, site/system-design.qmd]
+  expr: >-
+    (lambda d: fr(d.loc["calendrier"], 3) + " contre " + fr(d.loc["gardé"], 3))(
+    t("e5_summary").query("delay == 1").set_index("policy")["13 mars-31 déc."])
+
+- id: e5bis-remplacements-garde
+  text: "9 remplacements"
+  files: [README.md, site/retrospective.qmd]
+  expr: >-
+    str(int(t("e5_reprise_summary").query("delay == 1").set_index("policy").loc["gardé", "retrains"]))
+    + " remplacements"
+
+- id: e5bis-ratio-remplacements
+  text: "2,6 fois moins de remplacements"
+  files: [site/system-design.qmd, site/zonefleet.qmd]
+  expr: >-
+    (lambda d: fr(d.loc["calendrier"] / d.loc["gardé"], 1) + " fois moins de remplacements")(
+    t("e5_reprise_summary").query("delay == 1").set_index("policy")["retrains"])
+
+- id: e6-spearman-covid
+  text: "0,74"
+  files: [README.md, site/faq.qmd, site/concepts/dle.qmd, site/experiences/e6-localisation.qmd]
+  expr: fr(t("e6_real_correlations").set_index("cas").loc["COVID", "spearman_est_real"], 2)
+
+- id: e9-mae-prevision-arrondi
+  text: "0,1 %"
+  files: [README.md, site/faq.qmd, site/modele/e0.qmd, site/experiences/e9-meteo.qmd]
+  expr: >-
+    fr(t("e9_variants").query("variant.str.startswith('b') and period == 'analysis'")
+    ["delta_mae_pct"].iloc[0], 1) + " %"
+
+- id: e9-mae-prevision
+  text: "0,08 %"
+  files: [site/retrospective.qmd, site/faq.qmd]
+  expr: >-
+    fr(t("e9_variants").query("variant.str.startswith('b') and period == 'analysis'")
+    ["delta_mae_pct"].iloc[0], 2) + " %"
+
+- id: e10-derives-locales-concept
+  text: "26 sur 27"
+  files: [site/retrospective.qmd]
+  expr: >-
+    (lambda h: f"{(h['kind'] == 'concept').sum()} sur {len(h)}")(
+    t("e10_results").query("harmful and subset != 'all' and policy == 'ville'"))
+
+- id: e1-22-mars-estime
+  text: "0,48 ; la perte réalisée"
+  files: [site/retrospective.qmd]
+  expr: >-
+    fr(t("e1_performance").query("metric == 'mae_log' and date == '2020-03-22'")
+    ["estimated"].iloc[0], 2) + " ; la perte réalisée"
+
+- id: e1-22-mars-realise
+  text: "vaut 1,75"
+  files: [site/retrospective.qmd]
+  expr: >-
+    "vaut " + fr(t("e1_performance").query("metric == 'mae_log' and date == '2020-03-22'")
+    ["realized"].iloc[0], 2)
+
+- id: e3bis-pire-covariate
+  text: "suit à 0,84"
+  files: [site/experiences/e3-frontiere.qmd]
+  expr: >-
+    "suit à " + fr(t("e3_seeds_summary").query("family == 'covariate nuisible'")["min"].min(), 2)
+
+- id: e4-rappel-p3b-fourchette
+  text: "45 à 51 %"
+  files: [site/faq.qmd]
+  expr: >-
+    (lambda s: fr(100 * s.loc[1], 0) + " à " + pct(s.loc[7]))(
+    t("e4_summary").query("policy == 'P3b_clean_and_dle' and k == 1.0").set_index("smooth")["recall"])
+
+- id: e4-rappel-dle
+  text: "contre 56 % pour DLE seul"
+  files: [site/faq.qmd]
+  expr: >-
+    "contre " + pct(t("e4_summary").query("policy == 'P2_dle' and k == 1.0 and smooth == 7")
+    ["recall"].iloc[0]) + " pour DLE seul"
+
+- id: e6-psi-zone
+  text: "AUC 0,46"
+  files: [site/faq.qmd]
+  expr: >-
+    "AUC " + fr(t("e6_auc").query("cas == 'choc propagé CBD' and signal == 'PSI lag_168'")
+    ["auc"].iloc[0], 2)
+
+- id: e9-erreur-temperature
+  text: "1,5 °C d'erreur moyenne"
+  files: [site/donnees/sources.qmd]
+  expr: fr(t("e9_forecast_error")["mae_temperature"].iloc[0], 1) + " °C d'erreur moyenne"
+
+- id: e9-reentraine-prevision
+  text: "0,99 %"
+  files: [site/faq.qmd]
+  expr: >-
+    fr(t("e9_variants").query("variant.str.startswith('c') and period == 'analysis'")
+    ["delta_mae_pct"].iloc[0], 2) + " %"
+
+- id: e4-plafond-sans-labels
+  # part des dérives nuisibles qui ne sont pas des concept drifts : le maximum visible sans labels
+  text: "environ 64 %"
+  files: [site/faq.qmd, site/experiences/e4-backtest.qmd]
+  expr: >-
+    "environ " + pct((t("e4_results").query("harmful and k == 1.0 and smooth == 7")
+    .drop_duplicates("id")["kind"] != "concept").mean())
