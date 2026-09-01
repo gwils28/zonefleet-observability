@@ -38,6 +38,16 @@ make check
 - Messages de commit au format Conventional Commits (`feat`, `fix`, `docs`, `test`,
   `exp`, `ci`, `build`, `chore`, `refactor`, `perf`, `data`).
 
+## Publier une version
+
+1. `make release-check` sur un clone propre : aucune différence, aucun écart.
+2. Section de la version dans `CHANGELOG.md`, version dans `pyproject.toml` (et
+   `uv lock`), `CITATION.cff`, pied de page du site ; PR, CI verte, fusion.
+3. Tag annoté sur `main` : `git tag -a vX.Y.Z -m "Version X.Y.Z"` puis `git push origin vX.Y.Z`.
+4. Le workflow `release` crée la release GitHub avec la section du CHANGELOG
+   (`scripts/release_notes.py`) et y joint deux archives : `results/tables` avec le
+   registre des chiffres, et le site rendu.
+
 ## Structure du code
 
 | Module | Rôle |
