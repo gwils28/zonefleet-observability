@@ -6,7 +6,8 @@ Chaque entrée du registre donne le texte cité, les fichiers qui le citent et u
 expression Python qui recalcule ce texte depuis les tables. Échec si la valeur recalculée
 diffère du texte, ou si un fichier ne contient plus le texte (espaces et retours à la
 ligne normalisés). Les expressions sont celles du dépôt, évaluées avec : `t(nom)` (table
-de results/tables), `fr(x, d)` (format français) et `pct(x)` (proportion en « 51 % »).
+de results/tables), `fr(x, d)` (format français), `pct(x)` (proportion en « 51 % ») et
+`n_claims` (taille du registre).
 """
 
 from __future__ import annotations
@@ -45,7 +46,7 @@ def normalize(text: str) -> str:
 
 def check(claims: list[dict], root: Path = ROOT) -> list[str]:
     errors = []
-    env = {"t": t, "fr": fr, "pct": pct, "pd": pd}
+    env = {"t": t, "fr": fr, "pct": pct, "pd": pd, "n_claims": len(claims)}
     for c in claims:
         got = str(eval(c["expr"], env))  # noqa: S307 (expressions du dépôt)
         if got != c["text"]:
