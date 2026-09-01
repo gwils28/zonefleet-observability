@@ -215,3 +215,9 @@
   expr: >-
     (lambda r: f"volume entre {fr(r.volume_low, 2)} et {fr(r.volume_high, 2)} fois la médiane, "
     f"corrélation du profil au-dessus de {fr(r.profile_min, 3)}")(t("e8_thresholds").iloc[0])
+
+- id: registre-taille
+  # le registre se compte lui-même : la phrase qui annonce sa taille ne peut plus se périmer
+  text: "33 chiffres"
+  files: [README.md, CHANGELOG.md, site/methode.qmd, site/journal.qmd]
+  expr: f"{n_claims} chiffres"

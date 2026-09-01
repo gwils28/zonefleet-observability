@@ -85,7 +85,7 @@ tests/                   tests (anti-fuite, contrat, pureté des injections, ég
 ## Vérifier
 
 Chaque PR passe le lint, le typage, les 160 tests, la régénération des tables depuis
-`results/` (aucune différence admise), le recalcul des 27 chiffres clés cités dans la
+`results/` (aucune différence admise), le recalcul des 33 chiffres clés cités dans la
 prose (`configs/claims.yml`), le rendu du site et la vérification de ses liens, ancres et
 textes alternatifs. Avant une version, `make release-check` ajoute la régénération de
 toutes les figures.

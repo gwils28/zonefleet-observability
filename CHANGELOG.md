@@ -21,7 +21,7 @@ toutes les déviations et extensions sont datées dans `docs/notes/implementatio
 - Un site Quarto de plus de 45 pages, trois notebooks, trois parcours de lecture.
 
 ### Ajouté depuis 0.10
-- Registre des chiffres cités dans la prose (`configs/claims.yml`, 27 chiffres recalculés
+- Registre des chiffres cités dans la prose (`configs/claims.yml`, 33 chiffres recalculés
   à chaque PR) ; premier écart trouvé et corrigé (2,6 fois moins de remplacements, pas
   2,5).
 - Job CI de reproductibilité (tables régénérées sans différence) ; `make release-check`.

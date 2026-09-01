@@ -48,7 +48,7 @@ décision et les délais publiés pour les six politiques.
 
 Vérifié pour la version 1.0 sur un clone neuf du dépôt : `make release-check` passe en
 une minute et demie (toutes les figures et tables régénérées sans aucune différence,
-27 chiffres de la prose recalculés, rendu du site, 0 lien cassé).
+33 chiffres de la prose recalculés, rendu du site, 0 lien cassé).
 
 ## Ce que la CI vérifie à chaque PR
 

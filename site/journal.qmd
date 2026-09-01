@@ -84,6 +84,6 @@ Deux mois après le protocole, la version 1.0 fige l'état du projet :
 - `SPEC.md` est resté intact depuis le 2 juillet ; dix expériences et leurs variantes
   sont publiées, chaque extension étiquetée comme telle.
 - Tout ce qui est publié se régénère : figures, tables, graphiques interactifs, référence
-  d'API, et 27 chiffres clés de la prose recalculés depuis `results/` ; vérifié sur un
+  d'API, et 33 chiffres clés de la prose recalculés depuis `results/` ; vérifié sur un
   clone neuf du dépôt et dans un conteneur vierge.
 - Ce qui reste ouvert est listé dans la [rétrospective](retrospective.qmd#ce-qui-reste-ouvert).
