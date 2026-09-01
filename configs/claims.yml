@@ -13,21 +13,21 @@
 
 - id: e3-suivi-covariate
   text: "0,85 à 0,99"
-  files: [README.md, site/retrospective.qmd, site/veille/nannyml.qmd]
+  files: [README.md, CHANGELOG.md, site/retrospective.qmd, site/veille/nannyml.qmd]
   expr: >-
     (lambda s: fr(s.min(), 2) + " à " + fr(s.max(), 2))(
     t("e3_summary").query("family.str.startswith('covariate')")["tracking_steady"])
 
 - id: e4-rappel-p3b
   text: "51 %"
-  files: [README.md, site/retrospective.qmd, site/faq.qmd]
+  files: [README.md, CHANGELOG.md, site/retrospective.qmd, site/faq.qmd]
   expr: >-
     pct(t("e4_summary").query("policy == 'P3b_clean_and_dle' and k == 1.0 and smooth == 7")
     ["recall"].iloc[0])
 
 - id: e10-rappel-groupes
   text: "55 %"
-  files: [README.md, site/retrospective.qmd, site/faq.qmd]
+  files: [README.md, CHANGELOG.md, site/retrospective.qmd, site/faq.qmd]
   expr: pct(t("e10_summary").set_index("policy").loc["par_groupe", "recall"])
 
 - id: e2-jours-derive
@@ -53,7 +53,7 @@
 
 - id: e5bis-ratio-remplacements
   text: "2,6 fois moins de remplacements"
-  files: [site/system-design.qmd, site/zonefleet.qmd]
+  files: [CHANGELOG.md, site/system-design.qmd, site/zonefleet.qmd]
   expr: >-
     (lambda d: fr(d.loc["calendrier"] / d.loc["gardé"], 1) + " fois moins de remplacements")(
     t("e5_reprise_summary").query("delay == 1").set_index("policy")["retrains"])
