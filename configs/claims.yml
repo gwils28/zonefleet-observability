@@ -180,3 +180,38 @@
   expr: >-
     pct(t("e7_summary").query("feature == 'temperature_2m' and signal == 'z-score saisonnier'"
     " and split == 'congestion'")["share_alert_after"].iloc[0], 1) + " des jours"
+
+- id: e5-reflexe-contre-inaction
+  text: "(0,565) est **plus mauvais que l'inaction** (0,524)"
+  files: [site/experiences/e5-reentrainement.qmd]
+  expr: >-
+    (lambda d: f"({fr(d.loc['réflexe'], 3)}) est **plus mauvais que l'inaction** ({fr(d.loc['jamais'], 3)})")(
+    t("e5_summary").query("delay == 1").set_index("policy")["13 mars-31 déc."])
+
+- id: e5-reflexe-coince
+  text: "0,53 contre 0,40"
+  files: [site/experiences/e5-reentrainement.qmd]
+  expr: >-
+    (lambda d: fr(d.loc["réflexe"], 2) + " contre " + fr(d.loc["jamais"], 2))(
+    t("e5_summary").query("delay == 1").set_index("policy")["second semestre"])
+
+- id: e5bis-2021
+  text: "MAE log 0,264 contre 0,261"
+  files: [site/experiences/e5-reentrainement.qmd]
+  expr: >-
+    (lambda d: "MAE log " + fr(d.loc["gardé"], 3) + " contre " + fr(d.loc["calendrier"], 3))(
+    t("e5_reprise_summary").query("delay == 1").set_index("policy")["2021"])
+
+- id: e5bis-2021-l60
+  text: "0,269 contre 0,270"
+  files: [site/experiences/e5-reentrainement.qmd]
+  expr: >-
+    (lambda d: fr(d.loc["gardé"], 3) + " contre " + fr(d.loc["calendrier"], 3))(
+    t("e5_reprise_summary").query("delay == 60").set_index("policy")["2021"])
+
+- id: e8-seuils
+  text: "volume entre 0,68 et 1,38 fois la médiane, corrélation du profil au-dessus de 0,915"
+  files: [site/experiences/e8-qualite.qmd]
+  expr: >-
+    (lambda r: f"volume entre {fr(r.volume_low, 2)} et {fr(r.volume_high, 2)} fois la médiane, "
+    f"corrélation du profil au-dessus de {fr(r.profile_min, 3)}")(t("e8_thresholds").iloc[0])
