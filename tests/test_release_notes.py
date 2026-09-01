@@ -15,6 +15,8 @@ Première version.
 
 ## [0.10.0] - 2026-08-26
 - avant
+
+[1.0.0]: https://example.org/compare/v0.10.0...v1.0.0
 """
 
 
