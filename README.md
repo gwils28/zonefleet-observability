@@ -2,6 +2,7 @@
 
 [![tests](https://github.com/gwils28/zonefleet-observability/actions/workflows/tests.yml/badge.svg)](https://github.com/gwils28/zonefleet-observability/actions/workflows/tests.yml)
 [![site](https://github.com/gwils28/zonefleet-observability/actions/workflows/publish.yml/badge.svg)](https://gwils28.github.io/zonefleet-observability/)
+[![version](https://img.shields.io/github/v/release/gwils28/zonefleet-observability?label=version)](https://github.com/gwils28/zonefleet-observability/releases/latest)
 
 Observabilité d'un forecaster de demande **zone x heure** (taxis de New York) dont la
 vérité terrain arrive avec 24 heures d'horizon puis **60 jours** de délai de publication.
