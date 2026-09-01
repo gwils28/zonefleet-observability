@@ -61,7 +61,7 @@ Sans installer Python localement :
 
 ```bash
 docker build -t zonefleet .
-docker run --rm zonefleet make check            # 144 tests, lint, typage
+docker run --rm zonefleet make check            # 160 tests, lint, typage
 docker run --rm zonefleet make e1               # une expérience sur le panel versionné
 ```
 
@@ -82,6 +82,14 @@ site/                    site Quarto (figures et tables générées, jamais à l
 tests/                   tests (anti-fuite, contrat, pureté des injections, égalité NannyML)
 ```
 
+## Vérifier
+
+Chaque PR passe le lint, le typage, les 160 tests, la régénération des tables depuis
+`results/` (aucune différence admise), le recalcul des 27 chiffres clés cités dans la
+prose (`configs/claims.yml`), le rendu du site et la vérification de ses liens, ancres et
+textes alternatifs. Avant une version, `make release-check` ajoute la régénération de
+toutes les figures.
+
 ## Méthode
 
 Le protocole est figé dans `SPEC.md` ; chaque écart est daté et justifié dans
@@ -89,6 +97,10 @@ Le protocole est figé dans `SPEC.md` ; chaque écart est daté et justifié dan
 figures et tables sont générées par script. Les résultats imprévus (la taxe de congestion
 ne dégrade pas le modèle, la PCA ne voit pas le COVID, un calendrier mensuel bat la
 politique de réentraînement gardée) sont rapportés tels quels.
+
+## Citer
+
+Voir [`CITATION.cff`](CITATION.cff) (bouton « Cite this repository » sur GitHub).
 
 ## Licence
 

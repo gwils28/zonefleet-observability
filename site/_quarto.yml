@@ -97,7 +97,7 @@ website:
         href: https://github.com/gwils28/zonefleet-observability
   page-footer:
     left: "Wilson Goma · MLOps et observabilité des modèles de prévision"
-    right: "Construit avec [Quarto](https://quarto.org)"
+    right: "Version 1.0.0 · [journal des versions](https://github.com/gwils28/zonefleet-observability/blob/main/CHANGELOG.md) · construit avec [Quarto](https://quarto.org)"
 
 format:
   html:

@@ -42,9 +42,13 @@ l'historique des PR :
 ## Reproduire ailleurs
 
 L'image Docker du dépôt (`docker build -t zonefleet .`) fige l'environnement par
-`uv.lock`. Vérifié dans un conteneur vierge : `make check` passe (134 tests, lint,
-typage) et `make e1`, sans aucun cache, reproduit à l'identique les dates de décision et
-les délais publiés pour les six politiques.
+`uv.lock`. Vérifié dans un conteneur vierge : `make check` passe (lint, typage des 42
+modules, 160 tests) et `make e1`, sans aucun cache, reproduit à l'identique les dates de
+décision et les délais publiés pour les six politiques.
+
+Vérifié pour la version 1.0 sur un clone neuf du dépôt : `make release-check` passe en
+une minute et demie (toutes les figures et tables régénérées sans aucune différence,
+27 chiffres de la prose recalculés, rendu du site, 0 lien cassé).
 
 ## Ce que la CI vérifie à chaque PR
 

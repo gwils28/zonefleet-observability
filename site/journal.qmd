@@ -76,3 +76,14 @@ Six résultats contredisent l'intuition de départ ; ils sont rapportés tels qu
 - ~~Remplacer la météo réalisée par une vraie prévision à 24 h~~ : fait, sans effet mesurable ([E9](experiences/e9-meteo.qmd)).
 - ~~Conformaliser les quantiles~~ : fait (E0 bis), garantie non tenue hors régime calme.
 - ~~Localiser la dérive par zone~~ : fait ([E6](experiences/e6-localisation.qmd)).
+
+## Version 1.0 (2 septembre)
+
+Deux mois après le protocole, la version 1.0 fige l'état du projet :
+
+- `SPEC.md` est resté intact depuis le 2 juillet ; dix expériences et leurs variantes
+  sont publiées, chaque extension étiquetée comme telle.
+- Tout ce qui est publié se régénère : figures, tables, graphiques interactifs, référence
+  d'API, et 27 chiffres clés de la prose recalculés depuis `results/` ; vérifié sur un
+  clone neuf du dépôt et dans un conteneur vierge.
+- Ce qui reste ouvert est listé dans la [rétrospective](retrospective.qmd#ce-qui-reste-ouvert).

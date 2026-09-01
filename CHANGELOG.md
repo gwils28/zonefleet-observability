@@ -4,6 +4,35 @@ Format inspiré de *Keep a Changelog*. Les dates sont celles de fusion dans `mai
 
 ## [Non publié]
 
+## [1.0.0] - 2026-09-02
+
+Première version stable. Le protocole (`SPEC.md`) n'a pas changé depuis le 2 juillet ;
+toutes les déviations et extensions sont datées dans `docs/notes/implementation.md`.
+
+### Ce que contient la 1.0
+- Un forecaster LightGBM à trois quantiles sur 60 zones x heure (NYC TLC), surveillé sans
+  labels pendant 61 jours de fenêtre aveugle.
+- Dix expériences et leurs variantes (E0 à E10, `zonefleet list`) : la perte estimée suit
+  un covariate shift (taux de suivi 0,85 à 0,99) et reste aveugle à un concept drift pur
+  (0,00) ; la condition jointe « dérive nettoyée ET perte estimée » détecte 51 % des
+  dérives nuisibles (55 % par groupe de zones) sans aucune fausse page.
+- Une mise en exploitation de démonstration : graphe Dagster avec quatre contrôles,
+  registry MLflow champion / challenger, rapport du matin, runbook, CLI.
+- Un site Quarto de plus de 45 pages, trois notebooks, trois parcours de lecture.
+
+### Ajouté depuis 0.10
+- Registre des chiffres cités dans la prose (`configs/claims.yml`, 27 chiffres recalculés
+  à chaque PR) ; premier écart trouvé et corrigé (2,6 fois moins de remplacements, pas
+  2,5).
+- Job CI de reproductibilité (tables régénérées sans différence) ; `make release-check`.
+- Vérificateur des liens, ancres, images et textes alternatifs du site rendu.
+- Textes alternatifs pour les 53 images du site ; figure de E10 ; page « Par où
+  commencer » ; CITATION.cff.
+### Corrigé depuis 0.10
+- Sept défauts visuels de figures (trou météo, légendes, annotations).
+- `site-check` pouvait passer malgré un rendu en échec (`pipefail`).
+- Valeurs YAML des textes alternatifs des notebooks (rendu cassé par « : »).
+
 ## [0.10.0] - 2026-08-26
 ### Ajouté
 - E10 : condition jointe par groupe de zones (CBD, hors CBD), 55 % de rappel sans fausse

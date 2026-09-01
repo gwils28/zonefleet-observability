@@ -1,6 +1,6 @@
 [project]
 name = "zonefleet"
-version = "0.10.0"
+version = "1.0.0"
 description = "Observabilité d'un forecaster de demande zone x heure (NYC TLC) : dérive, performance estimée sans labels, déclencheurs de réentraînement."
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
