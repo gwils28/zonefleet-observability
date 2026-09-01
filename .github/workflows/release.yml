@@ -1,0 +1,32 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - name: Notes de version (section du CHANGELOG)
+        run: python3 scripts/release_notes.py "${GITHUB_REF_NAME}" > notes.md
+      - name: Archives des résultats et du site rendu
+        run: |
+          set -o pipefail
+          quarto render site 2>&1 | tail -3
+          tar -czf "zonefleet-resultats-${GITHUB_REF_NAME}.tar.gz" results/tables configs/claims.yml
+          tar -czf "zonefleet-site-${GITHUB_REF_NAME}.tar.gz" -C site _site
+      - name: Release GitHub (créée si absente) et pièces jointes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1 || \
+            gh release create "${GITHUB_REF_NAME}" --verify-tag \
+              --title "ZoneFleet ${GITHUB_REF_NAME}" --notes-file notes.md
+          gh release upload "${GITHUB_REF_NAME}" --clobber \
+            "zonefleet-resultats-${GITHUB_REF_NAME}.tar.gz" "zonefleet-site-${GITHUB_REF_NAME}.tar.gz"
