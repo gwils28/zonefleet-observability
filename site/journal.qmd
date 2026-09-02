@@ -87,3 +87,5 @@ Deux mois après le protocole, la version 1.0 fige l'état du projet :
   d'API, et 33 chiffres clés de la prose recalculés depuis `results/` ; vérifié sur un
   clone neuf du dépôt et dans un conteneur vierge.
 - Ce qui reste ouvert est listé dans la [rétrospective](retrospective.qmd#ce-qui-reste-ouvert).
+- Notes de version et archives (tables de résultats, site rendu) :
+  [release v1.0.0](https://github.com/gwils28/zonefleet-observability/releases/tag/v1.0.0).

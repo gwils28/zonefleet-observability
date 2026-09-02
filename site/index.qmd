@@ -11,7 +11,9 @@ l'arrivée des labels, et savoir **où cette mesure devient un mensonge** ?
 
 ::: {.callout-tip appearance="simple"}
 Plus de 45 pages : [**par où commencer**](parcours.qmd) propose trois parcours, de
-15 minutes à une journée.
+15 minutes à une journée. Version 1.0 :
+[notes et archives](https://github.com/gwils28/zonefleet-observability/releases/tag/v1.0.0)
+(tables de résultats, site rendu).
 :::
 
 Ce site documente un projet complet sur données réelles : un forecaster de demande de

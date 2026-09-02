@@ -14,10 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def section(changelog: str, version: str) -> str | None:
-    """Texte entre « ## [version] » et l'en-tête de version suivant, sans l'en-tête."""
-    m = re.search(
-        rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## \[|\Z)", changelog, re.M | re.S
-    )
+    """Texte entre « ## [version] » et l'en-tête suivant (ou les liens), sans l'en-tête."""
+    # fin de section : version suivante, ou définitions de liens en bas de fichier
+    pattern = rf"^## \[{re.escape(version)}\][^\n]*\n(.*?)(?=^## \[|^\[[^\]]+\]: |\Z)"
+    m = re.search(pattern, changelog, re.M | re.S)
     return m.group(1).strip() + "\n" if m else None
 
 

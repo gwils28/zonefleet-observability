@@ -181,3 +181,12 @@ Chaque entrée : date, décision, raison, impact sur les résultats.
   `results/tables`. Vérifié en CI et par `make release-check`.
 - Première exécution : un écart, « 2,5 fois moins de remplacements » (23 / 9 = 2,56),
   corrigé en 2,6 dans le system design et la page ZoneFleet. Les 21 autres concordaient.
+
+## 2026-09-01 : vérifications de la version 1.0
+
+- Clone neuf du dépôt : `make release-check` en 94 s, aucune différence sur les figures,
+  tables, graphiques interactifs et référence d'API ; registre des chiffres sans écart ;
+  0 lien cassé. Image Docker construite depuis ce clone : lint, typage, 160 tests.
+- Site publié contrôlé dans le navigateur : version en pied de page, chiffres corrigés
+  en ligne, textes alternatifs présents.
+- `SPEC.md` : un seul commit, le 2 juillet.
