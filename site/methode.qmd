@@ -43,7 +43,7 @@ l'historique des PR :
 
 L'image Docker du dépôt (`docker build -t zonefleet .`) fige l'environnement par
 `uv.lock`. Vérifié dans un conteneur vierge : `make check` passe (lint, typage des 42
-modules, 160 tests) et `make e1`, sans aucun cache, reproduit à l'identique les dates de
+modules, plus de 160 tests) et `make e1`, sans aucun cache, reproduit à l'identique les dates de
 décision et les délais publiés pour les six politiques.
 
 Vérifié pour la version 1.0 sur un clone neuf du dépôt : `make release-check` passe en
@@ -54,7 +54,7 @@ une minute et demie (toutes les figures et tables régénérées sans aucune dif
 
 | Contrôle | Ce qu'il attrape |
 |---|---|
-| lint, typage (mypy sur tous les modules), 157 tests | régressions de code, fuites temporelles, égalité avec NannyML |
+| lint, typage (mypy sur tous les modules), plus de 160 tests | régressions de code, fuites temporelles, égalité avec NannyML |
 | tables et graphiques interactifs régénérés depuis `results/` | un chiffre publié qui ne correspond plus aux résultats |
 | registre des chiffres cités dans la prose (`configs/claims.yml`), recalculés | une phrase qui cite une valeur périmée ou mal arrondie |
 | rendu complet du site (échec si Quarto échoue) | une page cassée, un YAML invalide |

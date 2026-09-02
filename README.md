@@ -62,7 +62,7 @@ Sans installer Python localement :
 
 ```bash
 docker build -t zonefleet .
-docker run --rm zonefleet make check            # 160 tests, lint, typage
+docker run --rm zonefleet make check            # plus de 160 tests, lint, typage
 docker run --rm zonefleet make e1               # une expérience sur le panel versionné
 ```
 
@@ -85,7 +85,7 @@ tests/                   tests (anti-fuite, contrat, pureté des injections, ég
 
 ## Vérifier
 
-Chaque PR passe le lint, le typage, les 160 tests, la régénération des tables depuis
+Chaque PR passe le lint, le typage, plus de 160 tests, la régénération des tables depuis
 `results/` (aucune différence admise), le recalcul des 33 chiffres clés cités dans la
 prose (`configs/claims.yml`), le rendu du site et la vérification de ses liens, ancres et
 textes alternatifs. Avant une version, `make release-check` ajoute la régénération de
