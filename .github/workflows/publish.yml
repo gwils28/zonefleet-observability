@@ -23,7 +23,7 @@ jobs:
       - uses: quarto-dev/quarto-actions/setup@v2
       - name: Rendu (figures et notebooks pré-calculés, aucune exécution)
         run: quarto render site
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site/_site
   deploy:
